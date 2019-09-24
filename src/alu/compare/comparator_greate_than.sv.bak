@@ -4,7 +4,7 @@
 module comparator_greater_than #(parameter N = 32)
 (input logic[N-1:0] a,b,
  output logic gtu,eq);
-    localparam int level = $clog2(N) + 1;
+    parameter int level = $clog2(N) + 1;
     logic[N-1:0] internal_equ[level];
     logic[N-1:0] internal_greater[level];
 
