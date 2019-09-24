@@ -1,7 +1,7 @@
 `ifndef  MODULE_STAGE_MEMORY__
 `define  MODULE_STAGE_MEMORY__ 
 
-`include "common/selector.sv"
+`include "src/common/selector.sv"
 
 import selector::mem_read_type;
 module stage_memory #(parameter N = 32)
