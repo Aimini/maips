@@ -1,4 +1,4 @@
-package opcode;
+package main_opcode;
 
 typedef enum logic[5:0] {
     RTYPE    = 6'b000000,
@@ -11,8 +11,8 @@ typedef enum logic[5:0] {
     BGTZ     = 6'b000111,
     ADDI     = 6'b001000,
     ADDIU    = 6'b001001,
-    STLI     = 6'b001010,
-    STLIU    = 6'b001011,
+    SLTI     = 6'b001010,
+    SLTIU    = 6'b001011,
     ANDI     = 6'b001100,
     ORI      = 6'b001101,
     XORI     = 6'b001110,
@@ -42,5 +42,5 @@ typedef enum logic[5:0] {
     // CACHE    = 6'b101111,
     LL       = 6'b110000,
     SC       = 6'b111000
-} encode;
-endpackage : opcode
+} opcode;
+endpackage : main_opcode
