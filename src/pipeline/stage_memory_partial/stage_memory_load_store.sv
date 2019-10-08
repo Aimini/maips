@@ -12,7 +12,7 @@ module stage_memory_load_store #(parameter N = 32)
     input selector::mem_write_type write_mode,
     input logic write_mem,
     /* interact with memory */
-    memory_interface.memory mif,
+    memory_interface.controller mif,
     /* pipeline output to next stage*/
     input logic[N-1:0] data_in,
     input logic[N-1:0] addr_in,

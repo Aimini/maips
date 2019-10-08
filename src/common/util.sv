@@ -19,5 +19,10 @@ module freq_divder(input logic clk,input logic[2:0] select,output logic clko);
     assign clko = select_clks[select];
 endmodule
 
+module sign_extend #(parameter NI = 16,parameter NO = 32)
+(input logic[NI - 1:0] i, output logic[NO - 1:0] o);
+    assign o =  {{NO - NI{i[NI - 1]}},i};
+endmodule
+
 
 `endif

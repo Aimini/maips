@@ -8,11 +8,13 @@ interface memory_interface #(parameter N = 32);
     logic[NN - 1:0] mask;
     logic write;
     logic busy;
-    modport  controller (input dout,  
-                         output din, addr, mask, write, busy);
 
-    modport  memory(input  dout, addr, mask, write, busy,
-                    output din);
+    modport  controller (input dout, busy,
+                        output din, mask, addr, write );
+    modport memory(input din, mask, addr, write,
+                  output  dout, busy);
+
+   modport  simple_memory(input din, addr, write, output dout);
 endinterface: memory_interface
 
 `endif

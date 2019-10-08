@@ -10,8 +10,8 @@ typedef struct{
     selector::register_source reg_src;
     selector::mem_read_type read_mode;
     selector::mem_write_type write_mode;
-
-
+    selector::operand_use opd_use;
+    
     selector::execption_check_t exc_chk;
     logic write_reg;
     logic write_cp0;

@@ -5,8 +5,9 @@
 `include "src/pipeline/decoder/main_decoder.sv"
 `include "src/common/encode/main_opcode.sv"
 `include "src/memory/register_file.sv"
+`include "src/pipeline/forward/main_forwarder.sv"
 
-module stage_decode(pipeline_interface.port pif);
+module stage_decode(pipeline_interface.port pif,input forward_info_t forward);
 
     signals::unpack_t unpack;
     signals::control_t ctl;
@@ -37,8 +38,8 @@ module stage_decode(pipeline_interface.port pif);
         reconnect.nullify = pif.nullify;
         reconnect.stall = pif.stall;
         
-        pif.signal_out.rs = rs;
-        pif.signal_out.rt = rt;
+        pif.signal_out.rs = forward.forward_rs ? forward.rs : rs;
+        pif.signal_out.rt = forward.forward_rt ? forward.rt : rt;
         pif.signal_out.control = ctl;
         
         pif.signal_out.pc = reconnect.signal_out.pc;

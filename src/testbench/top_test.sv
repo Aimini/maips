@@ -20,11 +20,11 @@ module top_test();
 
     initial begin
         reset = 1;
-        @(posedge clk) begin
+        @(negedge clk) begin
             reset = 1;
         end
         
-        @(posedge clk) begin
+        @(negedge clk) begin
             reset = 0;
         end
     end

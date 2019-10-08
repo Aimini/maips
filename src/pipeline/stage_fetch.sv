@@ -4,7 +4,7 @@ module stage_fetch(
  input logic[31:0]  pc_in,
  input logic[31:0]  idata,
  output logic[31:0] iaddr, input logic wait_memory,
- output logic[31:0] instruction,pc,pc_add4);
+ output logic[31:0] instruction, pc, pc_add4);
     logic[31:0] pc_reg;
 
     assign pc = pc_reg;

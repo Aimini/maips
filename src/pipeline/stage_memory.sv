@@ -7,7 +7,7 @@
 `include "src/pipeline/stage_memory_partial/stage_memory_load_store.sv"
 
 module stage_memory(pipeline_interface.port pif,
-    memory_interface.memory mif,
+    memory_interface.controller mif,
     output logic address_error);
 
     logic[31:0] mem_data_out,mem_data_in,mem_addr;

@@ -9,10 +9,10 @@ module rtype_decoder(input logic[31:0] instruction,output signals::control_t ctl
     signals::unpack_t  unpack;
     extract_instruction unit_ei(instruction,unpack);
     always_comb begin
-        ctl = '{selector::ALU_NCARE,     selector::ALU_SRCA_RS,   selector::ALU_SRCB_RT,
-                selector::DEST_REG_RD,   selector::PC_SRC_NEXT,   selector::FLAG_NCARE,
-                selector::REG_SRC_NCARE, selector::MEM_READ_NCARE,selector::MEM_WRITE_NCARE,
-                selector::EXC_CHK_NONE,
+        ctl = '{selector::ALU_NCARE,        selector::ALU_SRCA_RS,   selector::ALU_SRCB_RT,
+                selector::DEST_REG_RD,      selector::PC_SRC_NEXT,   selector::FLAG_NCARE,
+                selector::REG_SRC_NCARE,    selector::MEM_READ_NCARE,selector::MEM_WRITE_NCARE,
+                selector::OPERAND_USE_BOTH, selector::EXC_CHK_NONE,
                 1'b1,1'b0,1'b0,1'b0,1'b0};
         case(unpack.funct)
             rtype::SYSCALL: begin

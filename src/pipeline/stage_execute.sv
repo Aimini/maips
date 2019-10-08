@@ -9,9 +9,10 @@
 `include "src/pipeline/stage_execute_partial/dest_reg_mux.sv"
 `include "src/alu/alu.sv"
 `include "src/common/util.sv"
-`include "src/common/sign_extend.sv"
+`include "src/pipeline/forward/main_forwarder.sv"
 
 module stage_execute(pipeline_interface.port pif,
+input forward_info_t forward,
 input logic[31:0] hi,lo, //forward
 input logic llbit); //forward
 
@@ -81,8 +82,8 @@ input logic llbit); //forward
         dest_reg_select = pif.signal_out.control.dest_reg;
         alu_sa = unpack.sa;
         
-        rs_data    =  pif.signal_out.rs;
-        rt_data    =  pif.signal_out.rt;
+        rs_data    =  forward.forward_rs ?forward.rs : pif.signal_out.rs;
+        rt_data    =  forward.forward_rt ?forward.rt : pif.signal_out.rt;
         pcadd4 = pif.signal_out.pcadd4;
         cp0    = pif.signal_out.cp0;
 
