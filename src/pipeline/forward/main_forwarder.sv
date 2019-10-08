@@ -71,12 +71,12 @@ execute_forward_info
         decode_forward_info.forward_rt = '0;
         decode_forward_info.rt = 'x;
         if(ps_write_back.control.write_reg  & ps_write_back.dest_reg != 0) begin
-            if(execute_unpack.rs == ps_write_back.dest_reg) begin
+            if(decode_unpack.rs == ps_write_back.dest_reg) begin
                 decode_forward_info.forward_rs = '1;
                 decode_forward_info.rs = ps_write_back.dest_reg_data;
             end
 
-            if(execute_unpack.rt == ps_write_back.dest_reg) begin
+            if(decode_unpack.rt == ps_write_back.dest_reg) begin
                 decode_forward_info.forward_rt = '1;
                 decode_forward_info.rt = ps_write_back.dest_reg_data;
             end 
