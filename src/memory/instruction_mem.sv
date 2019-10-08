@@ -4,7 +4,5 @@ output logic[width - 1:0] dout);
     logic[width - 1:0] im[2**addr_wdith - 1:0];
     assign dout = im[addr];
 
-    initial begin
-        $readmemh("asm/test.asm.hextext",im);
-    end
+
 endmodule

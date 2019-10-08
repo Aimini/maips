@@ -15,9 +15,9 @@ module stage_decode(pipeline_interface.port pif,input forward_info_t forward);
     logic [31:0] dest_reg_data;
     logic [31:0] rs,rt;
     logic write_reg;
-    pipeline_interface reconnect(.clk(pif.clk),.reset(pif.reset));;
+    pipeline_interface reconnect(.clk(pif.clk),.reset(pif.reset));
 
-    pipeline_base unit_pb(reconnect);
+    pipeline_base unit_pb(.pif(reconnect),.nullify_instruction('1));
 
     main_decoder uint_decoder(pif.signal_out.instruction, ctl);
 
@@ -44,8 +44,9 @@ module stage_decode(pipeline_interface.port pif,input forward_info_t forward);
         
         pif.signal_out.pc = reconnect.signal_out.pc;
         pif.signal_out.pcadd4 = reconnect.signal_out.pcadd4;
+        pif.signal_out.pcjump = {pif.signal_out.pcadd4[31:28],pif.signal_out.instruction[25:0],2'b00};
         pif.signal_out.instruction = reconnect.signal_out.instruction;
-
+        
         dest_reg = pif.signal_in.dest_reg;
         dest_reg_data = pif.signal_in.dest_reg_data;
         write_reg  = pif.signal_in.control.write_reg;

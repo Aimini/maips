@@ -6,7 +6,7 @@ module stage_write_back(pipeline_interface.port pif);
     
     pipeline_interface reconnect(.clk(pif.clk),.reset(pif.reset));
 
-    pipeline_base unit_pb(reconnect);
+    pipeline_base unit_pb(.pif(reconnect),.nullify_instruction('0));
     always_comb begin
         reconnect.signal_in = pif.signal_in;
         reconnect.nullify = pif.nullify;

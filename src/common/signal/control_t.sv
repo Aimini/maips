@@ -21,10 +21,10 @@ typedef struct{
 
 function control_t nullify_control(input control_t ctl);
     ctl.exc_chk = selector::EXC_CHK_NONE;
-    ctl.write_mem = 0;
-    ctl.write_reg = 0;
-    ctl.write_cp0 = 0;
-    ctl.di = 0;
-    ctl.ie = 0;
+    ctl.write_mem = '0;
+    ctl.write_reg = '0;
+    ctl.write_cp0 = '0;
+    ctl.di = '0;
+    ctl.ie = '0;
     return ctl;
 endfunction

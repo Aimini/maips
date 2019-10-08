@@ -32,9 +32,9 @@ memory_interface.memory ins_i,data_i);
 
     logic[31:0] user_ins_offset;
      logic[31:0] user_ins_out;
-    // 1K user text
-    instruction_mem #(10,32) unit_ins_rom(
-        .addr(user_ins_offset[11:2]),
+    // 1M * 4byte user text
+    instruction_mem #(20,32) unit_ins_rom(
+        .addr(user_ins_offset[21:2]),
         .dout(user_ins_out));
 
      always_comb begin

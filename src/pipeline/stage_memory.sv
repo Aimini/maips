@@ -18,7 +18,7 @@ module stage_memory(pipeline_interface.port pif,
 
     pipeline_interface reconnect(.clk(pif.clk),.reset(pif.reset));
 
-    pipeline_base unit_pb(reconnect);
+    pipeline_base unit_pb(.pif(reconnect),.nullify_instruction('0));
 
     stage_memory_load_store #(32) unit_load_store
         (.read_mode(read_mode),.write_mode(write_mode),

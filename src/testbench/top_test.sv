@@ -10,7 +10,7 @@ module top_test();
 
     top unit_top(clk,reset);
 
-    logic reg_v0;
+    logic[31:0] reg_v0;
     selector::execption_check_t exc_chk;
 
     always_comb begin
@@ -20,6 +20,7 @@ module top_test();
 
     initial begin
         reset = 1;
+        $readmemh("asm/test_j_jal.asm.hextext",unit_top.unit_memory.unit_ins_rom.im);
         @(negedge clk) begin
             reset = 1;
         end

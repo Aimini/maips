@@ -6,7 +6,7 @@
 `include "src/pipeline/stage_memory.sv"
 `include "src/pipeline/stage_write_back.sv"
 `include "src/pipeline/forward/main_forwarder.sv"
-
+`include "src/pipeline/pipeline_flow_controller.sv"
 module core(input logic clk,reset,
 memory_interface.controller ins_mif, data_mif);
 
@@ -17,10 +17,14 @@ memory_interface.controller ins_mif, data_mif);
     pif_write_back(.clk(clk),.reset(reset));
 
     logic address_error;
+    logic load_pc;
+    logic[31:0] pc_value;
+
 
     stage_fetch unit_fetch(.clk(clk),.reset(reset),
-    .stall(1'b0),.nullify(1'b0),.load(1'b0),.pc_in(0),
-    .iaddr(ins_mif.addr),.idata(ins_mif.dout),
+    .stall(1'b0), .nullify(1'b0),
+    .load(load_pc), .pc_in(pc_value),
+    .iaddr(ins_mif.addr), .idata(ins_mif.dout),
     .wait_memory(ins_mif.busy),
     .instruction(pif_decode.signal_in.instruction),
     .pc(pif_decode.signal_in.pc),
@@ -34,6 +38,15 @@ memory_interface.controller ins_mif, data_mif);
     .ps_write_back(pif_write_back.signal_out),
     .decode_forward_info(decode_forward_info),
     .execute_forward_info(execute_forward_info));
+
+    pipeline_flow_controller unit_flow_controller
+    (.ps_decode(pif_decode.signal_out),
+    .ps_execute(pif_execute.signal_out),
+    .ps_memory(pif_memory.signal_out),
+    .ps_write_back(pif_write_back.signal_out),
+    .load(load_pc),
+    .pc(pc_value),
+    .nullify_fetch(pif_decode.nullify));
 
     stage_decode unit_decode(.pif(pif_decode),
         .forward(decode_forward_info));
@@ -58,7 +71,6 @@ memory_interface.controller ins_mif, data_mif);
         pif_decode.signal_in.dest_reg_data = pif_write_back.signal_out.dest_reg_data;
         pif_decode.signal_in.control.write_reg = pif_write_back.signal_out.control.write_reg;
 
-        pif_decode.nullify = 0;
         pif_execute.nullify = 0;
         pif_memory.nullify = 0;
         pif_write_back.nullify = 0;

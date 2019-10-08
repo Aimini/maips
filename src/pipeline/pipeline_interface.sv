@@ -11,6 +11,7 @@ typedef struct
     signals::flag_t flag;
     logic[31:0] pc,pcadd4; //fetch
     logic[31:0] instruction,rs,rt,cp0; //decode
+    logic[31:0] pcjump;
     logic[31:0] alu_out,dest_reg_data; //execute
     logic[31:0] mem_data;  // memory
     logic[4:0]  dest_reg; //fetch->write_back
