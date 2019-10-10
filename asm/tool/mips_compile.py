@@ -13,12 +13,12 @@ def pre_process(rfilename,mars_filename,sim_fliename):
         find_my_sysall(fr.readlines(),mfw,sfw)
 
 def find_my_sysall(lines,mwfp,swfp):
-    state = 0;
+    state = 0
     # 0 normal , 1 find my_syscall 2, else,
     for one in lines:
-        s =  one.strip();
+        s =  one.strip()
         if state == 0 and s == "###--my_syscall":
-            state = 1;
+            state = 1
         if state == 1:
             if s == "###--else":
                 state = 2
@@ -48,10 +48,9 @@ if len(sys.argv) > 1:
     pdir = namepath.parent
     tmpdir = pdir / "temp"
     run_by_mars = tmpdir / ("mars_" + name)
-    dump_to_modelsim = tmpdir / ("modelsim _" + name)
+    dump_to_modelsim = tmpdir / ("modelsim_" + name)
 
-    pre_process(namepath, run_by_mars, dump_to_modelsim);
-
+    pre_process(namepath, run_by_mars, dump_to_modelsim)
 
     hextextdir = tmpdir/ "{0}.hextext".format(name)
     special_dumpdir = tmpdir/ "{0}.spec.hextext".format(name)

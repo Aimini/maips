@@ -20,6 +20,7 @@ typedef struct{
 } control_t;
 
 function control_t nullify_control(input control_t ctl);
+    ctl.pc_src  = selector::PC_SRC_NEXT;
     ctl.exc_chk = selector::EXC_CHK_NONE;
     ctl.write_mem = '0;
     ctl.write_reg = '0;

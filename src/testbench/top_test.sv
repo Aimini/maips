@@ -11,16 +11,22 @@ module top_test();
     top unit_top(clk,reset);
 
     logic[31:0] reg_v0;
+    logic[31:0] reg_a0;
+    logic[31:0] reg_a1;
+    logic[31:0] reg_file[31:0];
     selector::execption_check_t exc_chk;
 
     always_comb begin
-        reg_v0  =  unit_top.unit_core.unit_decode.unit_rf.file[2];
+        reg_file = unit_top.unit_core.unit_decode.unit_rf.file;
+        reg_v0  =  reg_file[2];
+        reg_a0  = reg_file[4];
+        reg_a1  = reg_file[5];
         exc_chk =  unit_top.unit_core.pif_decode.signal_out.control.exc_chk;
     end
 
     initial begin
         reset = 1;
-        $readmemh("asm/test_j_jal.asm.hextext",unit_top.unit_memory.unit_ins_rom.im);
+        $readmemh("asm/temp/beq_bne.asm.hextext",unit_top.unit_memory.unit_ins_rom.im);
         @(negedge clk) begin
             reset = 1;
         end
@@ -32,9 +38,20 @@ module top_test();
 
     always @(posedge clk) begin
         if(exc_chk == selector::EXC_CHK_SYSCALL) begin
-                $info("syscall with $v0 = %0d",reg_v0);
-                if(reg_v0 == 10)
-                    $finish;
-            end
+            $info("syscall with $v0 = %0d",reg_v0);
+            case(reg_v0) 
+               
+                10: $finish;
+                100: begin
+                    assert(reg_a0 == reg_a1)
+                    else $error("assert fail! %8h(a0) != %8h(a1)",reg_a0,reg_a1);
+                end 
+
+                101:begin
+                    assert(reg_a0 != reg_a1)
+                    else $error("assert fail! %8h(a0) == %8h(a1)",reg_a0,reg_a1);
+                end
+            endcase
+        end
     end
 endmodule

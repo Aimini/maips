@@ -13,14 +13,16 @@ next1:
     addi $s3,$0,-5
     bne  $s2,$s3,wrong
     beq  $s2,$s3,next2
+    beq  $s2,$s3,wrong
     j wrong
     j wrong
 next2:
     addi $s5, $0,-32768 # min immed
     addi $s6, $0,32767  #max immed
-    beq  $s5, $6, wrong
-    bne  $s5, $6, end
-
+    beq  $s5, $s6, wrong
+    bne  $s5, $s6, end
+    bne  $s5, $s6, wrong
+    bne  $s5, $s6, wrong
 wrong:
     addi $a0,$0, -12321
     j   end

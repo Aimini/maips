@@ -8,7 +8,7 @@ import signals::*;
 module comparator #(parameter N = 5)
 (input logic[N-1:0] a,b,
  output signals::compare_t signal);
-    comparator_user #(N) cmp(a,b,signal);
+    comparator_system #(N) cmp(a,b,signal);
 endmodule
 
 module comparator_system #(parameter N = 32)

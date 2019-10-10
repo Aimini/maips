@@ -43,7 +43,21 @@ execute_forward_info
         execute_forward_info.rs = 'x;  
         execute_forward_info.forward_rt = '0;
         execute_forward_info.rt =  'x;
-        if(ps_memory.control.write_reg & ps_memory.dest_reg != 0) begin
+
+
+        if(ps_write_back.dest_reg != 0 & ps_write_back.control.write_reg) begin
+            if(execute_unpack.rs == ps_write_back.dest_reg) begin
+                execute_forward_info.forward_rs = '1;
+                execute_forward_info.rs = ps_write_back.dest_reg_data;
+            end
+
+            if(execute_unpack.rt == ps_write_back.dest_reg) begin
+                execute_forward_info.forward_rt = '1;
+                execute_forward_info.rt = ps_write_back.dest_reg_data;
+            end
+        end
+
+        if(ps_memory.dest_reg != 0 & ps_memory.control.dest_reg) begin
             if(execute_unpack.rs == ps_memory.dest_reg) begin
                 execute_forward_info.forward_rs = '1;
                 execute_forward_info.rs = ps_memory.dest_reg_data;
@@ -53,19 +67,8 @@ execute_forward_info
                 execute_forward_info.forward_rt = '1;
                 execute_forward_info.rt = ps_memory.dest_reg_data;
             end 
-        end else begin
-            if(ps_write_back.control.write_reg  & ps_write_back.dest_reg != 0) begin
-                if(execute_unpack.rs == ps_write_back.dest_reg) begin
-                    execute_forward_info.forward_rs = '1;
-                    execute_forward_info.rs = ps_write_back.dest_reg_data;
-                end
-
-                if(execute_unpack.rt == ps_write_back.dest_reg) begin
-                    execute_forward_info.forward_rt = '1;
-                    execute_forward_info.rt = ps_write_back.dest_reg_data;
-                end
-            end
         end
+
         decode_forward_info.forward_rs = '0;
         decode_forward_info.rs = 'x;
         decode_forward_info.forward_rt = '0;

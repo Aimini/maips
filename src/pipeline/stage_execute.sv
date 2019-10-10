@@ -19,6 +19,8 @@ input logic llbit); //forward
     logic[31:0] alu_a,alu_b;
     logic[4:0] alu_sa; 
     logic[15:0] immed;
+    logic[31:0] sign_immed;
+
     selector::alu_sourceA src_a;
     selector::alu_sourceB src_b;
     signals::flag_t alu_flag;  
@@ -28,15 +30,18 @@ input logic llbit); //forward
     selector::register_source reg_src;
     logic[31:0] pcadd4,cp0,rs_data,rt_data;/*,rs,hi,lo,cp0;*/
     logic[31:0] dest_reg_data,alu_out;
-    logic flag;//,llbit;
+    logic flag_selected;//,llbit;
     
     selector::destnation_regiter dest_reg_select;
     logic[4:0] dest_reg;
 
 
-    extract_instruction uint_ei(pif.signal_out.instruction, unpack);
+    extract_instruction unit_ei(pif.signal_out.instruction, unpack);
 
-    alu #(32) uint_alu(.a(alu_a),.b(alu_b),.sa(alu_sa),
+    sign_extend #(.NI(16),.NO(32)) 
+    unit_sign_extend(.i(immed << 2),.o(sign_immed));
+
+    alu #(32) unit_alu(.a(alu_a),.b(alu_b),.sa(alu_sa),
     .funct(pif.signal_out.control.alu_funct),
     .y(alu_out),
     .flag(alu_flag));
@@ -51,11 +56,11 @@ input logic llbit); //forward
         .reg_src(reg_src),
         .alu_out(alu_out),.pcadd4(pcadd4),.rs(rs_data),
         .hi(hi),.lo(lo),.cp0(cp0),
-        .flag(flag),.llbit(llbit),
+        .flag(flag_selected),.llbit(llbit),
         .data(dest_reg_data));
 
     compare_flag_mux unit_cmp_flag_mux(
-        .select(fs), .f(alu_flag.compare),.o(flag));
+        .select(fs), .f(alu_flag.compare),.o(flag_selected));
 
     dest_reg_mux unit_dest_reg_mux(.select(dest_reg_select),
         .rd(unpack.rd), .rt(unpack.rt),
@@ -74,6 +79,8 @@ input logic llbit); //forward
         pif.signal_out.dest_reg_data = dest_reg_data;
         pif.signal_out.alu_out = alu_out;
         pif.signal_out.dest_reg = dest_reg;
+        pif.signal_out.flag_selected = flag_selected;
+        pif.signal_out.pc_branch = pif.signal_out.pcadd4 + sign_immed;
 
         fs    =  pif.signal_out.control.flag_sel;
         src_a =  pif.signal_out.control.alu_srcA;

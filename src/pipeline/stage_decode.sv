@@ -19,9 +19,9 @@ module stage_decode(pipeline_interface.port pif,input forward_info_t forward);
 
     pipeline_base unit_pb(.pif(reconnect),.nullify_instruction('1));
 
-    main_decoder uint_decoder(pif.signal_out.instruction, ctl);
+    main_decoder unit_decoder(pif.signal_out.instruction, ctl);
 
-    extract_instruction uint_ei(pif.signal_out.instruction, unpack);
+    extract_instruction unit_ei(pif.signal_out.instruction, unpack);
     
     register_file #(.out(2), .addr(5), .width(32))
      unit_rf(.clk(pif.clk), .reset(pif.reset),

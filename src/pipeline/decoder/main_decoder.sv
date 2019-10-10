@@ -38,7 +38,7 @@ module main_decoder(input logic[31:0] instruction,output signals::control_t ctl)
             end
             
             main_opcode::BEQ,  main_opcode::BNE,
-            main_opcode::BLEZ, main_opcode::BGTZ,
+            main_opcode::BLEZ, main_opcode::BGTZ, //rt are hard encoding as $0
             main_opcode::BEQL, main_opcode::BNEL,
             main_opcode::BLEZL,main_opcode::BGTZL: begin
                 {ctl.pc_src,  ctl.alu_srcA,

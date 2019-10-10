@@ -46,7 +46,8 @@ memory_interface.controller ins_mif, data_mif);
     .ps_write_back(pif_write_back.signal_out),
     .load(load_pc),
     .pc(pc_value),
-    .nullify_fetch(pif_decode.nullify));
+    .nullify_decode(pif_decode.nullify),
+    .nullify_execute(pif_execute.nullify));
 
     stage_decode unit_decode(.pif(pif_decode),
         .forward(decode_forward_info));
@@ -71,7 +72,6 @@ memory_interface.controller ins_mif, data_mif);
         pif_decode.signal_in.dest_reg_data = pif_write_back.signal_out.dest_reg_data;
         pif_decode.signal_in.control.write_reg = pif_write_back.signal_out.control.write_reg;
 
-        pif_execute.nullify = 0;
         pif_memory.nullify = 0;
         pif_write_back.nullify = 0;
 
