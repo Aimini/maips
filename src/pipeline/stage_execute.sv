@@ -74,6 +74,9 @@ input logic llbit); //forward
         reconnect.nullify = pif.nullify;
         reconnect.stall = pif.stall;
 
+        rs_data    =  forward.forward_rs ?forward.rs : reconnect.signal_out.rs;
+        rt_data    =  forward.forward_rt ?forward.rt : reconnect.signal_out.rt;
+
         pif.signal_out = reconnect.signal_out;
         pif.signal_out.flag = alu_flag;
         pif.signal_out.dest_reg_data = dest_reg_data;
@@ -81,7 +84,9 @@ input logic llbit); //forward
         pif.signal_out.dest_reg = dest_reg;
         pif.signal_out.flag_selected = flag_selected;
         pif.signal_out.pc_branch = pif.signal_out.pcadd4 + sign_immed;
-
+        pif.signal_out.rs = rs_data;
+        pif.signal_out.rt = rt_data;
+        
         fs    =  pif.signal_out.control.flag_sel;
         src_a =  pif.signal_out.control.alu_srcA;
         src_b =  pif.signal_out.control.alu_srcB;
@@ -89,8 +94,7 @@ input logic llbit); //forward
         dest_reg_select = pif.signal_out.control.dest_reg;
         alu_sa = unpack.sa;
         
-        rs_data    =  forward.forward_rs ?forward.rs : pif.signal_out.rs;
-        rt_data    =  forward.forward_rt ?forward.rt : pif.signal_out.rt;
+        
         pcadd4 = pif.signal_out.pcadd4;
         cp0    = pif.signal_out.cp0;
 

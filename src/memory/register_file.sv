@@ -14,7 +14,7 @@ module register_file  #(parameter out = 2,parameter addr = 5,parameter width = 3
                 file[i] <= {width{1'b0}};
             end
         end 
-        else if(we) begin
+        else if(we & waddr !== 0) begin
             file[waddr] <= din;
         end
     end

@@ -106,11 +106,14 @@ module main_decoder(input logic[31:0] instruction,output signals::control_t ctl)
                  selector::MEM_WRITE_WORD, 1'b1};
             end
 
-            // main_opcode::LUI: begin /************NOT COMPETE**********/
-            //     ctl = '{ALU_NCARE,      ALU_SRCA_RS,   ALU_SRCB_IMMED,
-            //             DEST_REG_RT,    PC_SRC_NEXT,   FLAG_NCARE, 
-            //             EXC_CHK_NONE,   REG_SRC_ALU,   1'b1,     1'b0};
-            // end
+            main_opcode::LUI: begin
+                {ctl.alu_funct, ctl.reg_src,
+                 ctl.alu_srcA,  ctl.alu_srcB, ctl.dest_reg} = 
+                {selector::ALU_ADD,        selector::REG_SRC_ALU,
+                 selector::ALU_SRCA_RS,    selector::ALU_SRCB_UP_IMMED,
+                  selector::DEST_REG_RT};
+                ctl.write_reg = '1;
+            end
             
 
             default:
