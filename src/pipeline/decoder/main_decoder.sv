@@ -84,8 +84,9 @@ module main_decoder(input logic[31:0] instruction,output signals::control_t ctl)
                 {ctl.alu_funct, ctl.reg_src,
                  ctl.alu_srcA,  ctl.alu_srcB, ctl.dest_reg} = 
                 {selector::ALU_ADD,     selector::REG_SRC_ALU,
-                 selector::ALU_SRCA_RS, selector::ALU_SRCB_SIGN_IMMED,
+                 selector::ALU_SRCA_RS, selector::ALU_SRCB_IMMED,
                  selector::DEST_REG_RT};
+                 ctl.write_reg = '1;
                 case(unpack.opcode)
                     main_opcode::ANDI:
                         ctl.alu_funct = selector::ALU_AND;
@@ -96,6 +97,15 @@ module main_decoder(input logic[31:0] instruction,output signals::control_t ctl)
                 endcase
             end
             
+            main_opcode::SW: begin
+                {ctl.alu_funct, ctl.reg_src,
+                 ctl.alu_srcA,  ctl.alu_srcB,
+                 ctl.write_mode,ctl.write_mem } = 
+                {selector::ALU_ADD,        selector::REG_SRC_ALU,
+                 selector::ALU_SRCA_RS,    selector::ALU_SRCB_SIGN_IMMED,
+                 selector::MEM_WRITE_WORD, 1'b1};
+            end
+
             // main_opcode::LUI: begin /************NOT COMPETE**********/
             //     ctl = '{ALU_NCARE,      ALU_SRCA_RS,   ALU_SRCB_IMMED,
             //             DEST_REG_RT,    PC_SRC_NEXT,   FLAG_NCARE, 

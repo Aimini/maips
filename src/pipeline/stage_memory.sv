@@ -39,7 +39,7 @@ module stage_memory(pipeline_interface.port pif,
         pif.signal_out.mem_data = mem_data_out;
 
         mem_data_in = pif.signal_out.rt;
-        mem_addr    = pif.signal_out.alu_out;
+        mem_addr    = pif.signal_out.dest_reg_data;
         write_mem   = pif.signal_out.control.write_mem;
         read_mode   = pif.signal_out.control.read_mode;
         write_mode  = pif.signal_out.control.write_mode;

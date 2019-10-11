@@ -25,6 +25,7 @@ module stage_memory_load_store #(parameter N = 32)
     logic [15:0] aword;
 
     assign mif.write = write_mem;
+    assign mif.addr = addr_in;
     assign byte_index = addr_in[1:0];
     assign word_addr  = addr_in[N - 1:2];
 
