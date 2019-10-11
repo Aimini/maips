@@ -30,7 +30,7 @@ module stage_decode(pipeline_interface.port pif,input forward_info_t forward);
      .dout('{rs,rt}));
 
     always @(posedge pif.clk) begin
-        $display("decode [opcode:%6b, rs:%2d, rt:%2d, rd:%2d]",unpack.opcode, unpack.rs, unpack.rt, unpack.rd);
+       /* $display("decode [opcode:%6b, rs:%2d, rt:%2d, rd:%2d]",unpack.opcode, unpack.rs, unpack.rt, unpack.rd);*/
     end
 
     always_comb begin

@@ -86,15 +86,18 @@ input logic llbit); //forward
         pif.signal_out.pc_branch = pif.signal_out.pcadd4 + sign_immed;
         pif.signal_out.rs = rs_data;
         pif.signal_out.rt = rt_data;
-        
+
         fs    =  pif.signal_out.control.flag_sel;
         src_a =  pif.signal_out.control.alu_srcA;
         src_b =  pif.signal_out.control.alu_srcB;
         reg_src = pif.signal_out.control.reg_src;
         dest_reg_select = pif.signal_out.control.dest_reg;
-        alu_sa = unpack.sa;
-        
-        
+        case(pif.signal_out.control.alu_srcSa)
+            selector::ALU_SRCSA_SA: alu_sa = unpack.sa;
+            selector::ALU_SRCSA_SA: alu_sa = rs_data[4:0];
+            default:      
+                alu_sa = 'x;
+        endcase
         pcadd4 = pif.signal_out.pcadd4;
         cp0    = pif.signal_out.cp0;
 

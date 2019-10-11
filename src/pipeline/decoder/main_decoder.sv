@@ -20,6 +20,7 @@ module main_decoder(input logic[31:0] instruction,output signals::control_t ctl)
 
     always_comb begin
         ctl = '{selector::ALU_NCARE,       selector::ALU_SRCA_NCARE, selector::ALU_SRCB_NCARE,
+                selector::ALU_SRCSA_NCARE,
                 selector::DEST_REG_NCARE,  selector::PC_SRC_NEXT,    selector::FLAG_NCARE,
                 selector::REG_SRC_NCARE,   selector::MEM_READ_NCARE, selector::MEM_WRITE_NCARE,
                 selector::OPERAND_USE_BOTH,selector::EXC_CHK_NONE,

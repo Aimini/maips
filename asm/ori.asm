@@ -31,10 +31,10 @@ ori $29,$0,0xa000
 ori $30,$0,0x4001
 ori $31,$0,0x8002
 
-    lui $1, 0xffff
-    sw  $0,   4($1)
-    lui $6, 0x0001
-    sw  $6, 0($1) 
+lui $1, 0xffff
+sw  $0,   4($1)
+lui $6, 0x0001
+sw  $6, 0($1) 
 
     lui $1, 0xffff
     sw  $0, 0($1)

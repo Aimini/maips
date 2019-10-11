@@ -48,6 +48,9 @@ typedef enum  {
     ALU_SRCB_RT,    ALU_SRCB_SIGN_IMMED,
     ALU_SRCB_IMMED, ALU_SRCB_UP_IMMED,
     ALU_SRCB_NCARE} alu_sourceB;
+typedef enum  { ALU_SRCSA_SA,ALU_SRCSA_RS,
+ALU_SRCSA_NCARE  } 
+alu_sourceShift;
 
 typedef enum {
     DEST_REG_RD, DEST_REG_RT,

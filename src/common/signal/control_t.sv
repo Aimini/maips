@@ -4,6 +4,7 @@ typedef struct{
     selector::alu_function alu_funct;
     selector::alu_sourceA alu_srcA;
     selector::alu_sourceB alu_srcB; 
+    selector::alu_sourceShift alu_srcSa;
     selector::destnation_regiter dest_reg;
     selector::pc_source pc_src;
     selector::flag_select flag_sel;
