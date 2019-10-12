@@ -17,7 +17,8 @@ module top_test();
     logic[31:0] previous_dbg_arg;
 
     string dbg_target = "sw_dbg";
-    string target_name[] = '{dbg_target,"lui","ori","ori_2"};
+    string target_name[] = '{dbg_target,"lui_1","lui_2","ori_1",
+    "ori_2","sll_1","sll_2"};
     // string test_target = target_name[1];
 
     always_comb begin
@@ -36,7 +37,7 @@ module top_test();
     endfunction
 
     function automatic string get_regchk_filename(string target);
-        return  {"asm/temp/", target, ".reg.hextext"};
+        return  {"asm/temp/", target, ".asm.reg.hextext"};
     endfunction
 
     /* fill for sw_dbg test */
@@ -84,10 +85,12 @@ module top_test();
 
 
     task automatic new_test(string target,logic fill_reg);
+        
         string test_filename =  get_test_filename(target);
         string regchk_filename = get_regchk_filename(target);
         logic exit = 0;
 
+        $display("testing %s...",test_filename);
         $readmemh(test_filename, unit_top.unit_memory.unit_ins_rom.im);
         
         reset = 1;
@@ -150,8 +153,8 @@ module top_test();
     initial begin
          // new_test(.target(target_name[0]),.fill_reg('1));
          // new_test(.target(target_name[1]),.fill_reg(0));
-         new_test(.target(target_name[2]),.fill_reg(0));
-         new_test(.target(target_name[3]),.fill_reg(0));
+         for(int i = 0; i < target_name.size(); ++i)
+         new_test(.target(target_name[i ]),.fill_reg(i == 0));
          $finish;
     end
 

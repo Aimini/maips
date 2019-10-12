@@ -39,8 +39,8 @@ def find_my_sysall(lines,mwfp,swfp):
     if(state != 0):
         print("warning: somthing wrong with your ###--my_syscall")
 
-dump_reg =  " $0 $1 $2 $3 $4 $5 $6 $7 $8 $9 $10 $11 $12 $13 $14 $15 " \
-    " $16 $17 $18 $19 $20 $21 $22 $23 $24 $25 $26 $27 $28 $29 $30 $31 " 
+# dump_reg =  " $0 $1 $2 $3 $4 $5 $6 $7 $8 $9 $10 $11 $12 $13 $14 $15 " \
+#     " $16 $17 $18 $19 $20 $21 $22 $23 $24 $25 $26 $27 $28 $29 $30 $31 " 
 
 if len(sys.argv) > 1:
     namepath = pathlib.Path(sys.argv[1])
@@ -50,28 +50,30 @@ if len(sys.argv) > 1:
     run_by_mars = tmpdir / ("mars_" + name)
     dump_to_modelsim = tmpdir / ("modelsim_" + name)
 
-    pre_process(namepath, run_by_mars, dump_to_modelsim)
+    #pre_process(namepath, run_by_mars, dump_to_modelsim)
 
     hextextdir = tmpdir/ "{0}.hextext".format(name)
+    regdumpdir = tmpdir/ "{0}.reg.hextext".format(name)
     special_dumpdir = tmpdir/ "{0}.spec.hextext".format(name)
-    Mars_dir =  pdir / 'tool/Mars4_5.jar'
+    Mars_dir =  pdir / 'tool/Mars.jar'
 
     # runnig an watch result
-    just_run = 'java -jar {} $31 {}'.format(str(Mars_dir),str(run_by_mars))
-    os.system(just_run)
+    #just_run = 'java -jar {} $31 {}'.format(str(Mars_dir),str(run_by_mars))
+    #os.system(just_run)
 
     # dump 
     use_special_dump = len(sys.argv)  > 2
-    special_dump = ['java','-jar',str(Mars_dir),'33','0x00400000-0x007FFFFC']
-    normal_dump = ['java','-jar',str(Mars_dir),'a', 'dump','.text','HexText',str(hextextdir)]
+    special_dump = ['java','-jar',str(Mars_dir),'-1','0x00400000-0x007FFFFC']
+    normal_dump = ['java','-jar',str(Mars_dir),'-1', 'dump','.text','HexText',str(hextextdir)]
+    dump_reg = ['dump','reg','all',str(regdumpdir)]
+    # if use_special_dump:
+    #     dump_cmd = special_dump
+    # else:
+    dump_cmd = normal_dump
 
-    if use_special_dump:
-        dump_cmd = special_dump
-    else:
-        dump_cmd = normal_dump
-
-    dump_cmd.append(str(dump_to_modelsim))
-
+    dump_cmd.append(str(namepath))
+    dump_cmd.extend(dump_reg)
+   # print(dump_cmd)
     f = open(special_dumpdir,mode='wb')
     p1 = subprocess.Popen(dump_cmd, stdin=subprocess.PIPE,stdout=f,stderr=f)
     # stdout,stderr=p1.communicate()
