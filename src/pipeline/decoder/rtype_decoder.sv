@@ -27,6 +27,8 @@ module rtype_decoder(input logic[31:0] instruction,output signals::control_t ctl
                     selector::OPERAND_USE_RT
                 };
             end
+
+
             rtype::SYSCALL: begin
                 {ctl.alu_srcA, ctl.alu_srcB,
                  ctl.reg_src,  ctl.dest_reg, ctl.pc_src,
@@ -36,6 +38,11 @@ module rtype_decoder(input logic[31:0] instruction,output signals::control_t ctl
                  selector::EXC_CHK_SYSCALL};
                     ctl.write_reg = 0;
             end
+
+            rtype::ADDU: begin
+                ctl.alu_funct  = selector::ALU_ADD;
+            end
+
             default:begin
                 {ctl.alu_srcA, ctl.alu_srcB,
                  ctl.reg_src, ctl.dest_reg, ctl.pc_src,

@@ -17,8 +17,9 @@ module top_test();
     logic[31:0] previous_dbg_arg;
 
     string dbg_target = "sw_dbg";
-    string target_name[] = '{dbg_target,"lui_1","lui_2","ori_1",
-    "ori_2","sll_1","sll_2"};
+    string target_name[] = 
+    '{dbg_target,"lui_1", "lui_2", "ori_1",
+      "ori_2",   "sll_1", "sll_2", "addu"};
     // string test_target = target_name[1];
 
     always_comb begin
@@ -153,7 +154,7 @@ module top_test();
     initial begin
          // new_test(.target(target_name[0]),.fill_reg('1));
          // new_test(.target(target_name[1]),.fill_reg(0));
-         for(int i = 0; i < target_name.size(); ++i)
+         for(int i = target_name.size() - 1; i < target_name.size(); ++i)
          new_test(.target(target_name[i ]),.fill_reg(i == 0));
          $finish;
     end
