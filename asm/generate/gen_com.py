@@ -84,16 +84,22 @@ def get_exclued_reg_list(*args):
             num = int(one)
             if num < 0 or num >= 32:
                 raise IndexError("invalid register number: {0} , number must in range(0,32)".format(num))
-            a.remove(num)
+            try:
+                a.remove(num)
+            except ValueError as e:
+                print("remove twice ${}".format(num))
             continue
-
+        
         # get by string name
         num1 = reg_name_map.get(one.strip())
         if num1 is None:
            num1 = reg_name_map.get("$" + one)
         if num1 is None:
             raise IndexError("invalid reigster name:{0}".format(one))
-        a.remove(num1)
+        try:
+            a.remove(num1)
+        except ValueError as e:
+            print("remove twice ${}".format(num1))
     return a
 
 
