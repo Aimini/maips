@@ -63,17 +63,17 @@ if len(sys.argv) > 1:
 
     # dump 
     use_special_dump = len(sys.argv)  > 2
-    special_dump = ['java','-jar',str(Mars_dir),'-1','0x00400000-0x007FFFFC']
+    special_dump = ['java','-jar',str(Mars_dir),'-1','dump','0x00400000-0x0FFFFFFC','HexText',str(hextextdir)]
     normal_dump = ['java','-jar',str(Mars_dir),'-1', 'dump','.text','HexText',str(hextextdir)]
     dump_reg = ['dump','reg','all',str(regdumpdir)]
-    # if use_special_dump:
-    #     dump_cmd = special_dump
-    # else:
-    dump_cmd = normal_dump
+    if use_special_dump:
+        dump_cmd = special_dump
+    else:
+        dump_cmd = normal_dump
 
     dump_cmd.append(str(namepath))
     dump_cmd.extend(dump_reg)
-   # print(dump_cmd)
+    #print(dump_cmd)
     f = open(special_dumpdir,mode='wb')
     p1 = subprocess.Popen(dump_cmd, stdin=subprocess.PIPE,stdout=f,stderr=f)
     # stdout,stderr=p1.communicate()
@@ -87,14 +87,14 @@ if len(sys.argv) > 1:
             if(re.search('error', one, re.IGNORECASE)):
                 print(one,end='')
             
-            if(use_special_dump):
-                if wf is None:
-                    wf = open(hextextdir,mode='w')
-                if one.startswith("Mem[") and one.find('Invalid') == -1:
-                    contents = one.split(']')[1].split()
-                    for word in contents:
-                        if len(word) > 0:
-                            wf.write(word+'\n')
+            # if(use_special_dump):
+            #     if wf is None:
+            #         wf = open(hextextdir,mode='w')
+            #     if one.startswith("Mem[") and one.find('Invalid') == -1:
+            #         contents = one.split(']')[1].split()
+            #         for word in contents:
+            #             if len(word) > 0:
+            #                 wf.write(word+'\n')
 
         
 

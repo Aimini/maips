@@ -17,9 +17,12 @@ module top_test();
     logic[31:0] previous_dbg_arg;
 
     string dbg_target = "sw_dbg";
+    string j_too_large = "j";
+    string jal_too_large = "jal"; // don't test j and jal if unnecessary, it'test file too large
     string target_name[] = 
-    '{dbg_target,"lui_1", "lui_2", "ori_1",
-      "ori_2",   "sll_1", "sll_2", "addu"};
+    '{dbg_target, "lui_1",     "lui_2", "ori_1",
+      "ori_2",    "sll_1",     "sll_2", "addu",
+      /*j_too_large,jal_too_large*/};
     // string test_target = target_name[1];
 
     always_comb begin
@@ -34,10 +37,18 @@ module top_test();
     end
 
     function automatic string get_test_filename(string target);
+        if(target == jal_too_large)
+            return "D:/pipeline_temp/asm/temp/jal.asm.hextext";
+        else  if(target == j_too_large)
+            return "D:/pipeline_temp/asm/temp/j.asm.hextext";
         return {"asm/temp/", target, ".asm.hextext"};
     endfunction
 
     function automatic string get_regchk_filename(string target);
+    if (target == jal_too_large)
+            return "D:/pipeline_temp/asm/temp/jal.asm.reg.hextext";
+        else  if(target == j_too_large)
+            return "D:/pipeline_temp/asm/temp/j.asm.reg.hextext";
         return  {"asm/temp/", target, ".asm.reg.hextext"};
     endfunction
 
@@ -90,10 +101,9 @@ module top_test();
         string test_filename =  get_test_filename(target);
         string regchk_filename = get_regchk_filename(target);
         logic exit = 0;
-
         $display("testing %s...",test_filename);
         $readmemh(test_filename, unit_top.unit_memory.unit_ins_rom.im);
-        
+
         reset = 1;
         @(negedge clk) begin
             reset = 1;
@@ -115,7 +125,7 @@ module top_test();
                     0: exit = 1;
 
                     1: begin
-                        assert(dbg_arg[1] !== dbg_arg[2])
+                        assert(dbg_arg[1] === dbg_arg[2])
                         else $error("assert equal failed : %8h != %8h",dbg_arg[1],dbg_arg[2]);
                     end
 
@@ -154,8 +164,8 @@ module top_test();
     initial begin
          // new_test(.target(target_name[0]),.fill_reg('1));
          // new_test(.target(target_name[1]),.fill_reg(0));
-         for(int i = target_name.size() - 1; i < target_name.size(); ++i)
-         new_test(.target(target_name[i ]),.fill_reg(i == 0));
+         for(int i = target_name.size() - 2; i < target_name.size(); ++i)
+         new_test(.target(target_name[i]),.fill_reg(i == 0));
          $finish;
     end
 
