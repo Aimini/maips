@@ -23,7 +23,8 @@ module top_test();
     '{dbg_target, "lui_1",     "lui_2", "ori_1",
       "ori_2",    "sll_1",     "sll_2", "addu",
       /*j_too_large,jal_too_large*/
-      "addiu",    "beq",       "bne"};
+      "addiu",    "beq",       "bne",   "blez",
+      "bgtz",     "slti"};
     // string test_target = target_name[1];
 
     always_comb begin
@@ -123,7 +124,10 @@ module top_test();
                     continue;
 
                 case(dbg_arg[0])
-                    0: exit = 1;
+                    0:begin
+                        exit = 1;
+                        $display("finish.");
+                    end
 
                     1: begin
                         assert(dbg_arg[1] === dbg_arg[2])
@@ -139,8 +143,10 @@ module top_test();
                     32'h0001_0000: begin
                         if(dbg_arg[1] === 32'h0001_0000) begin
                              //ignore $gp, $sp
+                            $display("checking register file ignore $sp and $gp...");
                             check_regfile(regchk_filename, reg_file, 1);
                         end  else begin   //check all
+                            $display("checking register file...");
                             check_regfile(regchk_filename, reg_file, 0);
                         end
                     end
@@ -163,9 +169,9 @@ module top_test();
     endtask
 
     initial begin
-         // new_test(.target(target_name[0]),.fill_reg('1));
-         // new_test(.target(target_name[1]),.fill_reg(0));
-        //  for(int i = target_name.size() - 2; i < target_name.size(); ++i)
+        //  new_test(.target(target_name[0]),.fill_reg('1));
+        //  new_test(.target(target_name[1]),.fill_reg(0));
+        //  for(int i = 0; i < target_name.size(); ++i)
         //  new_test(.target(target_name[i]),.fill_reg(i == 0));
         //  $finish;
 

@@ -64,17 +64,22 @@ module main_decoder(input logic[31:0] instruction,output signals::control_t ctl)
                 {selector::ALU_ADD,     selector::REG_SRC_ALU,
                  selector::ALU_SRCA_RS, selector::ALU_SRCB_SIGN_IMMED,
                  selector::DEST_REG_RT};
+            
+                ctl.opd_use = selector::OPERAND_USE_RS;
                 ctl.write_reg = 1;
                 if(unpack.opcode == main_opcode::ADDI)
                     ctl.exc_chk = selector::EXC_CHK_OVERFLOW;
             end
 
             main_opcode::SLTI,main_opcode::SLTIU: begin
-                {ctl.alu_funct, ctl.reg_src,
-                 ctl.alu_srcA,  ctl.alu_srcB, ctl.dest_reg} = 
-                {selector::ALU_ADD,     selector::REG_SRC_FLAG,
+                { ctl.reg_src,
+                 ctl.alu_srcA,  ctl.alu_srcB,
+                 ctl.dest_reg,  ctl.write_reg,
+                 ctl.opd_use} = 
+                { selector::REG_SRC_FLAG,
                  selector::ALU_SRCA_RS, selector::ALU_SRCB_SIGN_IMMED,
-                 selector::DEST_REG_RT};
+                 selector::DEST_REG_RT, 1'b1,
+                 selector::OPERAND_USE_RS};
                 if(unpack.opcode == main_opcode::SLTIU)
                     ctl.flag_sel = selector::FLAG_LTU;
                 else
@@ -87,7 +92,8 @@ module main_decoder(input logic[31:0] instruction,output signals::control_t ctl)
                 {selector::ALU_ADD,     selector::REG_SRC_ALU,
                  selector::ALU_SRCA_RS, selector::ALU_SRCB_IMMED,
                  selector::DEST_REG_RT};
-                 ctl.write_reg = '1;
+                ctl.opd_use = selector::OPERAND_USE_RS;
+                ctl.write_reg = '1;
                 case(unpack.opcode)
                     main_opcode::ANDI:
                         ctl.alu_funct = selector::ALU_AND;
@@ -105,6 +111,7 @@ module main_decoder(input logic[31:0] instruction,output signals::control_t ctl)
                 {selector::ALU_ADD,        selector::REG_SRC_ALU,
                  selector::ALU_SRCA_RS,    selector::ALU_SRCB_SIGN_IMMED,
                  selector::MEM_WRITE_WORD, 1'b1};
+                 ctl.opd_use = selector::OPERAND_USE_RT;
             end
 
             main_opcode::LUI: begin
@@ -113,6 +120,7 @@ module main_decoder(input logic[31:0] instruction,output signals::control_t ctl)
                 {selector::ALU_ADD,        selector::REG_SRC_ALU,
                  selector::ALU_SRCA_RS,    selector::ALU_SRCB_UP_IMMED,
                   selector::DEST_REG_RT};
+                ctl.opd_use = selector::OPERAND_USE_NONE;
                 ctl.write_reg = '1;
             end
             
