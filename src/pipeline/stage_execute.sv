@@ -39,7 +39,7 @@ input logic llbit); //forward
     extract_instruction unit_ei(pif.signal_out.instruction, unpack);
 
     sign_extend #(.NI(16),.NO(32)) 
-    unit_sign_extend(.i(immed << 2),.o(sign_immed));
+    unit_sign_extend(.i(immed),.o(sign_immed));
 
     alu #(32) unit_alu(.a(alu_a),.b(alu_b),.sa(alu_sa),
     .funct(pif.signal_out.control.alu_funct),
@@ -83,7 +83,7 @@ input logic llbit); //forward
         pif.signal_out.alu_out = alu_out;
         pif.signal_out.dest_reg = dest_reg;
         pif.signal_out.flag_selected = flag_selected;
-        pif.signal_out.pc_branch = pif.signal_out.pcadd4 + sign_immed;
+        pif.signal_out.pc_branch = pif.signal_out.pcadd4 + (sign_immed << 2);
         pif.signal_out.rs = rs_data;
         pif.signal_out.rt = rt_data;
 
