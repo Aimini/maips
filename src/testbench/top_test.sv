@@ -23,7 +23,7 @@ module top_test();
     '{dbg_target, "lui_1",     "lui_2", "ori_1",
       "ori_2",    "sll_1",     "sll_2", "addu",
       /*j_too_large,jal_too_large*/
-      "addiu"};
+      "addiu",    "beq",       "bne"};
     // string test_target = target_name[1];
 
     always_comb begin
