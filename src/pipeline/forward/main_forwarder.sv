@@ -57,7 +57,7 @@ execute_forward_info
             end
         end
 
-        if(ps_memory.dest_reg != 0 & ps_memory.control.dest_reg) begin
+        if(ps_memory.dest_reg != 0 & ps_memory.control.write_reg) begin
             if(execute_unpack.rs == ps_memory.dest_reg) begin
                 execute_forward_info.forward_rs = '1;
                 execute_forward_info.rs = ps_memory.dest_reg_data;
