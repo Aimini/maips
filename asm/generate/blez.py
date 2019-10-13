@@ -10,9 +10,9 @@ def my_gen1(A,C,E):
         reg = i % 32;
         if reg == 0:
             continue
-        A("li ${0},{1}".format(reg, random.choice(range(0,2**31))))
+        A("li ${0},{1}".format(reg, random.choice(range(1,2**31))))
         A("blez ${},wrong".format(reg))
-        
+
     A("blez $0,next")
     #generate some meaing less code
     for i in range(32):
