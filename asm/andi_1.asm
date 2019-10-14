@@ -1,0 +1,72 @@
+.text
+li $0,0xFFFFFFFF
+li $1,0xFFFFFFFF
+li $2,0xFFFFFFFF
+li $3,0xFFFFFFFF
+li $4,0xFFFFFFFF
+li $5,0xFFFFFFFF
+li $6,0xFFFFFFFF
+li $7,0xFFFFFFFF
+li $8,0xFFFFFFFF
+li $9,0xFFFFFFFF
+li $10,0xFFFFFFFF
+li $11,0xFFFFFFFF
+li $12,0xFFFFFFFF
+li $13,0xFFFFFFFF
+li $14,0xFFFFFFFF
+li $15,0xFFFFFFFF
+li $16,0xFFFFFFFF
+li $17,0xFFFFFFFF
+li $18,0xFFFFFFFF
+li $19,0xFFFFFFFF
+li $20,0xFFFFFFFF
+li $21,0xFFFFFFFF
+li $22,0xFFFFFFFF
+li $23,0xFFFFFFFF
+li $24,0xFFFFFFFF
+li $25,0xFFFFFFFF
+li $26,0xFFFFFFFF
+li $27,0xFFFFFFFF
+li $28,0xFFFFFFFF
+li $29,0xFFFFFFFF
+li $30,0xFFFFFFFF
+li $31,0xFFFFFFFF
+andi $1,$1,65525
+andi $2,$2,65515
+andi $3,$3,65495
+andi $4,$4,65455
+andi $5,$5,65375
+andi $6,$6,65215
+andi $7,$7,64895
+andi $8,$8,64255
+andi $9,$9,62975
+andi $10,$10,60415
+andi $11,$11,55295
+andi $12,$12,45055
+andi $13,$13,24575
+andi $14,$14,49150
+andi $15,$15,32765
+andi $16,$16,65530
+andi $17,$17,65525
+andi $18,$18,65515
+andi $19,$19,65495
+andi $20,$20,65455
+andi $21,$21,65375
+andi $22,$22,65215
+andi $23,$23,64895
+andi $24,$24,64255
+andi $25,$25,62975
+andi $26,$26,60415
+andi $27,$27,55295
+andi $28,$28,45055
+andi $29,$29,24575
+andi $30,$30,49150
+andi $31,$31,32765
+
+lui $25, 0xffff
+sw  $0,   4($25)
+lui $10, 0x0001
+sw  $10, 0($25) 
+
+lui $25, 0xffff
+sw  $0, 0($25)

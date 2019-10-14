@@ -25,7 +25,8 @@ module top_test();
       "ori_2",    "sll_1",     "sll_2", "addu",
       /*j_too_large,jal_too_large*/
       "addiu",    "beq",       "bne",   "blez",
-      "bgtz",     "slti",      "sltiu"};
+      "bgtz",     "slti",      "sltiu", "andi_1",
+      "andi_2"};
     // string test_target = target_name[1];
 
     always_comb begin
@@ -184,8 +185,8 @@ module top_test();
         //  new_test(.target(target_name[i]),.fill_reg(i == 0));
         //  $finish;
 
-         new_test(.target(target_name[target_name.size() - 1]),.fill_reg(0));
-
+        new_test(.target(target_name[target_name.size() - 2]),.fill_reg(0));
+        new_test(.target(target_name[target_name.size() - 1]),.fill_reg(0));
         
          $finish;
     end

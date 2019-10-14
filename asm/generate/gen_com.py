@@ -89,7 +89,7 @@ def get_exclued_reg_list(*args):
             except ValueError as e:
                 print("remove twice ${}".format(num))
             continue
-        
+
         # get by string name
         num1 = reg_name_map.get(one.strip())
         if num1 is None:
@@ -204,3 +204,16 @@ sw  ${arg}, 0(${base}) """.format(base = base_reg,arg = arg_reg,reg = reg,immed 
 
 def assert_equal_immed(reg,immed,base_reg = None,arg_reg = None):
     return assert_function_immed(1,reg,immed,base_reg,arg_reg);
+
+
+def cutto_sign32(val):
+    ret = val & 0xFFFFFFFF
+    if ret >= 0x80000000:
+        ret = -(2**32 - ret) 
+    return ret
+    
+def cutto_sign16(val):
+    ret = val & 0xFFFF
+    if ret >= 0x8000:
+        ret = -(2**16 - ret)
+    return ret

@@ -2,16 +2,7 @@ from gen_com import *
 import random
 
 r = gen('slti')
-def cutto_sign32(val):
-    ret = val & 0xFFFFFFFF
-    if ret >= 0x80000000:
-        ret = -(2**32 - ret) 
-    return ret
-def cutto_sign16(val):
-    ret = val & 0xFFFF
-    if ret >= 0x8000:
-        ret = -(2**16 - ret)
-    return ret
+
 
 def gen_partial(A,reg_val_gen,immed_gen):
     #zero 

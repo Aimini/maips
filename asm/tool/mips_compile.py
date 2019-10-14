@@ -78,7 +78,7 @@ if len(sys.argv) > 1:
     dump_segment.append(str(hextextdir))
     command.extend(dump_segment)
     command.extend(dump_reg)
-    command.extend(dump_asm)
+    # command.extend(dump_asm)
 
     #print(dump_cmd)
     f = open(special_dumpdir,mode='wb')

@@ -101,6 +101,8 @@ module main_decoder(input logic[31:0] instruction,output signals::control_t ctl)
                         ctl.alu_funct = selector::ALU_OR;
                     main_opcode::XORI:
                         ctl.alu_funct = selector::ALU_XOR;
+                    default:
+                        ctl.alu_funct = selector::ALU_NCARE;
                 endcase
             end
             

@@ -16,7 +16,7 @@ output logic[N - 1:0] y);
     alu_logic_clz #(N) unit_clo(.a(~a),.y(clo_y),.all_zero(clo_all_zero));
     always_comb begin
         case(funct)
-            selector::ALU_AND : y = a ^ b;
+            selector::ALU_AND : y = a & b;
             selector::ALU_OR :  y = a | b;
             selector::ALU_XOR:  y = a^b;
             selector::ALU_NOR:  y = ~(a|b);
