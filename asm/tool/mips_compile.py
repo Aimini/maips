@@ -54,6 +54,7 @@ if len(sys.argv) > 1:
 
     hextextdir = tmpdir/ "{0}.hextext".format(name)
     regdumpdir = tmpdir/ "{0}.reg.hextext".format(name)
+    asmdumpdir = tmpdir/ "{0}.assembly.hextext".format(name)
     special_dumpdir = tmpdir/ "{0}.spec.hextext".format(name)
     Mars_dir =  pdir / 'tool/Mars.jar'
 
@@ -63,29 +64,38 @@ if len(sys.argv) > 1:
 
     # dump 
     use_special_dump = len(sys.argv)  > 2
-    special_dump = ['java','-jar',str(Mars_dir),'-1','dump','0x00400000-0x0FFFFFFC','HexText',str(hextextdir)]
-    normal_dump = ['java','-jar',str(Mars_dir),'-1', 'dump','.text','HexText',str(hextextdir)]
+    command = ['java','-jar',str(Mars_dir),sys.argv[1],'-1']
+    
+    dump_range = '0x00400000-0x0FFFFFFC'
+    dump_text = '.text'
     dump_reg = ['dump','reg','all',str(regdumpdir)]
+    dump_asm = ['dump','as','all',str(asmdumpdir)]
     if use_special_dump:
-        dump_cmd = special_dump
+        dump_segment = ['dump',dump_range,'HexText']
     else:
-        dump_cmd = normal_dump
+        dump_segment = ['dump',dump_text,'HexText']
+        
+    dump_segment.append(str(hextextdir))
+    command.extend(dump_segment)
+    command.extend(dump_reg)
+    command.extend(dump_asm)
 
-    dump_cmd.append(str(namepath))
-    dump_cmd.extend(dump_reg)
     #print(dump_cmd)
     f = open(special_dumpdir,mode='wb')
-    p1 = subprocess.Popen(dump_cmd, stdin=subprocess.PIPE,stdout=f,stderr=f)
+    #p1 = subprocess.Popen(command, stdin=subprocess.PIPE,stdout=f,stderr=f)
     # stdout,stderr=p1.communicate()
     # print(stderr.decode())
-    p1.wait()
-    f.close()
+    #p1.wait()
+    cmd_str = ' '.join(command)
+    print(cmd_str)
+    os.system(cmd_str)
+    # f.close()
 
-    wf = None
-    with open(special_dumpdir,mode='r') as rf:
-        for one in rf.readlines():
-            if(re.search('error', one, re.IGNORECASE)):
-                print(one,end='')
+    # wf = None
+    # with open(special_dumpdir,mode='r') as rf:
+    #     for one in rf.readlines():
+    #         if(re.search('error', one, re.IGNORECASE)):
+    #             print(one,end='')
             
             # if(use_special_dump):
             #     if wf is None:

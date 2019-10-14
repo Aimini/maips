@@ -12,7 +12,7 @@ module top_test();
 
     logic[31:0] reg_v[1:0],reg_a[3:0],reg_s[7:0],reg_t[9:0];
     logic[31:0]  reg_file[31:0];
-    logic write_dbg_memory;
+    logic write_dbg_memory,write_dbg_function_reg;
     logic dbg_loaded;
     logic[31:0] dbg_arg[7:0];
     logic[31:0] previous_dbg_arg;
@@ -25,7 +25,7 @@ module top_test();
       "ori_2",    "sll_1",     "sll_2", "addu",
       /*j_too_large,jal_too_large*/
       "addiu",    "beq",       "bne",   "blez",
-      "bgtz",     "slti"};
+      "bgtz",     "slti",      "sltiu"};
     // string test_target = target_name[1];
 
     always_comb begin
@@ -35,12 +35,13 @@ module top_test();
         reg_s = reg_file[23:16];
         reg_t = {reg_file[25:24], reg_file[15:8]};
 
-        write_dbg_memory =  unit_top.unit_memory.debug_we;
+        write_dbg_memory =  unit_top.unit_memory.unit_debug_ram.we;
+        write_dbg_function_reg =  unit_top.unit_memory.unit_debug_ram.addr == 0;
         dbg_arg = unit_top.unit_memory.unit_debug_ram.datas;
     end
 
     always_ff @(posedge clk)
-        dbg_loaded <= write_dbg_memory;
+        dbg_loaded <= write_dbg_memory & write_dbg_function_reg;
 
     function automatic string get_test_filename(string target);
         if(target == jal_too_large)
@@ -149,7 +150,7 @@ module top_test();
                              //ignore $gp, $sp
                             $display("checking register file ignore $sp and $gp...");
                             check_regfile(regchk_filename, reg_file, 1);
-                        end  else begin   //check all
+                        end else begin   //check all
                             $display("checking register file...");
                             check_regfile(regchk_filename, reg_file, 0);
                         end
@@ -159,13 +160,18 @@ module top_test();
                         for(int i = 0; i < 8; ++i) begin
                             $display("dbg(%0d) = %8h",i,dbg_arg[i]);
                         end   // check dbg_arg memory 
-                        if(dbg_arg[1] === 32'h0000_0020) begin
+                        if(dbg_arg[1] === 32'h0000_0000)
+                            continue;
+
+                        if(dbg_arg[1] === 32'h0000_0002) begin
                             check_sw_dbg_arg();
+                        end else begin
+                            $error("unsupport check:%8x, sub function:%8x",dbg_arg[0],dbg_arg[1]);    
                         end
                     end
 
                     default:
-                        $error("unsupport check!");
+                        $error("unsupport check:%8x",dbg_arg[0]);
                 endcase
             end
         end
@@ -179,6 +185,8 @@ module top_test();
         //  $finish;
 
          new_test(.target(target_name[target_name.size() - 1]),.fill_reg(0));
+
+        
          $finish;
     end
 
