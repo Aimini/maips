@@ -13,6 +13,7 @@ module top_test();
     logic[31:0] reg_v[1:0],reg_a[3:0],reg_s[7:0],reg_t[9:0];
     logic[31:0]  reg_file[31:0];
     logic write_dbg_memory;
+    logic dbg_loaded;
     logic[31:0] dbg_arg[7:0];
     logic[31:0] previous_dbg_arg;
 
@@ -37,6 +38,9 @@ module top_test();
         write_dbg_memory =  unit_top.unit_memory.debug_we;
         dbg_arg = unit_top.unit_memory.unit_debug_ram.datas;
     end
+
+    always_ff @(posedge clk)
+        dbg_loaded <= write_dbg_memory;
 
     function automatic string get_test_filename(string target);
         if(target == jal_too_large)
@@ -120,7 +124,7 @@ module top_test();
 
         while (~exit) begin
             @(negedge clk) begin
-                if(previous_dbg_arg === dbg_arg[0])
+                if(dbg_loaded !== '1)
                     continue;
 
                 case(dbg_arg[0])
@@ -155,7 +159,7 @@ module top_test();
                         for(int i = 0; i < 8; ++i) begin
                             $display("dbg(%0d) = %8h",i,dbg_arg[i]);
                         end   // check dbg_arg memory 
-                        if(dbg_arg[1] == 32'h0000_0020) begin
+                        if(dbg_arg[1] === 32'h0000_0020) begin
                             check_sw_dbg_arg();
                         end
                     end
@@ -164,7 +168,6 @@ module top_test();
                         $error("unsupport check!");
                 endcase
             end
-            previous_dbg_arg = dbg_arg[0];
         end
     endtask
 
