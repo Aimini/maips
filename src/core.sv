@@ -19,7 +19,7 @@ memory_interface.controller ins_mif, data_mif);
     logic address_error;
     logic load_pc;
     logic[31:0] pc_value;
-
+    logic data_memory_busy,instruction_memory_busy;
 
     stage_fetch unit_fetch(.clk(clk),.reset(reset),
     .stall(1'b0), .nullify(1'b0),
@@ -30,6 +30,8 @@ memory_interface.controller ins_mif, data_mif);
     .pc(pif_decode.signal_in.pc),
     .pc_add4(pif_decode.signal_in.pcadd4));
 
+
+
     forward_info_t decode_forward_info,execute_forward_info;
     main_forwarder unit_forwarder( 
     .ps_decode(pif_decode.signal_out),
@@ -38,6 +40,8 @@ memory_interface.controller ins_mif, data_mif);
     .ps_write_back(pif_write_back.signal_out),
     .decode_forward_info(decode_forward_info),
     .execute_forward_info(execute_forward_info));
+
+
 
     pipeline_flow_controller unit_flow_controller
     (.ps_decode(pif_decode.signal_out),
@@ -49,16 +53,23 @@ memory_interface.controller ins_mif, data_mif);
     .nullify_decode(pif_decode.nullify),
     .nullify_execute(pif_execute.nullify));
 
+
+
     stage_decode unit_decode(.pif(pif_decode),
         .forward(decode_forward_info));
     
+
+
     stage_execute unit_execute(.pif(pif_execute),
         .forward(execute_forward_info),
         .hi(0),.lo(0), //forward
         .llbit(1'b0));
 
-    stage_memory  unit_memory(.pif(pif_memory), .mif(data_mif),
-        .address_error(address_error));
+
+    stage_memory  unit_memory(.pif(pif_memory), .mif(data_mif)
+        ,.busy(data_memory_busy));
+
+
 
     stage_write_back unit_write_back(.pif(pif_write_back));
 

@@ -27,6 +27,10 @@ module top_test();
       "addiu",    "beq",       "bne",   "blez",
       "bgtz",     "slti",      "sltiu", "andi_1",
       "andi_2",   "xori_1",    "xori_2"};
+
+    string manual_target_name[] = {
+        "sys_serial_test"
+    };
     // string test_target = target_name[1];
 
     always_comb begin
@@ -50,6 +54,14 @@ module top_test();
         else  if(target == j_too_large)
             return "D:/pipeline_temp/asm/temp/j.asm.hextext";
         return {"asm/temp/", target, ".asm.hextext"};
+    endfunction
+
+    function automatic string get_data_filename(string target);
+        if(target == jal_too_large)
+            return "D:/pipeline_temp/asm/temp/jal.asm.data.hextext";
+        else  if(target == j_too_large)
+            return "D:/pipeline_temp/asm/temp/j.asm.data.hextext";
+        return {"asm/temp/", target, ".asm.data.hextext"};
     endfunction
 
     function automatic string get_regchk_filename(string target);
@@ -107,10 +119,12 @@ module top_test();
     task automatic new_test(string target,logic fill_reg);
         
         string test_filename =  get_test_filename(target);
+        string data_filename =  get_data_filename(target);
         string regchk_filename = get_regchk_filename(target);
         logic exit = 0;
         $display("testing %s...",test_filename);
         $readmemh(test_filename, unit_top.unit_memory.unit_ins_rom.im);
+        $readmemh(data_filename, unit_top.unit_memory.unit_user_ram.datas);
 
         reset = 1;
         @(negedge clk) begin
@@ -145,6 +159,19 @@ module top_test();
                         else $error("assert not equal failed : %8h == %8h",dbg_arg[1],dbg_arg[2]);
                     end
 
+                    3:  begin
+                        logic[31:0]  four_char = dbg_arg[1];
+                        logic[7:0] one_char;
+                        string message;
+                        for(int i = 0; i < 4; ++i) begin
+                            one_char = four_char[i*8 +:8];
+                            if(one_char === '0 |  one_char  === 'x) begin
+                                break;
+                            end
+                            message = {message,one_char};
+                        end
+                        $write(message);
+                    end
                     
                     32'h0001_0000: begin
                         if(dbg_arg[1] === 32'h0001_0000) begin
@@ -177,9 +204,10 @@ module top_test();
             end
         end
     endtask
-
+    logic[7:0] c;
+    string test;
     initial begin
-         new_test(.target(target_name[0]),.fill_reg('1));
+        // new_test(.target(target_name[0]),.fill_reg('1));
         //  new_test(.target(target_name[1]),.fill_reg(0));
         //  for(int i = 0; i < target_name.size(); ++i)
         //  new_test(.target(target_name[i]),.fill_reg(i == 0));
@@ -187,8 +215,11 @@ module top_test();
 
         //new_test(.target(target_name[target_name.size() - 2]),.fill_reg(0));
        // new_test(.target(target_name[target_name.size() - 1]),.fill_reg(0));
-        
-         $finish;
+
+        // manual target
+        new_test(.target(manual_target_name[manual_target_name .size() - 1]),.fill_reg(0));
+       
+        $finish;
     end
 
 

@@ -46,6 +46,8 @@ if len(sys.argv) > 1:
     namepath = pathlib.Path(sys.argv[1])
     name = namepath.name
     pdir = namepath.parent
+    pdir = pathlib.Path('.')
+    tooldir = pdir / "tool"
     tmpdir = pdir / "temp"
     run_by_mars = tmpdir / ("mars_" + name)
     dump_to_modelsim = tmpdir / ("modelsim_" + name)
@@ -53,10 +55,11 @@ if len(sys.argv) > 1:
     #pre_process(namepath, run_by_mars, dump_to_modelsim)
 
     hextextdir = tmpdir/ "{0}.hextext".format(name)
+    datadumpdir = tmpdir/ "{0}.data.hextext".format(name)
     regdumpdir = tmpdir/ "{0}.reg.hextext".format(name)
     asmdumpdir = tmpdir/ "{0}.assembly.hextext".format(name)
     special_dumpdir = tmpdir/ "{0}.spec.hextext".format(name)
-    Mars_dir =  pdir / 'tool/Mars.jar'
+    Mars_dir = tooldir / 'Mars.jar'
 
     # runnig an watch result
     #just_run = 'java -jar {} $31 {}'.format(str(Mars_dir),str(run_by_mars))
@@ -68,6 +71,7 @@ if len(sys.argv) > 1:
     
     dump_range = '0x00400000-0x0FFFFFFC'
     dump_text = '.text'
+    dump_data = ['dump','.data','HexText',str(datadumpdir)]
     dump_reg = ['dump','reg','all',str(regdumpdir)]
     dump_asm = ['dump','as','all',str(asmdumpdir)]
     if use_special_dump:
@@ -77,6 +81,7 @@ if len(sys.argv) > 1:
         
     dump_segment.append(str(hextextdir))
     command.extend(dump_segment)
+    command.extend(dump_data)
     command.extend(dump_reg)
     # command.extend(dump_asm)
 

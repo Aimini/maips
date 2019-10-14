@@ -9,8 +9,10 @@ interface memory_interface #(parameter N = 32);
     logic write;
     logic busy;
 
+    modport  read_only_controller (input dout, busy,
+                        output addr);
     modport  controller (input dout, busy,
-                        output din, mask, addr, write );
+                        output din, mask, addr, write);
     modport memory(input din, mask, addr, write,
                   output  dout, busy);
 
