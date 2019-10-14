@@ -26,7 +26,7 @@ module top_test();
       /*j_too_large,jal_too_large*/
       "addiu",    "beq",       "bne",   "blez",
       "bgtz",     "slti",      "sltiu", "andi_1",
-      "andi_2"};
+      "andi_2",   "xori_1",    "xori_2"};
     // string test_target = target_name[1];
 
     always_comb begin
@@ -73,11 +73,11 @@ module top_test();
 
     function automatic void check_sw_dbg_arg();
         logic ret = 1;
-         for(int i = 0; i < 8; ++i) begin
-            $display("dbg(%0d) = %8h",i,dbg_arg[i]);
-        end
+        //  for(int i = 0; i < 8; ++i) begin
+        //     $display("dbg(%0d) = %8h",i,dbg_arg[i]);
+        // end
         // check dbg_arg memory 
-        if(dbg_arg[1] == 32'h0000_0020) begin
+        if(dbg_arg[1] == 32'h0000_0002) begin
             assert (dbg_arg[0] === 32'hffff_0000)
             else  $error("dbg(0) != 32'hffff_0000!");
             for(int i = 1; i < 8; ++i) begin
@@ -179,14 +179,14 @@ module top_test();
     endtask
 
     initial begin
-        //  new_test(.target(target_name[0]),.fill_reg('1));
+         new_test(.target(target_name[0]),.fill_reg('1));
         //  new_test(.target(target_name[1]),.fill_reg(0));
         //  for(int i = 0; i < target_name.size(); ++i)
         //  new_test(.target(target_name[i]),.fill_reg(i == 0));
         //  $finish;
 
-        new_test(.target(target_name[target_name.size() - 2]),.fill_reg(0));
-        new_test(.target(target_name[target_name.size() - 1]),.fill_reg(0));
+        //new_test(.target(target_name[target_name.size() - 2]),.fill_reg(0));
+       // new_test(.target(target_name[target_name.size() - 1]),.fill_reg(0));
         
          $finish;
     end

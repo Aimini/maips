@@ -86,7 +86,7 @@ input logic llbit); //forward
         pif.signal_out.pc_branch = pif.signal_out.pcadd4 + (sign_immed << 2);
         pif.signal_out.rs = rs_data;
         pif.signal_out.rt = rt_data;
-
+        pif.signal_out.mem_addr = rs_data + sign_immed;
         fs    =  pif.signal_out.control.flag_sel;
         src_a =  pif.signal_out.control.alu_srcA;
         src_b =  pif.signal_out.control.alu_srcB;
