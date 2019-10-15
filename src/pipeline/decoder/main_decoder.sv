@@ -24,7 +24,7 @@ module main_decoder(input logic[31:0] instruction,output signals::control_t ctl)
                 selector::DEST_REG_NCARE,  selector::PC_SRC_NEXT,    selector::FLAG_NCARE,
                 selector::REG_SRC_NCARE,   selector::MEM_READ_NCARE, selector::MEM_WRITE_NCARE,
                 selector::OPERAND_USE_BOTH,selector::EXC_CHK_NONE,
-                1'b0,1'b0,1'b0,1'b0,1'b0};
+                1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0};
         case(unpack.opcode)
             main_opcode::RTYPE:   ctl = rtype_control;
             main_opcode::REGIMM:  ctl = regimm_control;

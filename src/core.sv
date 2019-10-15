@@ -62,7 +62,6 @@ memory_interface.controller ins_mif, data_mif);
 
     stage_execute unit_execute(.pif(pif_execute),
         .forward(execute_forward_info),
-        .hi(0),.lo(0), //forward
         .llbit(1'b0));
 
 
@@ -82,6 +81,10 @@ memory_interface.controller ins_mif, data_mif);
         pif_decode.signal_in.dest_reg = pif_write_back.signal_out.dest_reg;
         pif_decode.signal_in.dest_reg_data = pif_write_back.signal_out.dest_reg_data;
         pif_decode.signal_in.control.write_reg = pif_write_back.signal_out.control.write_reg;
+        pif_decode.signal_in.control.write_hi  = pif_memory.signal_out.control.write_hi;
+        pif_decode.signal_in.control.write_lo  = pif_memory.signal_out.control.write_lo;
+        pif_decode.signal_in.dest_hi_data  = pif_memory.signal_out.dest_hi_data;
+        pif_decode.signal_in.dest_lo_data  = pif_memory.signal_out.dest_lo_data;
 
         pif_memory.nullify = 0;
         pif_write_back.nullify = 0;

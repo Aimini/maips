@@ -175,6 +175,7 @@ lui ${0}, 0xffff
 sw  ${2},   4(${0})
 sw  ${3},   8(${0})
 li  ${1},   0x{4:0>8X}
+lui ${0}, 0xffff
 sw  ${1}, 0(${0}) """.format(base_reg,arg_reg,reg1,reg2,f)
     return code
 
@@ -194,11 +195,12 @@ def assert_function_immed(f,reg,immed,base_reg = None,arg_reg = None):
         base_reg,arg_reg = get_random_exclued_reg(k = 2,exclude=[reg])
 
     code = """
-lui ${base}, 0xffff
 li  ${arg},  0x{immed:0>8X}
+lui ${base}, 0xffff
 sw  ${arg}, 4(${base})
 sw  ${reg}, 8(${base})
 li  ${arg}, 0x{funct:0>8X}
+lui ${base}, 0xffff
 sw  ${arg}, 0(${base}) """.format(base = base_reg,arg = arg_reg,reg = reg,immed = immed,funct = f)
     return code
 
@@ -211,7 +213,7 @@ def cutto_sign32(val):
     if ret >= 0x80000000:
         ret = -(2**32 - ret) 
     return ret
-    
+
 def cutto_sign16(val):
     ret = val & 0xFFFF
     if ret >= 0x8000:

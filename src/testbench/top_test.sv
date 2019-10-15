@@ -26,7 +26,7 @@ module top_test();
       /*j_too_large,jal_too_large*/
       "addiu",    "beq",       "bne",   "blez",
       "bgtz",     "slti",      "sltiu", "andi_1",
-      "andi_2",   "xori_1",    "xori_2"};
+      "andi_2",   "xori_1",    "xori_2","mthi_mfhi"};
 
     string manual_target_name[] = {
         "sys_serial_test"
@@ -209,15 +209,15 @@ module top_test();
     initial begin
         // new_test(.target(target_name[0]),.fill_reg('1));
         //  new_test(.target(target_name[1]),.fill_reg(0));
-        //  for(int i = 0; i < target_name.size(); ++i)
-        //  new_test(.target(target_name[i]),.fill_reg(i == 0));
-        //  $finish;
+        // for(int i = 0; i < target_name.size(); ++i)
+        // new_test(.target(target_name[i]),.fill_reg(i == 0));
+        // $finish;
 
         //new_test(.target(target_name[target_name.size() - 2]),.fill_reg(0));
-       // new_test(.target(target_name[target_name.size() - 1]),.fill_reg(0));
+        new_test(.target(target_name[target_name.size() - 1]),.fill_reg(0));
 
         // manual target
-        new_test(.target(manual_target_name[manual_target_name .size() - 1]),.fill_reg(0));
+       // new_test(.target(manual_target_name[manual_target_name .size() - 1]),.fill_reg(0));
        
         $finish;
     end

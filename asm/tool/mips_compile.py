@@ -61,10 +61,6 @@ if len(sys.argv) > 1:
     special_dumpdir = tmpdir/ "{0}.spec.hextext".format(name)
     Mars_dir = tooldir / 'Mars.jar'
 
-    # runnig an watch result
-    #just_run = 'java -jar {} $31 {}'.format(str(Mars_dir),str(run_by_mars))
-    #os.system(just_run)
-
     # dump 
     use_special_dump = len(sys.argv)  > 2
     command = ['java','-jar',str(Mars_dir),sys.argv[1],'-1']
@@ -83,33 +79,16 @@ if len(sys.argv) > 1:
     command.extend(dump_segment)
     command.extend(dump_data)
     command.extend(dump_reg)
-    # command.extend(dump_asm)
+    command.extend(dump_asm)
 
-    #print(dump_cmd)
     f = open(special_dumpdir,mode='wb')
-    #p1 = subprocess.Popen(command, stdin=subprocess.PIPE,stdout=f,stderr=f)
-    # stdout,stderr=p1.communicate()
-    # print(stderr.decode())
-    #p1.wait()
     cmd_str = ' '.join(command)
-    print(cmd_str)
+    #print(cmd_str)
     os.system(cmd_str)
-    # f.close()
 
-    # wf = None
-    # with open(special_dumpdir,mode='r') as rf:
-    #     for one in rf.readlines():
-    #         if(re.search('error', one, re.IGNORECASE)):
-    #             print(one,end='')
-            
-            # if(use_special_dump):
-            #     if wf is None:
-            #         wf = open(hextextdir,mode='w')
-            #     if one.startswith("Mem[") and one.find('Invalid') == -1:
-            #         contents = one.split(']')[1].split()
-            #         for word in contents:
-            #             if len(word) > 0:
-            #                 wf.write(word+'\n')
+    # if no data to dump ,still create empty file
+    with open(datadumpdir,"a") as f:
+        pass
 
         
 

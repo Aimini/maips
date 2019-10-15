@@ -3,33 +3,22 @@
 
 
 `include "src/common/util.sv"
+typedef struct{
+    logic f;
+    logic[31:0] data;
+} fowrad_element_t;
+
 
 typedef struct {
-    logic forward_rs,forward_rt;
-    logic[31:0]rt,rs;
+    fowrad_element_t rs,rt,lo,hi;
 } forward_info_t;
-/*
-*/
+
 
 module main_forwarder(
 input pipeline_signal_t ps_decode,ps_execute,
 ps_memory,ps_write_back,
 output forward_info_t decode_forward_info,
-execute_forward_info
-  );
-
-  // fowrad_info_t memory_to_execute;
-  // fowrad_info_t write_back_to_execute;
-  // fowrad_info_t write_back_to_decode;
-
-  // single_forwarder unit_memory_to_execute_forwarder
-  // (ps_memory,ps_execute,memory_to_execute);
-
-  // single_forwarder unit_write_back_to_execute_forwarder
-  // (ps_write_back,ps_execute,memory_to_execute);
-
-  // single_forwarder unit_write_back_to_decode_forwarder
-  // (ps_write_back,ps_decode,write_back_to_decode);
+execute_forward_info);
 
     signals::unpack_t execute_unpack,decode_unpack;
     extract_instruction execute_ei(.instruction(ps_execute.instruction),
@@ -38,52 +27,56 @@ execute_forward_info
     extract_instruction decode_ei(.instruction(ps_decode.instruction),
     .ei(decode_unpack));
 
+    function  automatic  fowrad_element_t get_clear_element();
+        return fowrad_element_t'{1'b0 ,  32'bx};
+    endfunction
+
+    function automatic forward_info_t get_clear_info();
+        return forward_info_t'{ fowrad_element_t :  get_clear_element() };
+    endfunction
+
+
+     function automatic fowrad_element_t test_one(input pipeline_signal_t ps, logic [4:0] target);
+        if(ps.dest_reg !== 0 & ps.control.write_reg) begin
+            if(target === ps.dest_reg) begin
+                return fowrad_element_t'{f:'1 , data: ps.dest_reg_data};
+            end
+        end
+        return get_clear_element();
+    endfunction
+
     always_comb begin
-        execute_forward_info.forward_rs = '0;
-        execute_forward_info.rs = 'x;  
-        execute_forward_info.forward_rt = '0;
-        execute_forward_info.rt =  'x;
+        execute_forward_info = get_clear_info(); 
+        decode_forward_info  = get_clear_info();
+
+        execute_forward_info.rs = test_one(ps_memory, execute_unpack.rs);
+        execute_forward_info.rt = test_one(ps_memory, execute_unpack.rt);
+
+        if(execute_forward_info.rs.f === '0)
+            execute_forward_info.rs = test_one(ps_write_back, execute_unpack.rs);
+        if(execute_forward_info.rt.f === '0)
+            execute_forward_info.rt = test_one(ps_write_back, execute_unpack.rt);
 
 
-        if(ps_write_back.dest_reg != 0 & ps_write_back.control.write_reg) begin
-            if(execute_unpack.rs == ps_write_back.dest_reg) begin
-                execute_forward_info.forward_rs = '1;
-                execute_forward_info.rs = ps_write_back.dest_reg_data;
-            end
+        decode_forward_info.rs = test_one(ps_write_back, decode_unpack.rs);
+        decode_forward_info.rt = test_one(ps_write_back, decode_unpack.rt);
 
-            if(execute_unpack.rt == ps_write_back.dest_reg) begin
-                execute_forward_info.forward_rt = '1;
-                execute_forward_info.rt = ps_write_back.dest_reg_data;
-            end
+
+        /********* lo hi ****************/
+        if( ps_memory.control.write_lo) begin
+            execute_forward_info.lo.f = '1;
+            execute_forward_info.lo.data = ps_memory.dest_lo_data;
+            decode_forward_info.lo.f = '1;
+            decode_forward_info.lo.data = ps_memory.dest_lo_data;
         end
 
-        if(ps_memory.dest_reg != 0 & ps_memory.control.write_reg) begin
-            if(execute_unpack.rs == ps_memory.dest_reg) begin
-                execute_forward_info.forward_rs = '1;
-                execute_forward_info.rs = ps_memory.dest_reg_data;
-            end
-
-            if(execute_unpack.rt == ps_memory.dest_reg) begin
-                execute_forward_info.forward_rt = '1;
-                execute_forward_info.rt = ps_memory.dest_reg_data;
-            end 
-        end
-
-        decode_forward_info.forward_rs = '0;
-        decode_forward_info.rs = 'x;
-        decode_forward_info.forward_rt = '0;
-        decode_forward_info.rt = 'x;
-        if(ps_write_back.control.write_reg  & ps_write_back.dest_reg != 0) begin
-            if(decode_unpack.rs == ps_write_back.dest_reg) begin
-                decode_forward_info.forward_rs = '1;
-                decode_forward_info.rs = ps_write_back.dest_reg_data;
-            end
-
-            if(decode_unpack.rt == ps_write_back.dest_reg) begin
-                decode_forward_info.forward_rt = '1;
-                decode_forward_info.rt = ps_write_back.dest_reg_data;
-            end 
-        end
+        if( ps_memory.control.write_hi) begin
+            execute_forward_info.hi.f = '1;
+            execute_forward_info.hi.data = ps_memory.dest_hi_data;
+            decode_forward_info.hi.f = '1;
+            decode_forward_info.hi.data = ps_memory.dest_hi_data;
+        end 
+        
     end
   
 endmodule

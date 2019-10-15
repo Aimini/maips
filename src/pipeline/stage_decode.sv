@@ -14,6 +14,7 @@ module stage_decode(pipeline_interface.port pif,input forward_info_t forward);
     logic [4:0] dest_reg;
     logic [31:0] dest_reg_data;
     logic [31:0] rs,rt;
+    logic [31:0]  hi_reg, lo_reg;
     logic write_reg;
     pipeline_interface reconnect(.clk(pif.clk),.reset(pif.reset));
 
@@ -31,6 +32,15 @@ module stage_decode(pipeline_interface.port pif,input forward_info_t forward);
 
     always @(posedge pif.clk) begin
        /* $display("decode [opcode:%6b, rs:%2d, rt:%2d, rd:%2d]",unpack.opcode, unpack.rs, unpack.rt, unpack.rd);*/
+       if(pif.reset) begin
+           lo_reg <= '0;
+           hi_reg <= '0;
+       end else begin
+        if(pif.signal_in.control.write_lo)
+            lo_reg <= pif.signal_in.dest_lo_data;
+        if(pif.signal_in.control.write_hi)
+            hi_reg <= pif.signal_in.dest_hi_data;
+       end
     end
 
     always_comb begin
@@ -38,8 +48,8 @@ module stage_decode(pipeline_interface.port pif,input forward_info_t forward);
         reconnect.nullify = pif.nullify;
         reconnect.stall = pif.stall;
         
-        pif.signal_out.rs = forward.forward_rs ? forward.rs : rs;
-        pif.signal_out.rt = forward.forward_rt ? forward.rt : rt;
+        pif.signal_out.rs = forward.rs.f === '1? forward.rs.data : rs;
+        pif.signal_out.rt = forward.rt.f === '1? forward.rt.data : rt;
         pif.signal_out.control = ctl;
         
         pif.signal_out.pc = reconnect.signal_out.pc;
@@ -47,6 +57,9 @@ module stage_decode(pipeline_interface.port pif,input forward_info_t forward);
         pif.signal_out.pcjump = {pif.signal_out.pcadd4[31:28],pif.signal_out.instruction[25:0],2'b00};
         pif.signal_out.instruction = reconnect.signal_out.instruction;
         
+        pif.signal_out.hi = forward.hi.f === '1 ? forward.hi.data : hi_reg;
+        pif.signal_out.lo = forward.lo.f === '1 ? forward.lo.data : lo_reg;
+
         dest_reg = pif.signal_in.dest_reg;
         dest_reg_data = pif.signal_in.dest_reg_data;
         write_reg  = pif.signal_in.control.write_reg;

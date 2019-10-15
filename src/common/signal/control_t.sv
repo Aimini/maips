@@ -17,6 +17,7 @@ typedef struct{
     logic write_reg;
     logic write_cp0;
     logic write_mem;
+    logic write_hi,write_lo;
     logic di,ie;
 } control_t;
 
@@ -26,6 +27,10 @@ function control_t nullify_control(input control_t ctl);
     ctl.write_mem = '0;
     ctl.write_reg = '0;
     ctl.write_cp0 = '0;
+    ctl.di = '0;
+    ctl.ie = '0;
+    ctl.write_hi = '0;
+    ctl.write_lo = '0;
     ctl.di = '0;
     ctl.ie = '0;
     return ctl;
