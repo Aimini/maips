@@ -1,0 +1,8 @@
+*.bak
+/*.*
+/work
+!.gitignore
+!implement_order
+*.jar
+/asm/temp
+/_gsdata_

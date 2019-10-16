@@ -23,12 +23,34 @@ typedef struct
 
 
 interface pipeline_interface (input logic clk,reset);
-    logic nullify,stall;
+    /**
+        stall and bubble have same effect at most time, but
+        for multiple cycle element like multiplyer and divider,
+        stall meaning you can still caculate with correct operand.
+        bubble meaning that you must wait some instruction  
+        to get result anf forwarding to you.
+        for example :
+         lw $s0, 0($t0) # foward result at writeback
+         mult $s0,$s1   # Ops ! I' need $s0 and excute!
+         # in this case, lw will produce a bubble for mult, mult can't 
+         start caculate before get $s0.
+        and for example:
+          lw $s0, 0($t0)   # writeback
+          xori $s1,$0, 0x3 # memory
+          mult $s0,$s1    # excute
+          # in this case, when lw wait memory read, lw create a
+          # stall;but mult can caculate with correct operand!
+        
+    **/
+    logic nullify,stall,bubble;
+
     pipeline_signal_t signal_in;
     pipeline_signal_t signal_out;
 
-    modport port(input clk,reset,nullify,stall,signal_in,
+    modport port(input clk,reset,nullify,stall,bubble,signal_in,
     output signal_out);
+    modport controller(input signal_out,
+    output nullify,stall,bubble);
 endinterface
 
 `endif

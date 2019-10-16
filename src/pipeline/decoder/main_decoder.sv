@@ -5,7 +5,7 @@
 `include "src/common/util.sv"
 `include "src/common/encode/main_opcode.sv"
 `include "src/pipeline/decoder/rtype_decoder.sv"
-
+`include "src/pipeline/decoder/decoder_util.sv"
 
 module main_decoder(input logic[31:0] instruction,output signals::control_t ctl);
     signals::control_t rtype_control;
@@ -19,21 +19,17 @@ module main_decoder(input logic[31:0] instruction,output signals::control_t ctl)
     
 
     always_comb begin
-        ctl = '{selector::ALU_NCARE,       selector::ALU_SRCA_NCARE, selector::ALU_SRCB_NCARE,
-                selector::ALU_SRCSA_NCARE,
-                selector::DEST_REG_NCARE,  selector::PC_SRC_NEXT,    selector::FLAG_NCARE,
-                selector::REG_SRC_NCARE,   selector::MEM_READ_NCARE, selector::MEM_WRITE_NCARE,
-                selector::OPERAND_USE_BOTH,selector::EXC_CHK_NONE,
-                1'b0,1'b0,1'b0,1'b0,1'b0,1'b0,1'b0};
+        ctl =  signals::get_clear_control();
+
         case(unpack.opcode)
             main_opcode::RTYPE:   ctl = rtype_control;
             main_opcode::REGIMM:  ctl = regimm_control;
+
             main_opcode::J, main_opcode::JAL: begin
                 ctl.pc_src = selector::PC_SRC_JUMP;
-                ctl.opd_use = selector::OPERAND_USE_NONE;
                 if(unpack.opcode == main_opcode::JAL) begin
                     ctl.write_reg = 1;
-                    ctl.reg_src = selector::REG_SRC_PCADD4;
+                    ctl.reg_src =  selector::REG_SRC_PCADD4;
                     ctl.dest_reg = selector::DEST_REG_31;
                 end  
             end
@@ -42,91 +38,62 @@ module main_decoder(input logic[31:0] instruction,output signals::control_t ctl)
             main_opcode::BLEZ, main_opcode::BGTZ, //rt are hard encoding as $0
             main_opcode::BEQL, main_opcode::BNEL,
             main_opcode::BLEZL,main_opcode::BGTZL: begin
-                {ctl.pc_src,  ctl.alu_srcA,
-                 ctl.alu_srcB}  =
-                {selector::PC_SRC_BRANCH, selector::ALU_SRCA_RS,
-                 selector::ALU_SRCB_RT};
+                ctl = decoder_util::get_standard_control();
+               
                 case(unpack.opcode)
                     main_opcode::BEQ, main_opcode::BEQL:
-                        ctl.flag_sel = selector::FLAG_EQ;
+                        decoder_util::branch_with(ctl,selector::FLAG_EQ);
                     main_opcode::BNE,main_opcode::BNEL:
-                        ctl.flag_sel = selector::FLAG_NE;
+                        decoder_util::branch_with(ctl,selector::FLAG_NE);
                     main_opcode::BLEZ,main_opcode::BLEZL:
-                        ctl.flag_sel = selector::FLAG_LE;
+                        decoder_util::branch_with(ctl,selector::FLAG_LE);
                     main_opcode::BGTZ,main_opcode::BGTZL:
-                        ctl.flag_sel = selector::FLAG_GT;
+                        decoder_util::branch_with(ctl,selector::FLAG_GT);
                 endcase
             end
 
             main_opcode::ADDI,main_opcode::ADDIU: begin
-                {ctl.alu_funct ,ctl.reg_src,
-                 ctl.alu_srcA, ctl.alu_srcB  ,ctl.dest_reg} = 
-                {selector::ALU_ADD,     selector::REG_SRC_ALU,
-                 selector::ALU_SRCA_RS, selector::ALU_SRCB_SIGN_IMMED,
-                 selector::DEST_REG_RT};
-            
-                ctl.opd_use = selector::OPERAND_USE_RS;
-                ctl.write_reg = 1;
+                ctl = decoder_util::get_sign_immed_control();
+                decoder_util::write_alu_to_rt(ctl,selector::ALU_ADD);
+
                 if(unpack.opcode == main_opcode::ADDI)
                     ctl.exc_chk = selector::EXC_CHK_OVERFLOW;
             end
 
             main_opcode::SLTI,main_opcode::SLTIU: begin
-                { ctl.reg_src,
-                 ctl.alu_srcA,  ctl.alu_srcB,
-                 ctl.dest_reg,  ctl.write_reg,
-                 ctl.opd_use} = 
-                { selector::REG_SRC_FLAG,
-                 selector::ALU_SRCA_RS, selector::ALU_SRCB_SIGN_IMMED,
-                 selector::DEST_REG_RT, 1'b1,
-                 selector::OPERAND_USE_RS};
+                ctl = decoder_util::get_sign_immed_control();
+
                 if(unpack.opcode == main_opcode::SLTIU)
-                    ctl.flag_sel = selector::FLAG_LTU;
+                    decoder_util::write_flag_to_rt(ctl,selector::FLAG_LTU);
                 else
-                    ctl.flag_sel = selector::FLAG_LT;
+                    decoder_util::write_flag_to_rt(ctl,selector::FLAG_LT);
             end
 
             main_opcode::ANDI,main_opcode::ORI,main_opcode::XORI: begin
-                {ctl.alu_funct, ctl.reg_src,
-                 ctl.alu_srcA,  ctl.alu_srcB, ctl.dest_reg} = 
-                {selector::ALU_ADD,     selector::REG_SRC_ALU,
-                 selector::ALU_SRCA_RS, selector::ALU_SRCB_IMMED,
-                 selector::DEST_REG_RT};
-                ctl.opd_use = selector::OPERAND_USE_RS;
-                ctl.write_reg = '1;
+                ctl = decoder_util::get_zero_immed_control();
                 case(unpack.opcode)
                     main_opcode::ANDI:
-                        ctl.alu_funct = selector::ALU_AND;
+                        decoder_util::write_alu_to_rt(ctl, selector::ALU_AND);
                     main_opcode::ORI:
-                        ctl.alu_funct = selector::ALU_OR;
+                        decoder_util::write_alu_to_rt(ctl, selector::ALU_OR);
                     main_opcode::XORI:
-                        ctl.alu_funct = selector::ALU_XOR;
+                        decoder_util::write_alu_to_rt(ctl, selector::ALU_XOR);
                     default:
-                        ctl.alu_funct = selector::ALU_NCARE;
+                        decoder_util::write_alu_to_rt(ctl, selector::ALU_NCARE);
                 endcase
             end
             
             main_opcode::SW: begin
-                {ctl.alu_funct, ctl.reg_src,
-                 ctl.alu_srcA,  ctl.alu_srcB,
-                 ctl.write_mode,ctl.write_mem } = 
-                {selector::ALU_ADD,        selector::REG_SRC_ALU,
-                 selector::ALU_SRCA_RS,    selector::ALU_SRCB_SIGN_IMMED,
-                 selector::MEM_WRITE_WORD, 1'b1};
-                 ctl.opd_use = selector::OPERAND_USE_RT;
+                ctl = decoder_util::get_mem_addr_control();
+                {ctl.write_mode,           ctl.write_mem } = 
+                {selector::MEM_WRITE_WORD, 1'b1};
             end
 
             main_opcode::LUI: begin
-                {ctl.alu_funct, ctl.reg_src,
-                 ctl.alu_srcA,  ctl.alu_srcB, ctl.dest_reg} = 
-                {selector::ALU_ADD,        selector::REG_SRC_ALU,
-                 selector::ALU_SRCA_RS,    selector::ALU_SRCB_UP_IMMED,
-                  selector::DEST_REG_RT};
-                ctl.opd_use = selector::OPERAND_USE_NONE;
-                ctl.write_reg = '1;
+                ctl = decoder_util::get_up_immed_control();
+                decoder_util::write_alu_to_rt(ctl,selector::ALU_ADD);
             end
             
-
             default:
                 ctl.exc_chk = selector::EXC_CHK_RESERVERD;
         endcase

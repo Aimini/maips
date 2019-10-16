@@ -1,9 +1,8 @@
 module pipeline_base (pipeline_interface.port pif, input logic nullify_instruction = '0);
     pipeline_signal_t signal_reg;
 
-    always_comb begin
-        pif.signal_out = signal_reg;
-    end
+    assign pif.signal_out = signal_reg;
+    
 
     always_ff @(posedge pif.clk) begin
         if(pif.reset)
@@ -21,8 +20,11 @@ module pipeline_base (pipeline_interface.port pif, input logic nullify_instructi
             if(nullify_instruction)
                 signal_reg.instruction <= '0;
         end
-        else if(!pif.stall)
+        else if(!(pif.stall | pif.bubble))
             signal_reg <= pif.signal_in;
     end
 endmodule
+
+
+
 

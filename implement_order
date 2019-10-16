@@ -1,0 +1,50 @@
+# sw just check 0xffff0000-0xffff001C is 0 - 7
+# you can't change it.
+sw ( only)
+
+
+## 0xffff0000-0xffff001C were agent by modelsim,
+# 0xffff0000 as function opcode
+# 0xffff0004 -0xffff001C is argument
+arg[0]
+0x00000000 :  $finish
+
+0x00000001 :  assert arg[1] == arg[2]
+
+0x00000002 :  assert arg[1] != arg[2]
+
+0x00010000 : check register file
+        - arg[1]  *     0: check all 
+                  * other: check ignore gp\sp
+    - note: this one for lui, since we have sw-dbg,
+    we can use lui to load  upper 16 bit immed as 
+    dbg parameter.
+
+0xFFFF0000 : dump dbg arg at 0xffff0000-0xffff001C
+        - arg[1]  * 0x0000_0020:check whether arg[0] = 0xFFFF0000,
+                    check whether other  arg[i] is (1 << i),
+    - note: this one is for sw-dbg. when we begin test
+    sw dbg, modelsim will auto fill $s0 and $v0 to
+    0xFFFF0000, to other $si to (i << i), asm file 
+    excute process that store $s0-$s7 to 0xffff0000-0xffff001C. 
+
+##################################################################
+
+LUI
+ORI   (pesudo li)
+ADDU  (pesdo move)
+
+J, JAL
+ADDIU
+
+BEQ,BNE
+BLZE,BGTZ
+
+SLTI,SLTIU
+
+XORI
+
+MFHI,MTHI
+MFLO,MTLO
+//------------
+ADDI(NOEXCEUPTION)

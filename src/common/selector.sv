@@ -31,13 +31,25 @@ typedef enum  {
     ALU_SHIFT_ARITHMATIC_RIGHT  ,ALU_ROTATE_RIGHT,
     ALU_CLO                     ,ALU_CLZ,
     ALU_NCARE} alu_function;
+
+        //SPECIAL FUNCTION
+typedef enum{
+    MULDIV_MULT, MULDIV_MULTU,
+    MULDIV_DIV,  MULDIV_DIVU,
+    MULDIV_NCARE
+} muldiv_function;
+
+typedef enum{
+    HILO_SRC_RS, HILO_SRC_MULDIV,
+    HILO_SRC_NCARE
+} hilo_source;
 /** register source **/
 typedef enum {
-    REG_SRC_ALU,   REG_SRC_PCADD4,
+    REG_SRC_ALU,   REG_SRC_MUL_DIV, REG_SRC_PCADD4,
     REG_SRC_RS,    REG_SRC_FLAG,
     REG_SRC_LLBIT, REG_SRC_HI,
-    REG_SRC_LO,    REG_SRC_CP0,
-    REG_SRC_MEM,
+    REG_SRC_LO,    REG_SRC_MUL,
+    REG_SRC_CP0,   REG_SRC_MEM,
     REG_SRC_NCARE
 } register_source;
 

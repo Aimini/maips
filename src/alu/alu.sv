@@ -18,7 +18,7 @@ module alu #(parameter N = 32)
 
     assign flag.carry = carry;
     assign flag.compare = compare_result;
-    assign sub = (funct == selector::ALU_SUB);
+    assign sub = (funct === selector::ALU_SUB);
     alu_logic #(N) unit_alu_logic(.a(a),.b(b),
     .funct(funct),.sa(sa),
     .y(alu_logic_y));

@@ -29,16 +29,17 @@ module stage_memory(pipeline_interface.port pif,
      /* control signal*/
 
 
+    assign  reconnect.signal_in = pif.signal_in;
+    assign  reconnect.nullify = pif.nullify;
+    assign  reconnect.stall = pif.stall;
+    assign  reconnect.bubble = pif.bubble;
+
     always_comb begin
-        mem_data_out = mif.dout;
-
-        reconnect.signal_in = pif.signal_in;
-        reconnect.nullify = pif.nullify;
-        reconnect.stall = pif.stall;
-
         pif.signal_out = reconnect.signal_out;
         pif.signal_out.mem_data = processed_data;
+    end
 
+    always_comb begin
         register_data  = pif.signal_out.rt;
 
         write_mem   = pif.signal_out.control.write_mem;
@@ -50,6 +51,7 @@ module stage_memory(pipeline_interface.port pif,
         mif.din  = mem_data_in;
         mif.write  =  write_mem;
         mif.mask = byte_mask;
+        mem_data_out = mif.dout;
     end
 endmodule
 `endif
