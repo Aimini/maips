@@ -107,6 +107,10 @@ def get_random_exclued_reg( k = 1, exclude = []):
     a = get_exclued_reg_list(*exclude)
     return random.sample(a,k = k)
 
+
+def set_immed(reg,immed):
+    return """lui  ${0},   0x{1:0>4X}
+ori ${0},   0x{2:0>4X}""".format(reg,(immed >>16) & 0xFFFF, immed & 0xFFFF)
 ####################################################
 # call exit function in modelsim
 # using base_reg as momory address base
@@ -174,9 +178,8 @@ def assert_function(f,reg1,reg2,base_reg = None,arg_reg = None):
 lui ${0}, 0xffff
 sw  ${2},   4(${0})
 sw  ${3},   8(${0})
-li  ${1},   0x{4:0>8X}
-lui ${0}, 0xffff
-sw  ${1}, 0(${0}) """.format(base_reg,arg_reg,reg1,reg2,f)
+    {4}
+sw  ${1}, 0(${0}) """.format(base_reg,arg_reg,reg1,reg2,set_immed(arg_reg, f))
     return code
 
 
@@ -195,13 +198,14 @@ def assert_function_immed(f,reg,immed,base_reg = None,arg_reg = None):
         base_reg,arg_reg = get_random_exclued_reg(k = 2,exclude=[reg])
 
     code = """
-li  ${arg},  0x{immed:0>8X}
+{immed}
 lui ${base}, 0xffff
 sw  ${arg}, 4(${base})
 sw  ${reg}, 8(${base})
-li  ${arg}, 0x{funct:0>8X}
-lui ${base}, 0xffff
-sw  ${arg}, 0(${base}) """.format(base = base_reg,arg = arg_reg,reg = reg,immed = immed,funct = f)
+{funct}
+sw  ${arg}, 0(${base}) """.format(base = base_reg,arg = arg_reg,reg = reg,\
+    immed = set_immed(arg_reg, immed),\
+    funct = set_immed(arg_reg, f))
     return code
 
 def assert_equal_immed(reg,immed,base_reg = None,arg_reg = None):

@@ -30,7 +30,7 @@ output logic wait_result);
       .sub(sub),.add(add),
       .a(rs),.b(rt),.hi_in(hi_in),.lo_in(lo_in),
       .hi_out(hi_out),.lo_out(lo_out),
-      .write_hi_lo(write_hi_lo),.waiting_result(waiting_result));
+      .write_hi_lo(write_hi_lo),.waiting_result(wait_result));
     
     always_comb begin
         {mul, div} = '0;

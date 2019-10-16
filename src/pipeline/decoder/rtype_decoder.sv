@@ -52,6 +52,7 @@ module rtype_decoder(input logic[31:0] instruction,output signals::control_t ctl
             end
 
             rtype::MULTU: begin
+                ctl = decoder_util::get_standard_control();
                 ctl.hilo_src     =  selector::HILO_SRC_MULDIV;
                 ctl.muldiv_funct =  selector::MULDIV_MULTU;
                 ctl.write_hi =  1'b1;

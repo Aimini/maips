@@ -27,7 +27,7 @@ module top_test();
       "addiu",    "beq",       "bne",   "blez",
       "bgtz",     "slti",      "sltiu", "andi_1",
       "andi_2",   "xori_1",    "xori_2","mthi_mfhi",
-      "mtlo_mflo"};
+      "mtlo_mflo","multu"};
 
     string manual_target_name[] = {
         "sys_serial_test"
@@ -215,9 +215,9 @@ module top_test();
         // $finish;
     //  for(int i = 0; i < target_name.size(); ++i)
     //         new_test(.target(target_name[i]),.fill_reg(i == 0));
-    //     $finish;
-        new_test(.target(target_name[target_name.size() - 2]),.fill_reg(0));
-         new_test(.target(target_name[target_name.size() - 1]),.fill_reg(0));
+    // //     $finish;
+    //     new_test(.target(target_name[target_name.size() - 2]),.fill_reg(0));
+          new_test(.target(target_name[target_name.size() - 1]),.fill_reg(0));
        //  new_test(.target(target_name[9]),.fill_reg(0));
         // manual target
        // new_test(.target(manual_target_name[manual_target_name .size() - 1]),.fill_reg(0));
