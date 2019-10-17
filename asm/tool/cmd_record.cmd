@@ -22,3 +22,5 @@ generate\multu.py & tool\mips_compile.py multu.asm
 generate\divu.py & tool\mips_compile.py divu.asm
 generate\mult.py & tool\mips_compile.py mult.asm
 generate\mult.py & tool\mips_compile.py mult.asm
+generate\div.py
+generate\msubu.py

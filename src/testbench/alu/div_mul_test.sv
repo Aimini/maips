@@ -51,7 +51,8 @@ module div_mul_test();
         };
     endclass
 
-    typedef struct packed {
+    typedef struct {
+        string name;
         logic sub, add, using_sign, mul,div;
     } config_t;
 
@@ -62,8 +63,9 @@ module div_mul_test();
         logic[N*2 - 1:0] multiply_result;
         logic[N - 1:0] remainder, quotient;
         logic signed[N - 1:0] sa,sb;
+        string ingnore_name; // tool man, useless
 
-        {sub, add, using_sign, mul,div} = con;
+        {sub, add, using_sign, mul,div} = {con.sub, con.add, con.using_sign, con.mul,con.div};
         hi_in = td.hi; lo_in = td.lo;
         sa = td.a;     sb = td.b;
         a = td.a;      b = td.b;
@@ -88,7 +90,11 @@ module div_mul_test();
                 $sformat(hilo_info,"%x,%x +",td.hi, td.lo);
                 result = {td.hi, td.lo} + multiply_result;
             end
-                
+            if(con.sub) begin
+                fname = {"sub hi,lo",fname};
+                $sformat(hilo_info,"%x,%x -",td.hi, td.lo);
+                result = {td.hi, td.lo} - multiply_result;
+            end
         end else begin
             result = {remainder, quotient};
         end
@@ -145,16 +151,18 @@ module div_mul_test();
      task automatic test_all_bench();
         config_t all_config[] = '{
             // sub, add, using_sign, mul,div;
-            //'{0,0,0,1,0}, // unsigned mul
-            //'{0,0,0,0,1}, // unsigned div
-            //'{0,0,1,1,0}, // signed mul
-            //'{0,0,1,0,1} // signed div
-            //'{0,1,0,1,0} // MADDU
-            '{0,1,1,1,0} // MADD
+            //'{"unsigned multiply", 0,0,0,1,0}, // unsigned mul
+            //'{"unsigned division",0,0,0,0,1}, // unsigned div
+            //'{"signed multiply",0,0,1,1,0}, // signed mul
+            //'{"signed division",0,0,1,0,1} // signed div
+            //'{"add unsigned multiply",0,1,0,1,0} // MADDU
+            //'{"add signed multiply",0,1,1,1,0} // MADD
+            '{"sub unsigned multiply",1,0,0,1,0} // MSUBU
         };
        
         for(int i = 0; i < all_config.size(); ++i) begin
             config_t one_configuration = all_config[i];
+            $display("test %s..",one_configuration.name);
             test_one_mode_bench(one_configuration);
         end
     endtask
