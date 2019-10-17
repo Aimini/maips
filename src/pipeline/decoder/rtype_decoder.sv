@@ -51,20 +51,17 @@ module rtype_decoder(input logic[31:0] instruction,output signals::control_t ctl
                 ctl.write_lo =  1'b1;
             end
 
-            rtype::MULTU: begin
+            rtype::MULT, rtype::MULTU, rtype::DIVU, rtype::DIV: begin
                 ctl = decoder_util::get_standard_control();
                 ctl.hilo_src     =  selector::HILO_SRC_MULDIV;
-                ctl.muldiv_funct =  selector::MULDIV_MULTU;
                 ctl.write_hi =  1'b1;
                 ctl.write_lo =  1'b1;
-            end
-
-            rtype::DIVU: begin
-                ctl = decoder_util::get_standard_control();
-                ctl.hilo_src     =  selector::HILO_SRC_MULDIV;
-                ctl.muldiv_funct =  selector::MULDIV_DIVU;
-                ctl.write_hi =  1'b1;
-                ctl.write_lo =  1'b1;
+                case(unpack.funct)
+                    rtype::MULT : ctl.muldiv_funct = selector::MULDIV_MULT;
+                    rtype::MULTU: ctl.muldiv_funct = selector::MULDIV_MULTU;
+                    rtype::DIVU : ctl.muldiv_funct = selector::MULDIV_DIVU;
+                    rtype::DIV  : ctl.muldiv_funct = selector::MULDIV_DIV;
+                endcase
             end
 
             rtype::ADDU: begin

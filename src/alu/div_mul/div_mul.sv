@@ -182,7 +182,7 @@ module div_mul #(parameter N = 32)
             SRCB_A: srcB = a;
             SRCB_B: srcB = b;
             SRCB_ABS_B  : srcB = b_abs;
-            SRCB_AITER_B: srcB = b_abs & {N{a_abs_iter}};
+            SRCB_AITER_B: srcB = b_abs & ({N{a_abs_iter}});
             default:srcB = 'x;
         endcase
         if(neg_srcB)
@@ -322,6 +322,8 @@ module div_mul #(parameter N = 32)
         };
         write_hi_lo = '0;
         waiting_result = '1;
+        neg_srcB = '0;
+
         hi_out = thi;
         lo_out = tlo;
         case(current_state)
@@ -359,13 +361,13 @@ module div_mul #(parameter N = 32)
                 THI_ALU,  TLO_HOLD, SRCA_ZERO,   SRCB_THI,    CIN_ONE, 1'b1};
             NEG_PRODUCT_TLO:   
                 {thi_sel, tlo_sel, srcA_select, srcB_select, cin_sel, neg_srcB } = {
-                THI_HOLD, TLO_ALU, SRCA_ZERO,   SRCB_TLO,    CIN_ONE, 1'b1}; 
+                THI_HOLD, TLO_ALU, SRCA_ZERO,   SRCB_TLO,    CIN_ONE,  1'b1}; 
             NEG_PRODUCT_THI:  
                 {thi_sel, tlo_sel, srcA_select, srcB_select, cin_sel, neg_srcB } = {
-                THI_HOLD, TLO_ALU, SRCA_ZERO,   SRCB_TLO,    CIN_COUT,1'b1};  
+                THI_ALU, TLO_HOLD, SRCA_ZERO,   SRCB_THI,    CIN_COUT, 1'b1};  
             PREVIOUS_SUB_TLO: 
                 {thi_sel, tlo_sel, srcA_select, srcB_select, cin_sel, neg_srcB } = {
-                THI_HOLD, TLO_ALU, SRCA_LO,     SRCB_TLO,    CIN_ONE, 1'b1}; 
+                THI_HOLD, TLO_ALU, SRCA_LO,     SRCB_TLO,    CIN_ONE,  1'b1}; 
             PREVIOUS_SUB_THI:   
                 {thi_sel, tlo_sel,  srcA_select, srcB_select, cin_sel,  neg_srcB } = {
                 THI_ALU,  TLO_HOLD, SRCA_HI,     SRCB_THI,    CIN_COUT, 1'b1};

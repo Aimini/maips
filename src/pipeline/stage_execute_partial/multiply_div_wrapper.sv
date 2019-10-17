@@ -39,11 +39,16 @@ output logic wait_result);
             selector::MULDIV_MULTU: begin
                 mul = '1;
             end
+            selector::MULDIV_MULT: begin
+                mul = '1;
+                using_sign = '1;
+            end
             selector::MULDIV_DIVU: begin
                 div = '1;
             end
-            default: begin
-            
+            selector::MULDIV_DIV: begin
+                div = '1;
+                using_sign = '1;
             end
         endcase
     end

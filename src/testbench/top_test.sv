@@ -51,7 +51,8 @@ module top_test();
         '{"mthi_mfhi",  1'b1,  1'b0,  1'b1,  1'b0},
         '{"mtlo_mflo",  1'b1,  1'b0,  1'b1,  1'b0},
         '{"multu",      1'b1,  1'b0,  1'b1,  1'b0},
-        '{"divu",       1'b1,  1'b0,  1'b1,  1'b0}
+        '{"divu",       1'b1,  1'b0,  1'b1,  1'b0},
+        '{"mult",       1'b1,  1'b0,  1'b1,  1'b0}
       };
 
     string manual_target_name[] = {

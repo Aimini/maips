@@ -6,3 +6,5 @@
 *.jar
 /asm/temp
 /_gsdata_
+__pycache__
+/asm/temp
