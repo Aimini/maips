@@ -13,7 +13,7 @@ module top_test();
     logic[31:0] reg_v[1:0],reg_a[3:0],reg_s[7:0],reg_t[9:0];
     logic[31:0]  reg_file[31:0];
     logic write_dbg_memory,write_dbg_function_reg;
-
+    logic[31:0] pc_mem_stage;
     // indicate cpu is writing dbg memory.
     logic dbg_loaded;
     logic[31:0] dbg_arg[7:0];
@@ -52,24 +52,25 @@ module top_test();
         '{"mtlo_mflo",  1'b1,  1'b0,  1'b1,  1'b0},
         '{"multu",      1'b1,  1'b0,  1'b1,  1'b0},
         '{"divu",       1'b1,  1'b0,  1'b1,  1'b0},
-        '{"mult",       1'b1,  1'b0,  1'b1,  1'b0}
+        '{"mult",       1'b1,  1'b0,  1'b1,  1'b0},
+        '{"div",        1'b1,  1'b0,  1'b1,  1'b0}
       };
 
     string manual_target_name[] = {
         "sys_serial_test"
     };
 
+    assign reg_file = unit_top.unit_core.unit_decode.unit_rf.file;
+    assign reg_v  =  reg_file[3:2];
+    assign reg_a  = reg_file[7:4];
+    assign reg_s = reg_file[23:16];
+    assign reg_t = {reg_file[25:24], reg_file[15:8]};
     always_comb begin
-        reg_file = unit_top.unit_core.unit_decode.unit_rf.file;
-        reg_v  =  reg_file[3:2];
-        reg_a  = reg_file[7:4];
-        reg_s = reg_file[23:16];
-        reg_t = {reg_file[25:24], reg_file[15:8]};
-
         write_dbg_memory =  unit_top.unit_memory.unit_debug_ram.we;
         write_dbg_function_reg =  unit_top.unit_memory.unit_debug_ram.addr == 0;
         dbg_arg = unit_top.unit_memory.unit_debug_ram.datas;
     end
+    assign pc_mem_stage = unit_top.unit_core.unit_memory.pif.signal_out.pc;
 
     always_ff @(posedge clk)
         dbg_loaded <= write_dbg_memory & write_dbg_function_reg;
@@ -84,6 +85,12 @@ module top_test();
 
     function automatic string get_regchk_filename(string target);
         return  {"asm/temp/", target, ".asm.reg.hextext"};
+    endfunction
+
+    /* stop and dump pc */
+    function automatic void stop_print_pc();
+        $display("pc:[%8x]",pc_mem_stage);
+        $stop;
     endfunction
 
     /* fill for sw_dbg test */
@@ -122,7 +129,7 @@ module top_test();
             assert (temp[i] === rf[i]) 
             else  begin
                 $error("register file check failed at %0d: %8h != %8h ",i,temp[i],rf[i]);
-                $stop;
+                stop_print_pc();
             end
         end
     endfunction
@@ -151,7 +158,7 @@ module top_test();
                     assert(dbg_arg[1] === dbg_arg[2])
                     else begin
                         $error("assert equal failed : %8h != %8h",dbg_arg[1],dbg_arg[2]);
-                        $stop; 
+                        stop_print_pc();
                     end
                 end
 
@@ -161,7 +168,7 @@ module top_test();
                     assert(dbg_arg[1] !== dbg_arg[2])
                     else begin
                          $error("assert not equal failed : %8h == %8h",dbg_arg[1],dbg_arg[2]);
-                         $stop();
+                         stop_print_pc();
                     end
                 end
 
@@ -204,12 +211,14 @@ module top_test();
                         check_sw_dbg_arg();
                     end else begin
                         $error("unsupport check:%8x, sub function:%8x",dbg_arg[0],dbg_arg[1]);    
-                        $stop();
+                        stop_print_pc();
                     end
                 end
 
-                default:
+                default: begin
                     $error("unsupport check:%8x",dbg_arg[0]);
+                    stop_print_pc();
+                end
             endcase
         end
     endtask

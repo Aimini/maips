@@ -112,9 +112,9 @@ module div_mul_test();
         td.no_zero = 0;
         if(con.div === 1)
             td.no_zero = 1;
-
+        //test boundary value
         td.using_bound = 1;
-        for(int j = 0; j < 100000; ++j) begin
+        for(int j = 0; j < 50000; ++j) begin
             if(td.randomize()) begin
                 test_one_pair(con, td);
             end else begin
@@ -123,8 +123,9 @@ module div_mul_test();
             end
         end
         
+        //test random value
         td.using_bound = 0;
-        for(int i = 0; i < 100000; ++i) begin
+        for(int i = 0; i < 200000; ++i) begin
             if(td.randomize()) begin
                 test_one_pair(con, td);
             end else begin
@@ -136,8 +137,10 @@ module div_mul_test();
 
      task automatic test_all_bench();
         config_t all_config[] = '{
-      //      '{0,0,0,1,0}, // usign mul
-            '{0,0,0,0,1} // usign div
+            //'{0,0,0,1,0}, // unsigned mul
+            //'{0,0,0,0,1}, // unsigned div
+            //'{0,0,1,1,0}, // signed mul
+            '{0,0,1,0,1} // signed div
         };
        
         for(int i = 0; i < all_config.size(); ++i) begin
