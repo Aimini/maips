@@ -19,20 +19,20 @@ def gen_assert_one(A,reg1,reg1_val,reg2,reg2_val,prev_value):
         if reg1 == reg2:
             reg1_val = reg2_val
         next_value = prev_value
-        if reg2_val != 0:
-            result =reg1_val * reg2_val;
-            A(set_immed(reg1, reg1_val))
-            A(set_immed(reg2, reg2_val))
+        
+        result =reg1_val * reg2_val;
+        A(set_immed(reg1, reg1_val))
+        A(set_immed(reg2, reg2_val))
 
-            A("msubu ${},${}".format(reg1,reg2))
-            next_value -= result;
+        A("msubu ${},${}".format(reg1,reg2))
+        next_value -= result;
 
-            retrive_reg = random.sample(range(2,32),k = 2)
-            A("mfhi ${}".format(retrive_reg[0]))
-            A(assert_equal_immed(retrive_reg[0],(next_value >> 32) & 0xFFFFFFFF))
+        retrive_reg = random.sample(range(2,32),k = 2)
+        A("mfhi ${}".format(retrive_reg[0]))
+        A(assert_equal_immed(retrive_reg[0],(next_value >> 32) & 0xFFFFFFFF))
 
-            A("mflo ${}".format(retrive_reg[1]))  
-            A(assert_equal_immed(retrive_reg[1],next_value & 0xFFFFFFFF))
+        A("mflo ${}".format(retrive_reg[1]))  
+        A(assert_equal_immed(retrive_reg[1],next_value & 0xFFFFFFFF))
         return next_value & 0xFFFFFFFFFFFFFFFF 
             
 def gen_partial(A,reg_val_gen1,reg_val_gen2,previous_value, time = 2):

@@ -19,17 +19,17 @@ def gen_assert_one(A,reg1,reg1_val,reg2,reg2_val):
         if reg1 == reg2:
             reg1_val = reg2_val
 
-        if reg2_val != 0:
-            result = cutto_sign32(reg1_val) * cutto_sign32(reg2_val);
-            A(set_immed(reg1, reg1_val))
-            A(set_immed(reg2, reg2_val))
+        
+        result = cutto_sign32(reg1_val) * cutto_sign32(reg2_val);
+        A(set_immed(reg1, reg1_val))
+        A(set_immed(reg2, reg2_val))
 
-            
-            rt = random.choice(range(0,32))
-            A("mul ${},${},${}".format(rt, reg1, reg2))
-            if rt == 0:
-                result = 0
-            A(assert_equal_immed(rt, result & 0xFFFFFFFF))
+        
+        rd = random.choice(range(0,32))
+        A("mul ${},${},${}".format(rd, reg1, reg2))
+        if rd == 0:
+            result = 0
+        A(assert_equal_immed(rd, result & 0xFFFFFFFF))
             
 def gen_partial(A,reg_val_gen1,reg_val_gen2, time = 2):
     #zero 
