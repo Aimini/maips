@@ -59,6 +59,14 @@ module rtype_decoder(input logic[31:0] instruction,output signals::control_t ctl
                 ctl.write_lo =  1'b1;
             end
 
+            rtype::DIVU: begin
+                ctl = decoder_util::get_standard_control();
+                ctl.hilo_src     =  selector::HILO_SRC_MULDIV;
+                ctl.muldiv_funct =  selector::MULDIV_DIVU;
+                ctl.write_hi =  1'b1;
+                ctl.write_lo =  1'b1;
+            end
+
             rtype::ADDU: begin
                 ctl = decoder_util::get_alu_rtype_control(selector::ALU_ADD);
             end

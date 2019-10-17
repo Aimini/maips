@@ -102,7 +102,7 @@ module div_mul #(parameter N = 32)
             THI_HOLD            : thi <= thi;
             THI_ALU             : thi <= alu_out;
             THI_PARTIAL_MUL     : thi <= {cout,alu_out[N - 1:1]};
-            THI_PARTIAL_DIV     : thi <= {cout ? alu_out[N - 2:0] : thi[N - 2:0], a_abs_iter};
+            THI_PARTIAL_DIV     : thi <= cout ? alu_out : srcA;
             THI_ZERO            : thi <= 0;
             default:            thi <= 'x;
         endcase
@@ -111,7 +111,7 @@ module div_mul #(parameter N = 32)
             TLO_HOLD    : tlo <= tlo;
             TLO_ALU     : tlo <= alu_out;
             TLO_SR_MUL  : tlo <= {alu_out[0],tlo[N-1:1]};
-            TLO_SL_DIV  : tlo <= {tlo[N-1:1],cout};
+            TLO_SL_DIV  : tlo <= {tlo[N-2:0],cout};
             default     : tlo <= 'x;
         endcase
     end
@@ -134,6 +134,7 @@ module div_mul #(parameter N = 32)
     typedef enum   {
         SRCA_ZERO,
         SRCA_THI,
+        SRCA_THI_WITH_AITER,
         SRCA_HI,
         SRCA_LO,
         SRCA_NCARE
@@ -169,6 +170,7 @@ module div_mul #(parameter N = 32)
         case(srcA_select)
             SRCA_ZERO: srcA = 0;
             SRCA_THI : srcA = thi;
+            SRCA_THI_WITH_AITER : srcA = {thi[N-2:0],a_abs_iter};
             SRCA_HI : srcA = hi_in;
             SRCA_LO : srcA = lo_in;
             default:srcA = 'x;
@@ -243,8 +245,8 @@ module div_mul #(parameter N = 32)
                 else
                     next_state = DIV;
                 
-            DIV_INIT:
-                next_state = DIV;
+            // DIV_INIT:
+            //     next_state = DIV;
             DIV:
                 if(&tick_count) begin
                     if(using_sign) begin
@@ -343,12 +345,12 @@ module div_mul #(parameter N = 32)
             MUL :
                 {thi_sel,          tlo_sel,    srcA_select, srcB_select,  cin_sel,  tick_op } = 
                 { THI_PARTIAL_MUL, TLO_SR_MUL, SRCA_THI,    SRCB_AITER_B, CIN_ZERO, TICK_ONE};
-            DIV_INIT:
-                {thi_sel,        tlo_sel,    srcA_select,    srcB_select, cin_sel,  tick_op,    neg_srcB } = {
-                THI_PARTIAL_DIV, TLO_SL_DIV, SRCA_THI,       SRCB_ABS_B,  CIN_ONE,  TICK_RESET, 1'b1}; 
+            // DIV_INIT:
+            //     {thi_sel,        tlo_sel,    srcA_select,    srcB_select, cin_sel,  tick_op,    neg_srcB } = {
+            //     THI_PARTIAL_DIV, TLO_SL_DIV, SRCA_THI,       SRCB_ABS_B,  CIN_ONE,  TICK_RESET, 1'b1}; 
             DIV:              
-                {thi_sel,         tlo_sel,    srcA_select, srcB_select, cin_sel, tick_op,  neg_srcB } = 
-                {THI_PARTIAL_DIV, TLO_SL_DIV, SRCA_THI,    SRCB_ABS_B,  CIN_ONE, TICK_ONE, 1'b1}; 
+                {thi_sel,         tlo_sel,    srcA_select,         srcB_select, cin_sel, tick_op,  neg_srcB } = 
+                {THI_PARTIAL_DIV, TLO_SL_DIV, SRCA_THI_WITH_AITER, SRCB_ABS_B,  CIN_ONE, TICK_ONE, 1'b1}; 
             NEG_QUOTIENT_TLO:  
                 {thi_sel,  tlo_sel, srcA_select, srcB_select, cin_sel, neg_srcB } =  
                 {THI_HOLD, TLO_ALU, SRCA_ZERO,   SRCB_TLO,    CIN_ONE, 1'b1}; 

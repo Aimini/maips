@@ -34,13 +34,13 @@ output logic wait_result);
     
     always_comb begin
         {mul, div} = '0;
-        {sub, add, using_sign} = 'x;
+        {sub, add, using_sign} = '0;
         case(muldiv_funct)
             selector::MULDIV_MULTU: begin
                 mul = '1;
-                using_sign = '0;
-                sub = '0;
-                add = '0;
+            end
+            selector::MULDIV_DIVU: begin
+                div = '1;
             end
             default: begin
             
