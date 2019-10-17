@@ -157,7 +157,8 @@ module div_mul_test();
             //'{"signed division",0,0,1,0,1} // signed div
             //'{"add unsigned multiply",0,1,0,1,0} // MADDU
             //'{"add signed multiply",0,1,1,1,0} // MADD
-            '{"sub unsigned multiply",1,0,0,1,0} // MSUBU
+            //'{"sub unsigned multiply",1,0,0,1,0} // MSUBU
+            '{"sub signed multiply",1,0,1,1,0} // MSUB
         };
        
         for(int i = 0; i < all_config.size(); ++i) begin

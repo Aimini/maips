@@ -56,7 +56,8 @@ module top_test();
         '{"div",        1'b1,  1'b0,  1'b1,  1'b0},
         '{"maddu",      1'b1,  1'b0,  1'b1,  1'b0},
         '{"madd",       1'b1,  1'b0,  1'b1,  1'b0},
-        '{"msubu",      1'b1,  1'b0,  1'b1,  1'b0}
+        '{"msubu",      1'b1,  1'b0,  1'b1,  1'b0},
+        '{"msub",       1'b1,  1'b0,  1'b1,  1'b0}
       };
 
     string manual_target_name[] = {
