@@ -36,6 +36,8 @@ typedef enum  {
 typedef enum{
     MULDIV_MULT, MULDIV_MULTU,
     MULDIV_DIV,  MULDIV_DIVU,
+    MULDIV_MADD,MULDIV_MADDU,
+    MULDIV_MSUB,MULDIV_MSUBU,
     MULDIV_NCARE
 } muldiv_function;
 

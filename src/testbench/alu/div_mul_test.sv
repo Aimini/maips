@@ -56,7 +56,7 @@ module div_mul_test();
     } config_t;
 
     task automatic test_one_pair(input config_t con, input test_data_t td);
-        string fname;
+        string fname,hilo_info;
         string operand;
         logic[N*2 - 1:0] result;
         logic[N*2 - 1:0] multiply_result;
@@ -64,12 +64,9 @@ module div_mul_test();
         logic signed[N - 1:0] sa,sb;
 
         {sub, add, using_sign, mul,div} = con;
-        hi_in = td.hi;
-        lo_in = td.lo;
-        sa = td.a;
-        sb = td.b;
-        a = td.a;
-        b = td.b;
+        hi_in = td.hi; lo_in = td.lo;
+        sa = td.a;     sb = td.b;
+        a = td.a;      b = td.b;
 
         //switcch singed/unsigned div or mul
         if(con.using_sign) begin
@@ -81,14 +78,22 @@ module div_mul_test();
             quotient = a/ b;
             multiply_result = a*b;
         end
-        
+
+        fname = using_sign ? "signed" : "unsigned"; 
+        hilo_info = "";       
         if(con.mul) begin
             result = multiply_result;
+            if(con.add) begin
+                fname = {"add hi,lo",fname};
+                $sformat(hilo_info,"%x,%x +",td.hi, td.lo);
+                result = {td.hi, td.lo} + multiply_result;
+            end
+                
         end else begin
             result = {remainder, quotient};
         end
         
-        fname = using_sign ? "signed" : "unsigned";
+
         operand = con.mul ? "*" : "/";
         if(con.mul)
             fname = {fname," multiply"};
@@ -100,8 +105,10 @@ module div_mul_test();
         end while(waiting_result);
         // $display("%x %s %x = %x",td.a, operand ,td.b,result);
         assert({hi_out,lo_out} === result)
-        else $error("function %s: %x %s %x = %x, but we get %x",
-            fname, td.a, operand, td.b, result, {hi_out,lo_out});
+        else begin
+         $error("function %s: %s %x %s %x = %x, but we get %x",
+            fname, hilo_info, td.a, operand, td.b, result, {hi_out,lo_out});
+        end
     endtask
 
     task automatic test_one_mode_bench(input config_t con);
@@ -140,7 +147,8 @@ module div_mul_test();
             //'{0,0,0,1,0}, // unsigned mul
             //'{0,0,0,0,1}, // unsigned div
             //'{0,0,1,1,0}, // signed mul
-            '{0,0,1,0,1} // signed div
+            //'{0,0,1,0,1} // signed div
+            '{0,1,0,1,0} // MADDU
         };
        
         for(int i = 0; i < all_config.size(); ++i) begin

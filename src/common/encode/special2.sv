@@ -1,5 +1,5 @@
-package special2
-    typedef enum lgoic[5:0] { 
+package special2;
+    typedef enum logic[5:0] { 
         MADD    = 6'b000000,
         MADDU   = 6'b000001,
         MUL     = 6'b000010,
@@ -8,7 +8,7 @@ package special2
         MSUBU   = 6'b000101,
         //----
         CLZ     = 6'b100000,
-        CLO     = 6'b100001,
+        CLO     = 6'b100001
      } funct;
 
 endpackage : special2

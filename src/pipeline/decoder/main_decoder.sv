@@ -5,6 +5,7 @@
 `include "src/common/util.sv"
 `include "src/common/encode/main_opcode.sv"
 `include "src/pipeline/decoder/rtype_decoder.sv"
+`include "src/pipeline/decoder/special2_decoder.sv"
 `include "src/pipeline/decoder/decoder_util.sv"
 
 module main_decoder(input logic[31:0] instruction,output signals::control_t ctl);
@@ -16,7 +17,7 @@ module main_decoder(input logic[31:0] instruction,output signals::control_t ctl)
 
     extract_instruction unit_ei(instruction,unpack);
     rtype_decoder unit_rtype(instruction, rtype_control);
-    
+    special2_decoder unit_special2(instruction, special2_control);
 
     always_comb begin
         ctl =  signals::get_clear_control();
@@ -24,7 +25,9 @@ module main_decoder(input logic[31:0] instruction,output signals::control_t ctl)
         case(unpack.opcode)
             main_opcode::RTYPE:   ctl = rtype_control;
             main_opcode::REGIMM:  ctl = regimm_control;
+            main_opcode::SPECIAL2:ctl = special2_control;
 
+            
             main_opcode::J, main_opcode::JAL: begin
                 ctl.pc_src = selector::PC_SRC_JUMP;
                 if(unpack.opcode == main_opcode::JAL) begin

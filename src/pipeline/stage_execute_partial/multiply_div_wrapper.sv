@@ -50,6 +50,24 @@ output logic wait_result);
                 div = '1;
                 using_sign = '1;
             end
+            selector::MULDIV_MADDU: begin
+                mul = '1;
+                add = '1;
+            end
+            selector::MULDIV_MADD: begin
+                mul = '1;
+                add = '1;
+                using_sign = '1;
+            end
+            selector::MULDIV_MSUBU: begin
+                mul = '1;
+                sub = '1;
+            end
+            selector::MULDIV_MSUB: begin
+                mul = '1;
+                sub = '1;
+                using_sign = '1;
+            end
         endcase
     end
 endmodule

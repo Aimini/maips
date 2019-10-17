@@ -61,6 +61,8 @@ module rtype_decoder(input logic[31:0] instruction,output signals::control_t ctl
                     rtype::MULTU: ctl.muldiv_funct = selector::MULDIV_MULTU;
                     rtype::DIVU : ctl.muldiv_funct = selector::MULDIV_DIVU;
                     rtype::DIV  : ctl.muldiv_funct = selector::MULDIV_DIV;
+                    default:
+                        ctl.muldiv_funct = selector::MULDIV_NCARE;
                 endcase
             end
 

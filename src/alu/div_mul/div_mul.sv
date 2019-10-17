@@ -266,7 +266,12 @@ module div_mul #(parameter N = 32)
                     if(using_sign & (a[N - 1]^b[N - 1]))
                         next_state = NEG_PRODUCT_TLO;
                     else
-                        next_state = STORAGE;
+                        if(add)
+                             next_state = PREVIOUS_ADD_TLO;
+                        else if(sub) 
+                            next_state =  PREVIOUS_SUB_TLO;
+                        else
+                            next_state = STORAGE;
                 end
             
             NEG_PRODUCT_TLO: //negative quotion or axb[31:0]
@@ -275,7 +280,7 @@ module div_mul #(parameter N = 32)
                 if(sub) //multiply , need to check sub and add
                     next_state =  PREVIOUS_SUB_TLO;
                 else if(add)
-                    next_state =  PREVIOUS_ADD_THI;
+                    next_state =  PREVIOUS_ADD_TLO;
                 else
                     next_state =  STORAGE; 
 
@@ -292,9 +297,9 @@ module div_mul #(parameter N = 32)
                 next_state = PREVIOUS_SUB_THI;
             PREVIOUS_SUB_THI:
                 next_state = STORAGE;
-            PREVIOUS_ADD_THI:
-                next_state = PREVIOUS_ADD_THI;
             PREVIOUS_ADD_TLO:
+                next_state = PREVIOUS_ADD_THI;
+            PREVIOUS_ADD_THI:
                 next_state = STORAGE;
             STORAGE:
                 if(hold_result)
