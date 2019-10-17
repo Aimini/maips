@@ -12,7 +12,7 @@ module special2_decoder(input logic[31:0] instruction,output signals::control_t 
     always_comb begin
         ctl = signals::get_clear_control();
         case(unpack.funct)
-            special2::MADDU: begin
+            special2::MADD,special2::MADDU,special2::MSUB,special2::MSUBU: begin
                 ctl = decoder_util::get_standard_control();
                 ctl.write_hi = '1;
                 ctl.write_lo = '1;

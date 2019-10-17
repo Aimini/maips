@@ -217,14 +217,18 @@ def assert_equal_immed(reg,immed,base_reg = None,arg_reg = None):
     return assert_function_immed(1,reg,immed,base_reg,arg_reg);
 
 
-def cutto_sign32(val):
-    ret = val & 0xFFFFFFFF
-    if ret >= 0x80000000:
-        ret = -(2**32 - ret) 
+def cutto_signN(val,l):
+    mask = 2**l - 1;
+    ret = val & mask
+    if ret >= 2**(l - 1):
+        ret = -2**l + ret
     return ret
+def cutto_sign64(val):
+    return cutto_signN(val,64)
+
+
+def cutto_sign32(val):
+    return cutto_signN(val,32)
 
 def cutto_sign16(val):
-    ret = val & 0xFFFF
-    if ret >= 0x8000:
-        ret = -(2**16 - ret)
-    return ret
+    return cutto_signN(val,16)

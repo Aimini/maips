@@ -144,11 +144,13 @@ module div_mul_test();
 
      task automatic test_all_bench();
         config_t all_config[] = '{
+            // sub, add, using_sign, mul,div;
             //'{0,0,0,1,0}, // unsigned mul
             //'{0,0,0,0,1}, // unsigned div
             //'{0,0,1,1,0}, // signed mul
             //'{0,0,1,0,1} // signed div
-            '{0,1,0,1,0} // MADDU
+            //'{0,1,0,1,0} // MADDU
+            '{0,1,1,1,0} // MADD
         };
        
         for(int i = 0; i < all_config.size(); ++i) begin
