@@ -151,13 +151,13 @@ module div_mul_test();
      task automatic test_all_bench();
         config_t all_config[] = '{
             // sub, add, using_sign, mul,div;
-            //'{"unsigned multiply", 0,0,0,1,0}, // unsigned mul
-            //'{"unsigned division",0,0,0,0,1}, // unsigned div
-            //'{"signed multiply",0,0,1,1,0}, // signed mul
-            //'{"signed division",0,0,1,0,1} // signed div
-            //'{"add unsigned multiply",0,1,0,1,0} // MADDU
-            //'{"add signed multiply",0,1,1,1,0} // MADD
-            //'{"sub unsigned multiply",1,0,0,1,0} // MSUBU
+            '{"unsigned multiply", 0,0,0,1,0}, // unsigned mul
+            '{"unsigned division",0,0,0,0,1}, // unsigned div
+            '{"signed multiply",0,0,1,1,0}, // signed mul
+            '{"signed division",0,0,1,0,1}, // signed div
+            '{"add unsigned multiply",0,1,0,1,0}, // MADDU
+            '{"add signed multiply",0,1,1,1,0}, // MADD
+            '{"sub unsigned multiply",1,0,0,1,0}, // MSUBU
             '{"sub signed multiply",1,0,1,1,0} // MSUB
         };
        

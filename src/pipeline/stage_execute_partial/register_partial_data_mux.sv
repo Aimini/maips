@@ -10,7 +10,7 @@ output logic[31:0] data);
         case(reg_src)
             selector::REG_SRC_ALU:
                 data = alu_out;
-            selector::REG_SRC_MUL_DIV:
+            selector::REG_SRC_MUL:
                 data = mul_div_lo;
             selector::REG_SRC_PCADD4:
                 data = pcadd4;
