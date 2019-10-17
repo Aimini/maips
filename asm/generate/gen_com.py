@@ -1,12 +1,12 @@
-import random
+import random,pathlib,os
 
 class gen:
     def __init__(self,name, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # generate asm file path and regiter check file path
         self.name = name
-        self.asm_filename = name + ".asm"
-
+        self.asm_filename = pathlib.Path('.') /'temp'/ (name + '.asm')
+        self.cmd_filename = pathlib.Path('.') / ('compile_command.cmd')
 
     def gen(self,generate_funct):
         self.__replace = []
@@ -18,7 +18,12 @@ class gen:
             E = lambda b: self.EXIT(b)
             self.ASM(".text")
             # callback
-            generate_funct(A,C,E);
+            r = generate_funct(A,C,E);
+            compile_cmd = "tool\\mips_compile.py " + str(self.asm_filename);
+        with open(self.cmd_filename,"w") as f:
+            f.write(compile_cmd + "\n");
+        if r is not 0: # default to compile
+            os.system(compile_cmd)
 
     def ASM(self,code):
         self.__asm_file.write(code +'\n')

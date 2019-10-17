@@ -37,10 +37,10 @@ def gen_partial(A,reg_val_gen1,reg_val_gen2,time = 2):
                     reg_val1 = 0
                 if j == 0:
                     reg_val2 = 0
-            if i == j:
-                gen_assert_one(A,i,reg_val1,j,reg_val1);
-            else:
-                gen_assert_one(A,i,reg_val1,j,reg_val2);
+                if i == j:
+                    gen_assert_one(A,i,reg_val1,j,reg_val1);
+                else:
+                    gen_assert_one(A,i,reg_val1,j,reg_val2);
 
 
 def my_gen1(A,C,E):
@@ -56,6 +56,6 @@ def my_gen1(A,C,E):
     for i in gen_sample:
         for j in gen_sample:
             gen_partial(A,i,j,time = 3)
-    gen_partial(A, lambda : random.choice(range(2**32)), lambda : random.choice(range(2**32)),time = 20)
+    gen_partial(A, lambda : random.choice(range(2**32)), lambda : random.choice(range(2**32)),time = 10)
     A(check_and_exit())
 r.gen(my_gen1)
