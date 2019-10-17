@@ -24,8 +24,8 @@ output logic[N - 1:0] y);
             selector::ALU_SHIFT_LOGIC_RIGHT:      y = b >> sa;
             selector::ALU_SHIFT_ARITHMATIC_RIGHT: y = b >>> sa;
             selector::ALU_ROTATE_RIGHT:           y = (b >> sa) & (b << N - sa);
-            selector::ALU_CLO: y = clz_y;
-            selector::ALU_CLZ: y = clo_y;
+            selector::ALU_CLZ: y = clz_y;
+            selector::ALU_CLO: y = clo_y;
             default: y = 'x;
         endcase
     end

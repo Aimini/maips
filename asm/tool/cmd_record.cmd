@@ -18,10 +18,17 @@ generate\xori.py & tool\mips_compile.py xori_1.asm & tool\mips_compile.py xori_2
 tool\mips_compile.py manual_asm\sys_serial_test.asm
 generate\mthi_mfhi.py & tool\mips_compile.py mthi_mfhi.asm
 generate\mtlo_mflo.py & tool\mips_compile.py mtlo_mflo.asm
-generate\multu.py & tool\mips_compile.py multu.asm
-generate\divu.py & tool\mips_compile.py divu.asm
-generate\mult.py & tool\mips_compile.py mult.asm
-generate\mult.py & tool\mips_compile.py mult.asm
+generate\multu.py
+generate\divu.py
+generate\mult.py
 generate\div.py
+
+generate\maddu.py
 generate\msubu.py
+generate\madd.py
 generate\msub.py
+
+generate\mul.py
+
+generate\clz.py
+generate\clo.py
