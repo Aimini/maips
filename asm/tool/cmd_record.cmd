@@ -1,23 +1,24 @@
 tool\mips_compile.py manual_asm\sw_dbg.asm
-generate\lui.py & tool\mips_compile.py lui_1.asm & tool\mips_compile.py lui_2.asm 
-generate\ori.py & tool\mips_compile.py ori_1.asm & tool\mips_compile.py ori_2.asm 
-generate\sll.py & tool\mips_compile.py sll_1.asm & tool\mips_compile.py sll_2.asm 
 
-generate\addu.py & tool\mips_compile.py addu.asm
+generate\lui.py
+generate\ori.py
+generate\sll.py
+
+generate\addu.py 
 :: generate\j_jal.py  & tool\mips_compile.py j.asm --special & tool\mips_compile.py jal.asm --special
-generate\addiu.py & tool\mips_compile.py addiu.asm
-generate\beq.py & tool\mips_compile.py beq.asm
-generate\bne.py & tool\mips_compile.py bne.asm
-generate\blez.py & tool\mips_compile.py blez.asm
-generate\bgtz.py & tool\mips_compile.py bgtz.asm
-generate\slti.py & tool\mips_compile.py slti.asm
-generate\sltiu.py & tool\mips_compile.py sltiu.asm
-generate\andi.py & tool\mips_compile.py andi_1.asm & tool\mips_compile.py andi_2.asm
-generate\xori.py & tool\mips_compile.py xori_1.asm & tool\mips_compile.py xori_2.asm
+generate\addiu.py
+generate\beq.py 
+generate\bne.py 
+generate\blez.py
+generate\bgtz.py
+generate\slti.py
+generate\sltiu.py
+generate\andi.py
+generate\xori.py
 
 tool\mips_compile.py manual_asm\sys_serial_test.asm
-generate\mthi_mfhi.py & tool\mips_compile.py mthi_mfhi.asm
-generate\mtlo_mflo.py & tool\mips_compile.py mtlo_mflo.asm
+generate\mthi_mfhi.py
+generate\mtlo_mflo.py
 generate\multu.py
 generate\divu.py
 generate\mult.py

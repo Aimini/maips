@@ -1,6 +1,12 @@
 `include "src/common/signals.sv"
 
 package decoder_util;
+    function automatic signals::control_t get_default_control();
+        signals::control_t ret =signals::get_clear_control();
+        ret.opd_use  = selector::OPERAND_USE_BOTH;
+        return ret;
+    endfunction
+
     function automatic signals::control_t get_standard_control();
         signals::control_t ret =signals::get_clear_control();
         ret.alu_srcA = selector::ALU_SRCA_RS;
@@ -10,35 +16,31 @@ package decoder_util;
     endfunction
 
     function automatic signals::control_t get_sign_immed_control();
-        signals::control_t ret =signals::get_clear_control();
+        signals::control_t ret = get_default_control();
         ret.alu_srcA = selector::ALU_SRCA_RS;
         ret.alu_srcB = selector::ALU_SRCB_SIGN_IMMED;
-        ret.opd_use  = selector::OPERAND_USE_RS;
         return ret;
     endfunction
 
     function automatic signals::control_t get_zero_immed_control();
-        signals::control_t ret =signals::get_clear_control();
+        signals::control_t ret = get_default_control();
         ret.alu_srcA = selector::ALU_SRCA_RS;
         ret.alu_srcB = selector::ALU_SRCB_IMMED;
-        ret.opd_use  = selector::OPERAND_USE_RS;
         return ret;
     endfunction
 
     function automatic signals::control_t get_up_immed_control();
-        signals::control_t ret =signals::get_clear_control();
+        signals::control_t ret = get_default_control();
         ret.alu_srcA = selector::ALU_SRCA_RS;
         ret.alu_srcB = selector::ALU_SRCB_UP_IMMED;
-        ret.opd_use  = selector::OPERAND_USE_RS;
         return ret;
     endfunction
 
     function automatic signals::control_t get_mem_addr_control();
-        signals::control_t ret =signals::get_clear_control();
+        signals::control_t ret = get_default_control();
         ret.alu_srcA = selector::ALU_SRCA_RS;
         ret.alu_srcB = selector::ALU_SRCB_SIGN_IMMED;
         ret.alu_funct = selector::ALU_ADD;
-        ret.opd_use  = selector::OPERAND_USE_RS;
         return ret;
     endfunction
 
@@ -89,14 +91,12 @@ package decoder_util;
     endfunction
 
     function automatic signals::control_t get_shift_rtype_control(input selector::alu_function funct,input logic using_rs);
-        signals::control_t ctl =signals::get_clear_control();
+        signals::control_t ctl = get_default_control();
         ctl.alu_srcB = selector::ALU_SRCB_RT;
         if(using_rs) begin
             ctl.alu_srcSa = selector::ALU_SRCSA_RS;
-            ctl.opd_use = selector::OPERAND_USE_BOTH;
         end else begin
-             ctl.alu_srcSa = selector::ALU_SRCSA_SA;
-            ctl.opd_use = selector::OPERAND_USE_RT;
+            ctl.alu_srcSa = selector::ALU_SRCSA_SA;
         end
         write_alu_to_rd(ctl,funct);
         return ctl;

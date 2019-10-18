@@ -10,10 +10,9 @@ module special2_decoder(input logic[31:0] instruction,output signals::control_t 
     signals::unpack_t  unpack;    
     extract_instruction unit_ei(instruction,unpack);
     always_comb begin
-        ctl = signals::get_clear_control();
+        ctl = decoder_util::get_default_control();
         case(unpack.funct)
             special2::MADD,special2::MADDU,special2::MSUB,special2::MSUBU: begin
-                ctl.opd_use  = selector::OPERAND_USE_BOTH;
                 ctl.hilo_src = selector::HILO_SRC_MULDIV;
                 ctl.write_hi = '1;
                 ctl.write_lo = '1;
@@ -28,7 +27,6 @@ module special2_decoder(input logic[31:0] instruction,output signals::control_t 
             end
 
             special2::MUL: begin
-                ctl.opd_use      = selector::OPERAND_USE_BOTH;
                 ctl.muldiv_funct = selector::MULDIV_MULT;
                 decoder_util::write_rd(ctl, selector::REG_SRC_MUL);
             end
@@ -43,8 +41,8 @@ module special2_decoder(input logic[31:0] instruction,output signals::control_t 
             end
             
             default: begin
-                { ctl.pc_src, ctl.exc_chk}  = 
-                { selector::PC_SRC_EXECPTION, selector::EXC_CHK_RESERVERD};
+                {ctl.opd_use, ctl.pc_src, ctl.exc_chk}  = 
+                {selector::OPERAND_USE_NONE, selector::PC_SRC_EXECPTION, selector::EXC_CHK_RESERVERD};
             end 
         endcase
     end

@@ -21,23 +21,29 @@ module rtype_decoder(input logic[31:0] instruction,output signals::control_t ctl
 
 
     always_comb begin
-        ctl = signals::get_clear_control();
+        ctl = decoder_util::get_default_control();
 
         case(unpack.funct)
             rtype::SLL: begin
                 ctl = decoder_util::get_shift_rtype_control(selector::ALU_SHIFT_LEFT, '0);
+                ctl.opd_use = selector::OPERAND_USE_RT;
             end
 
             rtype::SYSCALL: begin
+                ctl.opd_use = selector::OPERAND_USE_NONE;
                 { ctl.pc_src,                ctl.exc_chk}  = 
                 { selector::PC_SRC_EXECPTION,selector::EXC_CHK_SYSCALL};
             end
 
+            rtype::JR: begin
+                ctl.opd_use = selector::OPERAND_USE_RS;
+            end
             rtype::MFHI: begin
                 decoder_util::write_rd(ctl, selector::REG_SRC_HI);
             end
 
             rtype::MTHI: begin
+                ctl.opd_use = selector::OPERAND_USE_RS;
                 ctl.hilo_src = selector::HILO_SRC_RS;
                 ctl.write_hi =  1'b1;
             end
@@ -47,12 +53,12 @@ module rtype_decoder(input logic[31:0] instruction,output signals::control_t ctl
             end
 
             rtype::MTLO: begin
+                ctl.opd_use = selector::OPERAND_USE_RS;
                 ctl.hilo_src = selector::HILO_SRC_RS;
                 ctl.write_lo =  1'b1;
             end
 
             rtype::MULT, rtype::MULTU, rtype::DIVU, rtype::DIV: begin
-                ctl.opd_use  = selector::OPERAND_USE_BOTH;
                 ctl.hilo_src = selector::HILO_SRC_MULDIV;
                 ctl.write_hi =  1'b1;
                 ctl.write_lo =  1'b1;
@@ -71,8 +77,8 @@ module rtype_decoder(input logic[31:0] instruction,output signals::control_t ctl
             end
 
             default:begin
-                { ctl.pc_src, ctl.exc_chk}  = 
-                { selector::PC_SRC_EXECPTION, selector::EXC_CHK_RESERVERD};
+                {ctl.opd_use, ctl.pc_src, ctl.exc_chk}  = 
+                {selector::OPERAND_USE_NONE, selector::PC_SRC_EXECPTION, selector::EXC_CHK_RESERVERD};
             end
         endcase
     end
