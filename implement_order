@@ -55,5 +55,7 @@ MADD,MSUB
 MUL
 
 CLZ,CLO
+
+LW, LH
 //------------
 ADDI(NOEXCEUPTION)
