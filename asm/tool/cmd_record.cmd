@@ -36,3 +36,5 @@ generate\clo.py
 generate\lw.py
 generate\lh.py
 generate\lb.py
+
+tool\mips_compile.py manual_asm\print_string.asm

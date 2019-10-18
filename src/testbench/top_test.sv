@@ -67,7 +67,8 @@ module top_test();
       };
 
     string manual_target_name[] = {
-        "sys_serial_test"
+        "sys_serial_test",
+        "print_string"
     };
 
     assign reg_file = unit_top.unit_core.unit_decode.unit_rf.file;
@@ -285,12 +286,17 @@ module top_test();
         
     endtask
 
-
+    check_target_t manual_check_target;
     initial begin
         // for(int i = all_targets.size() - 1; i < all_targets.size(); ++i)
         //     new_test(.target(all_targets[i]));
         // $finish;
-        new_test(.target(all_targets[all_targets.size() - 1]));
+        //new_test(.target(all_targets[all_targets.size() - 1]));
+        manual_check_target = '{"", 1'b0,  1'b0,  1'b0,  1'b0};
+        for(int i = manual_target_name.size() - 1; i < manual_target_name.size(); ++i)
+            manual_check_target.name = manual_target_name[i];
+            new_test(.target(manual_check_target));
+        $finish;
         $finish;
     end
 
