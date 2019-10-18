@@ -237,6 +237,9 @@ def cutto_sign32(val):
 def cutto_sign16(val):
     return cutto_signN(val,16)
 
+def cutto_sign8(val):
+    return cutto_signN(val,8)
+
 def get_bound(bit_len,using_signed = False):
     if using_signed:
         max_limit = 2**(bit_len - 1)
@@ -253,6 +256,8 @@ def get_bound_s16():
 def get_s16():
     return random.choice(range(-2**15,2**15))
 
+def get_s8():
+    return random.choice(range(-2**8,2**8))
 
 def get_random_below(x):
         return random.choice(range(x))

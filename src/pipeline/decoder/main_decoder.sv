@@ -86,6 +86,12 @@ module main_decoder(input logic[31:0] instruction,output signals::control_t ctl)
                 endcase
             end
 
+            main_opcode::LB: begin
+                ctl = decoder_util::get_mem_addr_control();
+                ctl.read_mode = selector::MEM_READ_BYTE;
+                decoder_util::write_rt(ctl, selector::REG_SRC_MEM);
+            end
+
             main_opcode::LH: begin
                 ctl = decoder_util::get_mem_addr_control();
                 ctl.read_mode = selector::MEM_READ_HALF;

@@ -62,7 +62,8 @@ module top_test();
         '{"clz",        1'b1,  1'b0,  1'b1,  1'b0},
         '{"clo",        1'b1,  1'b0,  1'b1,  1'b0},
         '{"lw",         1'b1,  1'b0,  1'b1,  1'b0},
-        '{"lh",         1'b1,  1'b0,  1'b1,  1'b0}
+        '{"lh",         1'b1,  1'b0,  1'b1,  1'b0},
+        '{"lb",         1'b1,  1'b0,  1'b1,  1'b0}
       };
 
     string manual_target_name[] = {

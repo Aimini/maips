@@ -32,3 +32,7 @@ generate\mul.py
 
 generate\clz.py
 generate\clo.py
+
+generate\lw.py
+generate\lh.py
+generate\lb.py
