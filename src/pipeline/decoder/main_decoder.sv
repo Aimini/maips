@@ -85,7 +85,12 @@ module main_decoder(input logic[31:0] instruction,output signals::control_t ctl)
                         decoder_util::write_alu_to_rt(ctl, selector::ALU_NCARE);
                 endcase
             end
-            
+            main_opcode::LW: begin
+                ctl = decoder_util::get_mem_addr_control();
+                ctl.read_mode = selector::MEM_READ_WORD;
+                decoder_util::write_rt(ctl, selector::REG_SRC_MEM);
+            end
+
             main_opcode::SW: begin
                 ctl = decoder_util::get_mem_addr_control();
                 {ctl.write_mode,           ctl.write_mem } = 

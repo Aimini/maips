@@ -52,9 +52,9 @@ memory_interface.memory ins_i,data_i);
         data_i.dout = 'x;
         
 
-        if(32'h1000_0000< data_paddr &  data_paddr < 32'h2000_0000) begin
+        if(32'h5000_0000<= data_paddr &  data_paddr < 32'h6000_0000) begin
             user_we = data_i.write;
-            user_data_offset = data_paddr - 32'h1000_0000;
+            user_data_offset = data_paddr - 32'h5001_0000;
             data_i.dout = user_dout;
         end else 
 
@@ -72,7 +72,7 @@ memory_interface.memory ins_i,data_i);
 
         user_ins_offset = 'x;
         ins_i.dout  = 'x;
-        if(32'h4000_0000 < ins_paddr & ins_paddr < 32'h8000_0000) begin
+        if(32'h4000_0000 <= ins_paddr & ins_paddr < 32'h8000_0000) begin
             user_ins_offset = ins_paddr - 32'h4000_0000 - 32'h0040_0000;
             ins_i.dout = user_ins_out;
         end

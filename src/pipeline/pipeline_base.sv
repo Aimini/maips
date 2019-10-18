@@ -11,7 +11,9 @@ module pipeline_base (pipeline_interface.port pif, input logic nullify_instructi
                 signals::flag_t:   '{default: '0},
                 default: '0
             };
-        else if(pif.nullify) begin
+        else  if(pif.stall | pif.bubble) begin
+        
+        end else if(pif.nullify) begin
             signal_reg <= '{
                 signals::control_t: signals::nullify_control(pif.signal_in.control),
                 signals::flag_t:   '{default: 'x},
@@ -19,8 +21,7 @@ module pipeline_base (pipeline_interface.port pif, input logic nullify_instructi
             };
             if(nullify_instruction)
                 signal_reg.instruction <= '0;
-        end
-        else if(!(pif.stall | pif.bubble))
+        end else
             signal_reg <= pif.signal_in;
     end
 endmodule

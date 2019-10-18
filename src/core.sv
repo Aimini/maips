@@ -40,7 +40,8 @@ memory_interface.controller data_mif);
     .pif_execute(pif_execute),
     .pif_memory(pif_memory),
     .pif_write_back(pif_write_back),
-    .execute_busy(execute_busy),
+    .execute_busy(execute_busy),.data_memory_busy(data_memory_busy),
+    .instruction_memory_busy(instruction_memory_busy),
     .load(load_pc),
     .pc(pc_value),
     .stall_fetch(stall_fetch));

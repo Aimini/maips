@@ -1,5 +1,5 @@
 import random,pathlib,os
-
+import itertools
 class gen:
     def __init__(self,name, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -92,7 +92,8 @@ def get_exclued_reg_list(*args):
             try:
                 a.remove(num)
             except ValueError as e:
-                print("remove twice ${}".format(num))
+                pass
+               # print("remove twice ${}".format(num))
             continue
 
         # get by string name
@@ -104,7 +105,8 @@ def get_exclued_reg_list(*args):
         try:
             a.remove(num1)
         except ValueError as e:
-            print("remove twice ${}".format(num1))
+            pass
+           # print("remove twice ${}".format(num1))
     return a
 
 
@@ -112,6 +114,8 @@ def get_random_exclued_reg( k = 1, exclude = []):
     a = get_exclued_reg_list(*exclude)
     return random.sample(a,k = k)
 
+def get_one_writable_reg():
+    return get_random_exclued_reg(k = 1,exclude = [0])[0]
 
 def set_immed(reg,immed):
     return """lui  ${0},   0x{1:0>4X}
@@ -232,3 +236,60 @@ def cutto_sign32(val):
 
 def cutto_sign16(val):
     return cutto_signN(val,16)
+
+def get_bound(bit_len,using_signed = False):
+    if using_signed:
+        max_limit = 2**(bit_len - 1)
+        min_value = -2**(bit_len - 1)
+    else:
+        max_limit = 2**bit_len
+        min_value = 0
+    middle_value = int((max_limit + min_value)/2)
+    return list(itertools.chain(range(min_value,min_value + 4),range(middle_value - 4, middle_value + 4),range(max_limit - 4,max_limit)))
+
+def get_bound_s16():
+    return get_bound(16,True)
+
+def get_s16():
+    return random.choice(range(-2**15,2**15))
+
+
+def get_random_below(x):
+        return random.choice(range(x))
+
+
+def parameter_iter_pass(*args,callback):
+    # record the iter arguments
+    iter_args = []
+    # record iter arguments coressponding index
+    iter_args_index = []
+    # record the argument list with out iterable arguments.
+    exclude_iter_args = [None for x in args]
+    for idx,ele in enumerate(args):
+        if hasattr(ele,'__iter__'):
+            iter_args.append(ele)
+            iter_args_index.append(idx);
+        else:
+            exclude_iter_args[idx] = ele;
+
+
+    # print(itertools.product(*iter_args))
+    for one_group in itertools.product(*iter_args):
+        pass_args =  [None for x in args];
+        for idx,ele in enumerate(one_group):
+            pass_args[iter_args_index[idx]] = ele
+
+        for idx,ele in enumerate(exclude_iter_args):
+            if ele is None:
+                continue;
+            if callable(ele):
+                pass_args[idx] = ele()
+            else:
+                pass_args[idx] = ele
+        # print(pass_args)
+        callback(*pass_args)
+##
+## return a generator than get funct(*args) <time> times
+def repeat_function(funct,*args,time = 1):
+    for x in range(time):
+        yield funct(*args)

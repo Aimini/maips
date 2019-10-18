@@ -12,7 +12,7 @@
 module pipeline_flow_controller(
 pipeline_interface.controller pif_decode,pif_execute,
 pif_memory,pif_write_back,
-input logic execute_busy,
+input logic execute_busy, data_memory_busy, instruction_memory_busy,
 output logic load,
 output logic[31:0] pc,
 output logic stall_fetch);
@@ -62,13 +62,32 @@ output logic stall_fetch);
                 pif_execute.nullify = '1;
         end
 /************** stall or bubble to clear data hazard  **********/
-        if(execute_busy) begin
+        if(instruction_memory_busy) begin
+            stall_fetch = '1;
+            pif_decode.nullify = '1; // when stall or bubble is assert , nullify do nothing.
+        end
+        
+        if(ps_execute.control.write_reg & ps_execute.control.reg_src === selector::REG_SRC_MEM) begin
+            if(ps_execute.dest_reg === decode_unpack.rs 
+                &(ps_decode.control.opd_use === selector::OPERAND_USE_BOTH
+                 |ps_decode.control.opd_use === selector::OPERAND_USE_RS)
+              |ps_execute.dest_reg === decode_unpack.rt
+                &(ps_decode.control.opd_use === selector::OPERAND_USE_BOTH
+                 |ps_decode.control.opd_use === selector::OPERAND_USE_RT)) begin
+                pif_execute.nullify = '1;
+                pif_decode.bubble   = '1;
+                stall_fetch = '1;
+            end
+        end
+
+        if(execute_busy | data_memory_busy) begin
             stall_fetch = '1;
             pif_decode.stall = '1;
             pif_execute.stall = '1;
             pif_memory.stall = '1;
             pif_write_back.stall = '1;
         end
+
     end
 endmodule
 

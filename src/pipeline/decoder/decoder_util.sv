@@ -42,21 +42,20 @@ package decoder_util;
         return ret;
     endfunction
 
-    function automatic void write_rt(ref signals::control_t  ctl);
+    function automatic void write_rt(ref signals::control_t  ctl,input selector::register_source reg_src);
         ctl.write_reg = '1;
         ctl.dest_reg = selector::DEST_REG_RT;
+        ctl.reg_src = reg_src;
     endfunction
 
     function automatic void write_alu_to_rt(ref signals::control_t  ctl,input selector::alu_function funct);
-        write_rt(ctl);
+        write_rt(ctl,selector::REG_SRC_ALU);
         ctl.alu_funct = funct;
-        ctl.reg_src = selector::REG_SRC_ALU;
     endfunction
 
     function automatic void write_flag_to_rt(ref signals::control_t  ctl,input selector::flag_select sel);
-        write_rt(ctl);
+        write_rt(ctl,selector::REG_SRC_FLAG);
         ctl.flag_sel = sel;
-        ctl.reg_src = selector::REG_SRC_FLAG;
     endfunction
 
     function automatic void branch_with(ref signals::control_t  ctl,input selector::flag_select sel);
