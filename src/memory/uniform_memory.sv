@@ -30,9 +30,9 @@ memory_interface.memory ins_i,data_i);
     .we(kernel_we),.addr(kernel_data_offset[11:2]),
     .din(data_i.din),.dout(kernel_dout));
         
-    // 4K user space
-    ram #(12,32) unit_user_ram(.clk(clk),
-    .we(user_we),.addr(user_data_offset[13:2]),
+    // 8M * 4byte user space
+    ram #(23,32) unit_user_ram(.clk(clk),
+    .we(user_we),.addr(user_data_offset[24:2]),
     .din(data_i.din),.dout(user_dout));
 
     logic[31:0] user_ins_offset;

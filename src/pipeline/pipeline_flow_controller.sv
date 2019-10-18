@@ -61,6 +61,12 @@ output logic stall_fetch);
                 pif_decode.nullify = '1;
                 pif_execute.nullify = '1;
         end
+        if(ps_execute.control.pc_src === selector::PC_SRC_REGISTER) begin
+                load = '1;
+                pc = ps_execute.rs;
+                pif_decode.nullify = '1;
+                pif_execute.nullify = '1;
+        end
 /************** stall or bubble to clear data hazard  **********/
         if(instruction_memory_busy) begin
             stall_fetch = '1;
