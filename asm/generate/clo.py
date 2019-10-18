@@ -31,17 +31,17 @@ def gen_partial(A,reg_val_gen1, time = 2):
     for x in range(time):
         for i in range(32):
                 reg_val1 = reg_val_gen1()
-                # $s0 always being zero
                 gen_assert_one(A,i,reg_val1,);
 
 
 def my_gen1(A,C,E):
+    fill_one = 2**32 - 1
     for x in range(20):
         for i in range(33):
-            if i > 30:
-                v = (2**31 >> i)
-            else:
-                v = (2**31 >> i) + random.choice(range(31 - i))
+            v = (fill_one << i) & 0xFFFFFFFF 
+            if i > 1:
+                v += random.choice(range(2**(i - 1)))
+
             send_reg = random.choice(range(1,32))
             gen_assert_one(A, send_reg,v);
 

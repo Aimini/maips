@@ -285,11 +285,11 @@ module top_test();
 
 
     initial begin
-        for(int i = all_targets.size() - 1; i < all_targets.size(); ++i)
-            new_test(.target(all_targets[i]));
-        $finish;
-        // new_test(.target(all_targets[all_targets.size() - 1]));
+        // for(int i = all_targets.size() - 1; i < all_targets.size(); ++i)
+        //     new_test(.target(all_targets[i]));
         // $finish;
+        new_test(.target(all_targets[all_targets.size() - 2]));
+        $finish;
     end
 
 
