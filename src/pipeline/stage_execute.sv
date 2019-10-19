@@ -132,7 +132,7 @@ input logic llbit); //forward
     always_comb begin
         case(p_out.control.alu_srcSa)
             selector::ALU_SRCSA_SA: alu_sa = unpack.sa;
-            selector::ALU_SRCSA_SA: alu_sa = rs_data[4:0];
+            selector::ALU_SRCSA_RS: alu_sa = rs_data[4:0];
             default:      
                 alu_sa = 'x;
         endcase

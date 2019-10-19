@@ -42,6 +42,10 @@ module rtype_decoder(input logic[31:0] instruction,output signals::control_t ctl
                 ctl.opd_use = selector::OPERAND_USE_RT;
             end
 
+            rtype::SLLV: begin
+                ctl = decoder_util::get_shift_rtype_control(selector::ALU_SHIFT_LEFT, '1);
+            end
+
             rtype::SYSCALL: begin
                 ctl.opd_use = selector::OPERAND_USE_NONE;
                 { ctl.pc_src,                ctl.exc_chk}  = 
