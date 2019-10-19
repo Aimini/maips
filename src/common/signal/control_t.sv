@@ -19,7 +19,7 @@ typedef struct{
     selector::mem_write_type write_mode;
 
     selector::operand_use opd_use;
-    
+    selector::write_register_condition write_cond;
     selector::execption_check_t exc_chk;
     logic write_reg;
     logic write_cp0;
@@ -31,6 +31,7 @@ typedef struct{
 function control_t nullify_control(input control_t ctl);
     ctl.pc_src  = selector::PC_SRC_NEXT;
     ctl.exc_chk = selector::EXC_CHK_NONE;
+    ctl.write_cond =selector::REG_WRITE_ALWAYS;
     ctl.write_mem = '0;
     ctl.write_reg = '0;
     ctl.write_cp0 = '0;
@@ -47,9 +48,9 @@ function control_t get_clear_control();
     return control_t'{
         selector::ALU_NCARE,        selector::ALU_SRCA_NCARE,   selector::ALU_SRCB_NCARE,
         selector::ALU_SRCSA_NCARE,  selector::MULDIV_NCARE,     selector::HILO_SRC_NCARE,
-        selector::DEST_REG_NCARE,      selector::PC_SRC_NEXT,   selector::FLAG_NCARE,
-        selector::REG_SRC_NCARE,     selector::MEM_READ_NCARE, selector::MEM_WRITE_NCARE,
-        selector::OPERAND_USE_NONE, selector::EXC_CHK_NONE,
+        selector::DEST_REG_NCARE,   selector::PC_SRC_NEXT,      selector::FLAG_NCARE,
+        selector::REG_SRC_NCARE,    selector::MEM_READ_NCARE,   selector::MEM_WRITE_NCARE,
+        selector::OPERAND_USE_NONE, selector::REG_WRITE_ALWAYS, selector::EXC_CHK_NONE,
         1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0
     };
 endfunction

@@ -30,10 +30,10 @@ input logic llbit); //forward
     selector::flag_select   flag_sel;
     selector::register_source reg_src;
     logic[31:0] pcadd4,cp0,rs_data,rt_data;
-    logic[31:0] hi_data,lo_data;//forward
+    logic[31:0] hi_data,lo_data;//forwarded result
     logic[31:0] dest_reg_data,alu_out;
-    logic flag_selected;//,llbit;
-    
+    logic flag_selected;//
+    logic write_reg_selected;
     selector::destnation_regiter dest_reg_select;
     logic[4:0] dest_reg;
     pipeline_signal_t p_out;
@@ -95,6 +95,15 @@ input logic llbit); //forward
         pif.signal_out.rt = rt_data;
         pif.signal_out.hi = hi_data;
         pif.signal_out.lo = lo_data;
+        pif.signal_out.flag = alu_flag;
+        pif.signal_out.dest_reg_data = dest_reg_data;
+        pif.signal_out.alu_out = alu_out;
+        pif.signal_out.dest_reg = dest_reg;
+        pif.signal_out.flag_selected = flag_selected;
+        pif.signal_out.pc_branch = pif.signal_out.pcadd4 + (sign_immed << 2);
+        pif.signal_out.mem_addr = rs_data + sign_immed;
+        pif.signal_out.control.write_reg = write_reg_selected;
+
         case(pif.signal_out.control.hilo_src)
             selector::HILO_SRC_RS: begin
                 pif.signal_out.dest_hi_data = rs_data;
@@ -109,14 +118,15 @@ input logic llbit); //forward
                 pif.signal_out.dest_lo_data = 'x;
             end
         endcase
-       
-        pif.signal_out.flag = alu_flag;
-        pif.signal_out.dest_reg_data = dest_reg_data;
-        pif.signal_out.alu_out = alu_out;
-        pif.signal_out.dest_reg = dest_reg;
-        pif.signal_out.flag_selected = flag_selected;
-        pif.signal_out.pc_branch = pif.signal_out.pcadd4 + (sign_immed << 2);
-        pif.signal_out.mem_addr = rs_data + sign_immed;
+    end
+    
+    always_comb begin
+        case(p_out.control.write_cond)
+            selector::REG_WRITE_WHEN_FLAG:  write_reg_selected = flag_selected;
+            selector::REG_WRITE_WHEN_LLBIT: write_reg_selected = llbit;
+            default:      
+                write_reg_selected = '1;
+        endcase
     end
     
     always_comb begin

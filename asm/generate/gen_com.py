@@ -258,6 +258,8 @@ def get_bound(bit_len,using_signed = False):
 
 def get_bound_s16():
     return get_bound(16,True)
+def get_u32():
+    return random.choice(range(2**32)) 
 
 def get_s16():
     return random.choice(range(-2**15,2**15))

@@ -65,7 +65,9 @@ module top_test();
         '{"lh",         1'b1,  1'b0,  1'b1,  1'b0},
         '{"lb",         1'b1,  1'b0,  1'b1,  1'b0},
         '{"jr",         1'b0,  1'b0,  1'b1,  1'b0},
-        '{"jalr",       1'b0,  1'b0,  1'b1,  1'b0}
+        '{"jalr",       1'b0,  1'b0,  1'b1,  1'b0},
+        '{"movz",       1'b0,  1'b0,  1'b1,  1'b0},
+        '{"movn",       1'b0,  1'b0,  1'b1,  1'b0}
       };
 
     string manual_target_name[] = {
@@ -296,6 +298,7 @@ module top_test();
         // // for(int i = all_targets.size() - 1; i < all_targets.size(); ++i)
         //     new_test(.target(all_targets[i]));
         // $finish;
+        new_test(.target(all_targets[all_targets.size() - 2]));
         new_test(.target(all_targets[all_targets.size() - 1]));
         manual_check_target = '{"", 1'b0,  1'b0,  1'b0,  1'b0};
         // for(int i = manual_target_name.size() - 1; i < manual_target_name.size(); ++i) begin

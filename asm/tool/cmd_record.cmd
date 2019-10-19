@@ -39,3 +39,7 @@ generate\lh.py
 generate\lb.py
 
 tool\mips_compile.py manual_asm\print_string.asm
+
+generate\jr.py
+generate\jalr.py
+generate\movn_movz.py

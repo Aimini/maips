@@ -46,6 +46,17 @@ module rtype_decoder(input logic[31:0] instruction,output signals::control_t ctl
                 decoder_util::write_rd(ctl, selector::REG_SRC_PCADD4);
             end
 
+            rtype::MOVZ,rtype::MOVN: begin
+                decoder_util::write_rd(ctl, selector::REG_SRC_RS);
+                ctl.alu_srcA = selector::ALU_SRCA_RT;
+                ctl.alu_srcB = selector::ALU_SRCB_ZERO;
+                ctl.write_cond = selector::REG_WRITE_WHEN_FLAG;
+                if(unpack.funct == rtype::MOVZ)
+                    ctl.flag_sel = selector::FLAG_EQ;
+                else
+                    ctl.flag_sel = selector::FLAG_NE;
+            end
+
             rtype::MFHI: begin
                 decoder_util::write_rd(ctl, selector::REG_SRC_HI);
             end

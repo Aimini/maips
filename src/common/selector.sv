@@ -55,12 +55,19 @@ typedef enum {
     REG_SRC_NCARE
 } register_source;
 
+typedef enum {
+    REG_WRITE_WHEN_FLAG,
+    REG_WRITE_WHEN_LLBIT,
+    REG_WRITE_ALWAYS
+} write_register_condition;
+
 typedef enum  {
     ALU_SRCA_RS,   ALU_SRCA_RT,
     ALU_SRCA_NCARE} alu_sourceA;
 typedef enum  {
     ALU_SRCB_RT,    ALU_SRCB_SIGN_IMMED,
     ALU_SRCB_IMMED, ALU_SRCB_UP_IMMED,
+    ALU_SRCB_ZERO,
     ALU_SRCB_NCARE} alu_sourceB;
 typedef enum  { ALU_SRCSA_SA,ALU_SRCSA_RS,
 ALU_SRCSA_NCARE  } 

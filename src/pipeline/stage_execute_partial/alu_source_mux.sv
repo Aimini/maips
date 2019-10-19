@@ -36,6 +36,8 @@ output logic[31:0] a,b);
                 b = zero_immed;
             selector::ALU_SRCB_UP_IMMED:
                 b = up_immed;
+            selector::ALU_SRCB_ZERO:
+                b = 0;
             default:
                 b = 'x;
         endcase
