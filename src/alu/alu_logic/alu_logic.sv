@@ -12,8 +12,10 @@ output logic[N - 1:0] y);
 
     logic[$clog2(N):0] clz_y,clo_y;
     logic clz_all_zero,clo_all_zero;
+    logic signed[N - 1:0] bs;
     alu_logic_clz #(N) unit_clz(.a(a),.y(clz_y),.all_zero(clz_all_zero));
     alu_logic_clz #(N) unit_clo(.a(~a),.y(clo_y),.all_zero(clo_all_zero));
+    assign bs = b;
     always_comb begin
         case(funct)
             selector::ALU_AND : y = a & b;
@@ -22,7 +24,7 @@ output logic[N - 1:0] y);
             selector::ALU_NOR:  y = ~(a|b);
             selector::ALU_SHIFT_LEFT:             y = b << sa;
             selector::ALU_SHIFT_LOGIC_RIGHT:      y = b >> sa;
-            selector::ALU_SHIFT_ARITHMATIC_RIGHT: y = b >>> sa;
+            selector::ALU_SHIFT_ARITHMATIC_RIGHT: y = bs >>> sa;
             selector::ALU_ROTATE_RIGHT:           y = (b >> sa) | (b << N - sa);
             selector::ALU_CLZ: y = clz_y;
             selector::ALU_CLO: y = clo_y;
