@@ -66,8 +66,10 @@ module top_test();
         '{"lb",         1'b1,  1'b0,  1'b1,  1'b0},
         '{"jr",         1'b0,  1'b0,  1'b1,  1'b0},
         '{"jalr",       1'b0,  1'b0,  1'b1,  1'b0},
-        '{"movz",       1'b0,  1'b0,  1'b1,  1'b0},
-        '{"movn",       1'b0,  1'b0,  1'b1,  1'b0}
+        '{"movz",       1'b1,  1'b0,  1'b1,  1'b0},
+        '{"movn",       1'b1,  1'b0,  1'b1,  1'b0},
+        '{"srl",        1'b1,  1'b0,  1'b1,  1'b0},
+        '{"rotr",       1'b1,  1'b0,  1'b1,  1'b0}
       };
 
     string manual_target_name[] = {

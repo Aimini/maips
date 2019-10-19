@@ -43,3 +43,4 @@ tool\mips_compile.py manual_asm\print_string.asm
 generate\jr.py
 generate\jalr.py
 generate\movn_movz.py
+generate\srl_rotr.py
