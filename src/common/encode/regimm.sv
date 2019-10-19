@@ -1,4 +1,4 @@
-package regimm
+package regimm;
     typedef enum logic[4:0] {
         BLTZ    = 5'b00000,
         BGEZ    = 5'b00001,

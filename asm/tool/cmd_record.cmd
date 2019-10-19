@@ -56,3 +56,8 @@ generate\and.py
 generate\or.py
 generate\xor.py
 generate\nor.py
+
+generate\slt_sltu.py slt
+generate\slt_sltu.py sltu
+
+generate\slt_sltu.py bltz

@@ -1,0 +1,31 @@
+`ifndef REGIMM_DECODER__
+`define REGIMM_DECODER__
+`include "src/common/encode/regimm.sv"
+`include "src/common/signals.sv"
+`include "src/pipeline/decoder/decoder_util.sv"
+
+module regimm_decoder(input logic[31:0] instruction,output signals::control_t ctl);
+    signals::unpack_t  unpack;
+    extract_instruction unit_ei(instruction,unpack);
+    always_comb begin
+        ctl = decoder_util::get_default_control();
+        case(unpack.rt)
+            regimm::BLTZ,regimm::BLTZL,regimm::BLTZAL,regimm::BLTZALL: begin
+                ctl.opd_use  = selector::OPERAND_USE_RS;
+                ctl.alu_srcA = selector::ALU_SRCA_RS;
+                ctl.alu_srcB = selector::ALU_SRCB_ZERO;
+                decoder_util::branch_with(ctl,selector::FLAG_LT);
+                if(unpack.rt === regimm::BLTZAL |unpack.rt === regimm::BLTZALL) begin
+                    ctl.write_reg = '1;
+                    ctl.reg_src = selector::REG_SRC_PCADD4;
+                    ctl.dest_reg = selector::DEST_REG_31;
+                end
+            end
+            default:
+            {ctl.opd_use, ctl.pc_src, ctl.exc_chk}  = 
+            {selector::OPERAND_USE_NONE, selector::PC_SRC_EXECPTION, selector::EXC_CHK_RESERVERD};
+        endcase
+    end
+endmodule
+
+`endif

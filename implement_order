@@ -71,5 +71,7 @@ AND
 OR
 XOR
 NOR
+SLT,SLTU
+BLTZ
 //------------
 ADDI(NOEXCEUPTION)
