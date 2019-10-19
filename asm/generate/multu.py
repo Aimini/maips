@@ -55,7 +55,7 @@ def my_gen1(A,C,E):
         lambda : random.choice(range(0x8FFFFFF0,0xFFFFFFFF))  ]
     for i in gen_sample:
         for j in gen_sample:
-            gen_partial(A,i,j,time = 3)
-    gen_partial(A, lambda : random.choice(range(2**32)), lambda : random.choice(range(2**32)),time = 10)
+            gen_partial(A,i,j,time = 2)
+    gen_partial(A, lambda : random.choice(range(2**32)), lambda : random.choice(range(2**32)),time = 5)
     A(check_and_exit())
 r.gen(my_gen1)

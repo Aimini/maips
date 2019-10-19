@@ -26,13 +26,13 @@ def gen_by(cmd):
 
         
         for i in range(1024):
-            reg = get_random_exclued_reg(k = 3)
+            reg = get_random_exclude_reg(k = 3)
             A(f"addu ${reg[0]},${reg[1]},${reg[2]}")
-            reg = get_random_exclued_reg(k = 3)
+            reg = get_random_exclude_reg(k = 3)
             A(f"addu ${reg[0]},${reg[1]},${reg[2]}")
-            reg = get_random_exclued_reg(k = 3)
+            reg = get_random_exclude_reg(k = 3)
             A(f"addu ${reg[0]},${reg[1]},${reg[2]}")
-            reg = get_random_exclued_reg(k = 3)
+            reg = get_random_exclude_reg(k = 3)
             A(f"{cmd} ${reg[0]},${reg[1]},${reg[2]}")
         A(check_and_exit())
     g.gen(my_gen2)

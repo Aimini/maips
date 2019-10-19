@@ -20,14 +20,14 @@ def my_gen1(A,C,E):
     for x in range(N):
         A(f"mark{x}: ")
         r16 = get_s16()
-        reg = get_random_exclued_reg(k = 2,exclude = [29,31])
+        reg = get_random_exclude_reg(k = 2,exclude = [29,31])
         A(f"addi ${reg[0]}, ${reg[1]}, {r16}")
         
         A(f"addi $sp,$sp,-4")
         A(f"sw   $ra,0($sp)")
         if x != N - 1:
             A(f"jal mark{x + 1}")
-        reg = get_random_exclued_reg(k = 2,exclude = [29,31])
+        reg = get_random_exclude_reg(k = 2,exclude = [29,31])
         r16 = random.choice(range(2**16))
         A(f"ori ${reg[0]}, ${reg[1]}, {r16}")
         A(f"jal group_2_{x}")

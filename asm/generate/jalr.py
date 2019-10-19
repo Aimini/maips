@@ -26,15 +26,15 @@ def my_gen1(A,C,E):
         A(f"sw   ${pc_save_reg},0($sp)")
         r16 = get_s16()
 
-        reg = get_random_exclued_reg(k = 2,exclude = [29])
+        reg = get_random_exclude_reg(k = 2,exclude = [29])
         A(f"addi ${reg[0]}, ${reg[1]}, {r16}")
         
         temp_pc_save_reg = pc_save_reg
         if x != N - 1:
-            pc_save_reg, pc_target_reg = get_random_exclued_reg(k = 2,exclude = [0,29])
+            pc_save_reg, pc_target_reg = get_random_exclude_reg(k = 2,exclude = [0,29])
             A(f"la   ${pc_target_reg},mark{x + 1}")
             A(f"jalr ${pc_save_reg},${pc_target_reg}")
-        reg = get_random_exclued_reg(k = 2,exclude = [29])
+        reg = get_random_exclude_reg(k = 2,exclude = [29])
         r16 = random.choice(range(2**16))
         A(f"ori ${reg[0]}, ${reg[1]}, {r16}")
         A(f"lw   ${temp_pc_save_reg},0($sp)")

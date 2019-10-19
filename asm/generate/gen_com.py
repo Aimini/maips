@@ -110,12 +110,12 @@ def get_exclued_reg_list(*args):
     return a
 
 
-def get_random_exclued_reg( k = 1, exclude = []):
+def get_random_exclude_reg( k = 1, exclude = []):
     a = get_exclued_reg_list(*exclude)
     return random.sample(a,k = k)
 
 def get_one_writable_reg():
-    return get_random_exclued_reg(k = 1,exclude = [0])[0]
+    return get_random_exclude_reg(k = 1,exclude = [0])[0]
 
 def set_immed(reg,immed):
     return """lui  ${0},   0x{1:0>4X}
@@ -127,7 +127,7 @@ ori ${0},   0x{2:0>4X}""".format(reg,(immed >>16) & 0xFFFF, immed & 0xFFFF)
 #####################################################
 def exit_using(base_reg = None) -> map:
     if base_reg is None:
-        base_reg = get_random_exclued_reg(k = 1)
+        base_reg = get_random_exclude_reg(k = 1)
     code =  """
 lui ${0}, 0xffff
 sw  $0, 0(${0})""".format(base_reg)
@@ -148,7 +148,7 @@ sw  $0, 0(${0})""".format(base_reg)
 
 def check_reg_using(base_reg = None,arg_reg = None,ignore_gp_sp = False):
     if base_reg is None or arg_reg is None:
-        base_reg,arg_reg = get_random_exclued_reg(k = 2)
+        base_reg,arg_reg = get_random_exclude_reg(k = 2)
 
     code1 = """
 lui ${0}, 0xffff
@@ -171,7 +171,7 @@ sw  ${1}, 0(${0}) """.format(base_reg,arg_reg)
 
 def check_and_exit(base_reg  = None,arg_reg  = None,ignore_gp_sp = False):
     if base_reg is None or arg_reg is None:
-        base_reg,arg_reg = get_random_exclued_reg(k = 2)
+        base_reg,arg_reg = get_random_exclude_reg(k = 2)
     return check_reg_using(base_reg,arg_reg,ignore_gp_sp) +'\n' + exit_using(base_reg)
 
 
@@ -181,7 +181,7 @@ def check_and_exit(base_reg  = None,arg_reg  = None,ignore_gp_sp = False):
 #######################################################################
 def assert_function(f,reg1,reg2,base_reg = None,arg_reg = None):
     if base_reg is None or arg_reg is None:
-        base_reg,arg_reg = get_random_exclued_reg(k = 2,exclude=[reg1,reg2])
+        base_reg,arg_reg = get_random_exclude_reg(k = 2,exclude=[reg1,reg2])
 
     code = """
 lui ${0}, 0xffff
@@ -204,7 +204,7 @@ def assert_not_equal(reg1,reg2,base_reg = None,arg_reg = None):
 #######################################################################
 def assert_function_immed(f,reg,immed,base_reg = None,arg_reg = None):
     if base_reg is None or arg_reg is None:
-        base_reg,arg_reg = get_random_exclued_reg(k = 2,exclude=[reg])
+        base_reg,arg_reg = get_random_exclude_reg(k = 2,exclude=[reg])
 
     code = """
 {immed}

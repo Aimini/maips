@@ -14,13 +14,13 @@ def my_gen2(A,C,E):
         gen_sslv(get_u32(),get_u32())
 
     for i in range(4096):
-        reg = get_random_exclued_reg(k = 3)
+        reg = get_random_exclude_reg(k = 3)
         A(f"addu ${reg[0]},${reg[1]},${reg[2]}")
-        reg = get_random_exclued_reg(k = 3)
+        reg = get_random_exclude_reg(k = 3)
         A(f"addu ${reg[0]},${reg[1]},${reg[2]}")
-        reg = get_random_exclued_reg(k = 3)
+        reg = get_random_exclude_reg(k = 3)
         A(f"addu ${reg[0]},${reg[1]},${reg[2]}")
-        reg = get_random_exclued_reg(k = 3)
+        reg = get_random_exclude_reg(k = 3)
         A(f"sllv ${reg[0]},${reg[1]},${reg[2]}")
     A(check_and_exit())
 

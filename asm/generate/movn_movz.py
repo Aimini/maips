@@ -15,7 +15,7 @@ def gen_when(cmd):
             A(set_immed(reg, value))
             A(set_immed(reg2, condition_value))
             
-            rd, = get_random_exclued_reg(k = 1, exclude =[reg2])
+            rd, = get_random_exclude_reg(k = 1, exclude =[reg2])
             rd_value = random.choice(range(2**32))
             A(set_immed(rd, rd_value))
             if reg == rd:
@@ -35,7 +35,7 @@ def gen_when(cmd):
 
         
         def test_one(value, condition_value):
-            reg = get_random_exclued_reg(k = 2)
+            reg = get_random_exclude_reg(k = 2)
             gen_assert_one(A, reg[0], value, reg[1], condition_value)
         
         def test_by_iter(word_cout,offset):

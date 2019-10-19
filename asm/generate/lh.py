@@ -65,7 +65,7 @@ def my_gen1(A,C,E):
         offset = get_s16()
         address = convert_adddress(count)
         base_address = address - offset
-        regs = get_random_exclued_reg(5)
+        regs = get_random_exclude_reg(5)
         A(f"li ${regs[0]},{base_address}")
         A(f"lh ${regs[1]},{offset}(${regs[0]})")
         A(f"addu ${regs[2]},${regs[1]},${regs[3]}")
