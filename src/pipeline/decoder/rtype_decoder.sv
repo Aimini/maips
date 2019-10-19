@@ -123,6 +123,10 @@ module rtype_decoder(input logic[31:0] instruction,output signals::control_t ctl
                 ctl = decoder_util::get_alu_rtype_control(selector::ALU_ADD);
             end
 
+            rtype::SUBU: begin
+                ctl = decoder_util::get_alu_rtype_control(selector::ALU_SUB);
+            end
+
             default:begin
                 {ctl.opd_use, ctl.pc_src, ctl.exc_chk}  = 
                 {selector::OPERAND_USE_NONE, selector::PC_SRC_EXECPTION, selector::EXC_CHK_RESERVERD};
