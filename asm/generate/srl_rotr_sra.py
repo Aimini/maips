@@ -1,14 +1,16 @@
 from gen_com import *
-
+import sys
 def gen_by(cmd):
     g = gen(cmd)
     def my_gen2(A,C,E):
         def logic_calculate(val1,val2):
             if cmd == "srl":
                 return (val1 >> val2) & 0xFFFFFFFF
-            else:
+            elif cmd == "rotr":
                 return ((val1 >> val2) | (val1 << (32 - val2))) & 0xFFFFFFFF
-
+            else:
+                return (cutto_sign32(val1) >> val2)& 0xFFFFFFFF
+                
         def assert_one(reg,reg_val,c):
             next_reg = reg + 1
             if next_reg >= 32:
@@ -29,5 +31,4 @@ def gen_by(cmd):
         A(check_and_exit())
     g.gen(my_gen2)
 
-gen_by("srl")
-gen_by("rotr")
+gen_by(sys.argv[1])
