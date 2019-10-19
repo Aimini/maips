@@ -75,7 +75,11 @@ module top_test();
         '{"srlv",       1'b1,  1'b0,  1'b1,  1'b0},
         '{"rotrv",      1'b1,  1'b0,  1'b1,  1'b0},
         '{"srav",       1'b1,  1'b0,  1'b1,  1'b0},
-        '{"subu",       1'b0,  1'b0,  1'b1,  1'b0}
+        '{"subu",       1'b0,  1'b0,  1'b1,  1'b0},
+        '{"and",        1'b1,  1'b0,  1'b1,  1'b0},
+        '{"or",         1'b1,  1'b0,  1'b1,  1'b0},
+        '{"xor",        1'b1,  1'b0,  1'b1,  1'b0},
+        '{"nor",        1'b1,  1'b0,  1'b1,  1'b0}
       };
 
     string manual_target_name[] = {
@@ -303,12 +307,12 @@ module top_test();
         // for(int i = 0; i < all_targets.size(); ++i)
         //     new_test(.target(all_targets[i]));
         // $finish;
-        // // for(int i = all_targets.size() - 1; i < all_targets.size(); ++i)
-        //     new_test(.target(all_targets[i]));
-        // $finish;
+        for(int i = all_targets.size() - 4; i < all_targets.size(); ++i)
+            new_test(.target(all_targets[i]));
+        $finish;
         //new_test(.target(all_targets[all_targets.size() - 3]));
         //new_test(.target(all_targets[all_targets.size() - 2]));
-        new_test(.target(all_targets[all_targets.size() - 1]));
+        //new_test(.target(all_targets[all_targets.size() - 1]));
         manual_check_target = '{"", 1'b0,  1'b0,  1'b0,  1'b0};
         // for(int i = manual_target_name.size() - 1; i < manual_target_name.size(); ++i) begin
         //     manual_check_target.name = manual_target_name[i];

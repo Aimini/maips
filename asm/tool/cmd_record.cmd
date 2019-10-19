@@ -50,3 +50,9 @@ generate\sllv.py
 generate\srlv_rotrv_srav.py srlv
 generate\srlv_rotrv_srav.py rotrv
 generate\srlv_rotrv_srav.py srav
+generate\subu.py
+
+generate\and.py
+generate\or.py
+generate\xor.py
+generate\nor.py
