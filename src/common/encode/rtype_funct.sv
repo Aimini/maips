@@ -31,6 +31,8 @@ package rtype;
         OR      = 6'b100101,
         XOR     = 6'b100110,
         NOR     = 6'b100111,
+        SLT     = 6'b101010,
+        SLTU    = 6'b101011,
         TGE     = 6'b110000,
         TGEU    = 6'b110001,
         TLT     = 6'b110010,

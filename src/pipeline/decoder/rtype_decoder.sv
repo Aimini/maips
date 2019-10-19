@@ -142,7 +142,15 @@ module rtype_decoder(input logic[31:0] instruction,output signals::control_t ctl
             rtype::NOR: begin
                 ctl = decoder_util::get_alu_rtype_control(selector::ALU_NOR);
             end
-            
+
+            rtype::SLT,rtype::SLTU:begin
+                ctl = decoder_util::get_standard_control();
+                if(unpack.funct == rtype::SLTU)
+                    decoder_util::write_flag_to_rd(ctl, selector::FLAG_LTU);
+                else
+                    decoder_util::write_flag_to_rd(ctl, selector::FLAG_LT);
+            end
+
             default:begin
                 {ctl.opd_use, ctl.pc_src, ctl.exc_chk}  = 
                 {selector::OPERAND_USE_NONE, selector::PC_SRC_EXECPTION, selector::EXC_CHK_RESERVERD};
