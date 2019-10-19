@@ -47,3 +47,4 @@ generate\srl_rotr_sra.py srl
 generate\srl_rotr_sra.py rotr
 generate\srl_rotr_sra.py sra
 generate\sllv.py
+generate\srlv_rotrv_srav.py srlv

@@ -71,7 +71,8 @@ module top_test();
         '{"srl",        1'b1,  1'b0,  1'b1,  1'b0},
         '{"rotr",       1'b1,  1'b0,  1'b1,  1'b0},
         '{"sra",        1'b1,  1'b0,  1'b1,  1'b0},
-        '{"sllv",       1'b1,  1'b0,  1'b1,  1'b0}
+        '{"sllv",       1'b1,  1'b0,  1'b1,  1'b0},
+        '{"srlv",       1'b1,  1'b0,  1'b1,  1'b0}
       };
 
     string manual_target_name[] = {
