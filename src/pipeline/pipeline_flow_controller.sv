@@ -61,6 +61,7 @@ output logic stall_fetch);
                 pif_decode.nullify = '1;
                 pif_execute.nullify = '1;
         end
+        // execute JR,JALR
         if(ps_execute.control.pc_src === selector::PC_SRC_REGISTER) begin
                 load = '1;
                 pc = ps_execute.rs;

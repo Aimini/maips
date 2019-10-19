@@ -64,7 +64,8 @@ module top_test();
         '{"lw",         1'b1,  1'b0,  1'b1,  1'b0},
         '{"lh",         1'b1,  1'b0,  1'b1,  1'b0},
         '{"lb",         1'b1,  1'b0,  1'b1,  1'b0},
-        '{"jr",         1'b0,  1'b0,  1'b1,  1'b0}
+        '{"jr",         1'b0,  1'b0,  1'b1,  1'b0},
+        '{"jalr",       1'b0,  1'b0,  1'b1,  1'b0}
       };
 
     string manual_target_name[] = {

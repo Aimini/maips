@@ -220,6 +220,12 @@ sw  ${arg}, 0(${base}) """.format(base = base_reg,arg = arg_reg,reg = reg,\
 def assert_equal_immed(reg,immed,base_reg = None,arg_reg = None):
     return assert_function_immed(1,reg,immed,base_reg,arg_reg);
 
+def set_gp_and_sp():
+    return """
+    li  $sp,0x10110000
+    li  $gp,0x10090000
+    jr $31
+"""
 
 def cutto_signN(val,l):
     mask = 2**l - 1;

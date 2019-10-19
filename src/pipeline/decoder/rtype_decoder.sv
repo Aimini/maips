@@ -39,6 +39,13 @@ module rtype_decoder(input logic[31:0] instruction,output signals::control_t ctl
                 ctl.opd_use = selector::OPERAND_USE_RS;
                 ctl.pc_src =  selector::PC_SRC_REGISTER;
             end
+
+            rtype::JALR: begin
+                ctl.opd_use = selector::OPERAND_USE_RS;
+                ctl.pc_src =  selector::PC_SRC_REGISTER;
+                decoder_util::write_rd(ctl, selector::REG_SRC_PCADD4);
+            end
+
             rtype::MFHI: begin
                 decoder_util::write_rd(ctl, selector::REG_SRC_HI);
             end
