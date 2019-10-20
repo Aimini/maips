@@ -64,3 +64,5 @@ generate\bltz.py
 generate\bltzal.py
 generate\bgez.py
 generate\bgezal.py
+
+generate\sb_sh_sw.py sb

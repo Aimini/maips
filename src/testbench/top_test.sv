@@ -85,7 +85,8 @@ module top_test();
         '{"bltz",       1'b0,  1'b0,  1'b1,  1'b0},
         '{"bltzal",     1'b1,  1'b0,  1'b1,  1'b0},
         '{"bgez",       1'b0,  1'b0,  1'b1,  1'b0},
-        '{"bgezal",     1'b1,  1'b0,  1'b1,  1'b0}
+        '{"bgezal",     1'b1,  1'b0,  1'b1,  1'b0},
+        '{"sb",         1'b1,  1'b0,  1'b1,  1'b0}
       };
 
     string manual_target_name[] = {
@@ -99,8 +100,8 @@ module top_test();
     assign reg_s = reg_file[23:16];
     assign reg_t = {reg_file[25:24], reg_file[15:8]};
     always_comb begin
-        write_dbg_memory =  unit_top.unit_memory.unit_debug_ram.we;
-        write_dbg_function_reg =  unit_top.unit_memory.unit_debug_ram.addr == 0;
+        write_dbg_memory =  unit_top.unit_memory.unit_debug_ram.mif.write;
+        write_dbg_function_reg =  unit_top.unit_memory.unit_debug_ram.mif.addr == 0;
         dbg_arg = unit_top.unit_memory.unit_debug_ram.datas;
     end
     assign pc_mem_stage = unit_top.unit_core.unit_memory.pif.signal_out.pc;

@@ -8,7 +8,7 @@
 `include "src/pipeline/forward/main_forwarder.sv"
 `include "src/pipeline/pipeline_flow_controller.sv"
 module core(input logic clk,reset,
-memory_interface.read_only_controller ins_mif,
+memory_interface.rom_controller ins_mif,
 memory_interface.controller data_mif);
 
     pipeline_interface pif_fetch(.clk(clk),.reset(reset)),

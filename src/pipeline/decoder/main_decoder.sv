@@ -101,10 +101,15 @@ module main_decoder(input logic[31:0] instruction,output signals::control_t ctl)
                 decoder_util::write_rt(ctl, selector::REG_SRC_MEM);
             end
 
-            main_opcode::SW: begin
+            main_opcode::SB, main_opcode::SW: begin
                 ctl = decoder_util::get_mem_addr_control();
-                {ctl.write_mode,           ctl.write_mem } = 
-                {selector::MEM_WRITE_WORD, 1'b1};
+                ctl.write_mem = '1;
+                case(unpack.opcode)
+                    main_opcode::SB: ctl.write_mode = selector::MEM_WRITE_BYTE;
+                    main_opcode::SH: ctl.write_mode = selector::MEM_WRITE_HALF;
+                    main_opcode::SW: ctl.write_mode = selector::MEM_WRITE_WORD;
+                    default: ctl.write_mode = selector::MEM_WRITE_NCARE;
+                endcase
             end
 
             main_opcode::LUI: begin

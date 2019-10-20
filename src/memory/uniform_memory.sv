@@ -18,56 +18,65 @@ memory_interface.memory ins_i,data_i);
      logic[31:0] debug_data_offset,kernel_data_offset, user_data_offset;
      logic debug_we,kernel_we,user_we;
      logic[31:0] debug_dout,kernel_dout,user_dout;
-     
-
+    
     // 8 * 4 32byte debug argument
-    ram #(3,32) unit_debug_ram(.clk(clk),
-    .we(debug_we),.addr(debug_data_offset[4:2]),
-    .din(data_i.din),.dout(debug_dout));
+    localparam DBG_N = 3;
+    // 8M * 4byte user text 32MB
+    localparam KRL_N = 23;
+    // 1M *4byte kernel space 4MB
+    localparam USR_N = 20;
+    memory_interface #(32) debug_data_mif();
+    memory_interface #(32) kernel_data_mif();
+    memory_interface #(32) user_data_mif();
 
-    // 1K kernel space
-    ram #(10,32) unit_kernel_ram(.clk(clk),
-    .we(kernel_we),.addr(kernel_data_offset[11:2]),
-    .din(data_i.din),.dout(kernel_dout));
-        
-    // 8M * 4byte user space
-    ram #(23,32) unit_user_ram(.clk(clk),
-    .we(user_we),.addr(user_data_offset[24:2]),
-    .din(data_i.din),.dout(user_dout));
+    ram #(DBG_N,32) unit_debug_ram (clk, debug_data_mif);
+    ram #(KRL_N,32) unit_kernel_ram(clk, kernel_data_mif);
+    ram #(USR_N,32) unit_user_ram  (clk, user_data_mif);
 
     logic[31:0] user_ins_offset;
      logic[31:0] user_ins_out;
-    // 64M * 4byte user text 256MB
     instruction_mem #(26,32) unit_ins_rom(
         .addr(user_ins_offset[27:2]),
         .dout(user_ins_out));
 
+    assign debug_data_mif.mask =  data_i.mask;
+    assign kernel_data_mif.mask = data_i.mask;
+    assign user_data_mif.mask =   data_i.mask;
+
+    assign debug_data_mif.din =  data_i.din;
+    assign kernel_data_mif.din = data_i.din;
+    assign user_data_mif.din   = data_i.din;
+
      always_comb begin
-        user_we = 1'b0;
-        kernel_we = 1'b0;
-        debug_we = 1'b0;
         user_data_offset  = 'x;
         kernel_data_offset = 'x;
         debug_data_offset = 'x;
         data_i.dout = 'x;
         
+        debug_data_mif.write = 0;
+        kernel_data_mif.write = 0;
+        user_data_mif.write = 0;
+
 
         if(32'h5000_0000<= data_paddr &  data_paddr < 32'h6000_0000) begin
-            user_we = data_i.write;
+            user_data_mif.write = data_i.write;
             user_data_offset = data_paddr - 32'h5001_0000;
-            data_i.dout = user_dout;
+            user_data_mif.addr = user_data_offset[USR_N + 1:2];
+            data_i.dout = user_data_mif.dout;
         end else 
 
         if(32'hA000_0000 <= data_paddr & data_paddr < 32'hB000_0000) begin
-            kernel_we = data_i.write;
+            kernel_data_mif.write = data_i.write;
             kernel_data_offset = (data_paddr - 32'hA000_0000);
-            data_i.dout = kernel_dout;
+            kernel_data_mif.addr = kernel_data_offset[KRL_N + 1:2];
+            data_i.dout = kernel_data_mif.dout;
         end
 
         if(32'hFFFF_0000 <= data_paddr & data_paddr < 32'hFFFF_0020) begin
-            debug_we = data_i.write;
+            debug_data_mif.write = data_i.write;
             debug_data_offset = (data_paddr - 32'hFFFF_0000);
-            data_i.dout = debug_dout;
+            debug_data_mif.addr = debug_data_offset[DBG_N + 1:2];
+            data_i.dout = debug_data_mif.dout;
         end
 
         user_ins_offset = 'x;

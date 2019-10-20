@@ -2,7 +2,7 @@ module stage_fetch(
  input clk,reset,
  input logic stall, load,
  input logic[31:0]  pc_in,
- memory_interface.read_only_controller mif,
+ memory_interface.rom_controller mif,
  output logic[31:0] instruction, pc, pc_add4);
     logic[31:0] pc_reg;
 
