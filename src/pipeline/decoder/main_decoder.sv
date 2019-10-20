@@ -89,13 +89,15 @@ module main_decoder(input logic[31:0] instruction,output signals::control_t ctl)
                 endcase
             end
 
-            main_opcode::LB, main_opcode::LH,  main_opcode::LW: begin
+            main_opcode::LB, main_opcode::LH,  main_opcode::LW,main_opcode::LBU, main_opcode::LHU: begin
                 ctl = decoder_util::get_mem_addr_control();
                 ctl.opd_use = selector::OPERAND_USE_RS;
                 case(unpack.opcode)
                     main_opcode::LB: ctl.read_mode = selector::MEM_READ_BYTE;
                     main_opcode::LH: ctl.read_mode = selector::MEM_READ_HALF;
                     main_opcode::LW: ctl.read_mode = selector::MEM_READ_WORD;
+                    main_opcode::LBU: ctl.read_mode = selector::MEM_READ_UNSIGN_BYTE;
+                    main_opcode::LHU: ctl.read_mode = selector::MEM_READ_UNSIGN_HALF;
                     default: ctl.read_mode = selector::MEM_READ_NCARE;
                 endcase
                 decoder_util::write_rt(ctl, selector::REG_SRC_MEM);

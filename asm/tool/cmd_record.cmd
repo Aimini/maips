@@ -67,3 +67,6 @@ generate\bgezal.py
 
 generate\sb_sh_sw.py sb
 generate\sb_sh_sw.py sh
+generate\sb_sh_sw.py sw
+generate\lbu_lhu.py lbu
+generate\lbu_lhu.py lbu
