@@ -62,3 +62,5 @@ generate\slt_sltu.py sltu
 
 generate\bltz.py
 generate\bltzal.py
+generate\bgez.py
+generate\bgezal.py
