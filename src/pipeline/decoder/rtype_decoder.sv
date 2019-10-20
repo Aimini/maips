@@ -119,12 +119,16 @@ module rtype_decoder(input logic[31:0] instruction,output signals::control_t ctl
                 endcase
             end
 
-            rtype::ADDU: begin
+            rtype::ADDU, rtype::ADD: begin
                 ctl = decoder_util::get_alu_rtype_control(selector::ALU_ADD);
+                if(unpack.funct === rtype::ADD)
+                    ctl.exc_chk = selector::EXC_CHK_OVERFLOW;
             end
 
-            rtype::SUBU: begin
+            rtype::SUBU, rtype::SUB: begin
                 ctl = decoder_util::get_alu_rtype_control(selector::ALU_SUB);
+                if(unpack.funct === rtype::SUB)
+                    ctl.exc_chk = selector::EXC_CHK_OVERFLOW;
             end
 
             rtype::AND: begin
