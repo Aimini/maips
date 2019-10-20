@@ -60,4 +60,5 @@ generate\nor.py
 generate\slt_sltu.py slt
 generate\slt_sltu.py sltu
 
-generate\slt_sltu.py bltz
+generate\bltz.py
+generate\bltzal.py
