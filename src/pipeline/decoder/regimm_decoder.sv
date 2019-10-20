@@ -21,6 +21,18 @@ module regimm_decoder(input logic[31:0] instruction,output signals::control_t ct
                     ctl.dest_reg = selector::DEST_REG_31;
                 end
             end
+
+            regimm::BGEZ,regimm::BGEZL,regimm::BGEZAL,regimm::BGEZALL: begin
+                ctl.opd_use  = selector::OPERAND_USE_RS;
+                ctl.alu_srcA = selector::ALU_SRCA_RS;
+                ctl.alu_srcB = selector::ALU_SRCB_ZERO;
+                decoder_util::branch_with(ctl,selector::FLAG_GE);
+                if(unpack.rt === regimm::BGEZAL |unpack.rt === regimm::BGEZALL) begin
+                    ctl.write_reg = '1;
+                    ctl.reg_src = selector::REG_SRC_PCADD4;
+                    ctl.dest_reg = selector::DEST_REG_31;
+                end
+            end
             default:
             {ctl.opd_use, ctl.pc_src, ctl.exc_chk}  = 
             {selector::OPERAND_USE_NONE, selector::PC_SRC_EXECPTION, selector::EXC_CHK_RESERVERD};
