@@ -80,7 +80,7 @@ module stage_memory_load_store #(parameter N = 32)
                 mem_data_in  = register_data << 8*byte_index;
            end
             selector::MEM_WRITE_HALF: begin
-                byte_mask = 4'b0011 << (byte_index[1] << 1);
+                byte_mask = 4'b0011 << ({byte_index[1],1'b0});
                 mem_data_in  = register_data << 8*(byte_index[1] << 1);
             end
             selector::MEM_WRITE_WORD: begin
