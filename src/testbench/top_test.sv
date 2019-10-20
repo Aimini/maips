@@ -87,7 +87,8 @@ module top_test();
         '{"bgez",       1'b0,  1'b0,  1'b1,  1'b0},
         '{"bgezal",     1'b1,  1'b0,  1'b1,  1'b0},
         '{"sb",         1'b1,  1'b0,  1'b1,  1'b0},
-        '{"sh",         1'b1,  1'b0,  1'b1,  1'b0}
+        '{"sh",         1'b1,  1'b0,  1'b1,  1'b0},
+        '{"sw",         1'b1,  1'b0,  1'b1,  1'b0}
       };
 
     string manual_target_name[] = {
