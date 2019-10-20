@@ -11,7 +11,7 @@ def my_gen1(A,C,E):
     A("sw $0, 0x10010000")
     for i in range(N):
         reg =   get_random_exclude_reg(k = 1,exclude = [29])[0];
-        A("li ${},{}".format(reg, random.choice(range(0,2**31))))
+        A("li ${},{}".format(reg, random.choice(range(1,2**31))))
         A("bltzal ${},wrong".format(reg))
         A("lw $2,0x10010000")
         A("addiu $2,$2,1")
@@ -37,8 +37,6 @@ def my_gen1(A,C,E):
         A("addiu $sp,$sp, -4")
         A("sw $ra, 0($sp)")
         A("li ${},{}".format(reg, random.choice(range(2**31,2**32))))
-        if reg == 0:
-            continue
         if i != N - 1:
             A("bltzal ${},mark{}".format(reg,i + 1))
         A("lw $ra, 0($sp)")
