@@ -30,6 +30,9 @@ typedef enum  {
     ALU_SHIFT_LEFT              ,ALU_SHIFT_LOGIC_RIGHT,
     ALU_SHIFT_ARITHMATIC_RIGHT  ,ALU_ROTATE_RIGHT,
     ALU_CLO                     ,ALU_CLZ,
+    ALU_SWAP_BYTE_IN_HALF       ,ALU_SIGN_EXT_BYTE,
+    ALU_SIGN_EXT_HALF           ,ALU_EXTRACT_BIT,
+    ALU_INSERT_BIT,
     ALU_NCARE} alu_function;
 
         //SPECIAL FUNCTION
@@ -52,6 +55,7 @@ typedef enum {
     REG_SRC_LLBIT, REG_SRC_HI,
     REG_SRC_LO,    REG_SRC_MUL,
     REG_SRC_CP0,   REG_SRC_MEM,
+    REG_SRC_SPECIAL3,
     REG_SRC_NCARE
 } register_source;
 

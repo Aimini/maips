@@ -6,6 +6,7 @@
 `include "src/common/encode/main_opcode.sv"
 `include "src/pipeline/decoder/rtype_decoder.sv"
 `include "src/pipeline/decoder/special2_decoder.sv"
+`include "src/pipeline/decoder/special3_decoder.sv"
 `include "src/pipeline/decoder/regimm_decoder.sv"
 `include "src/pipeline/decoder/decoder_util.sv"
 
@@ -14,12 +15,14 @@ module main_decoder(input logic[31:0] instruction,output signals::control_t ctl)
     signals::control_t regimm_control;
     signals::control_t cop0_control;
     signals::control_t special2_control;
+    signals::control_t special3_control;
     signals::unpack_t  unpack;
 
     extract_instruction unit_ei(instruction,unpack);
     rtype_decoder unit_rtype(instruction, rtype_control);
     regimm_decoder unit_regimm(instruction,regimm_control);
     special2_decoder unit_special2(instruction, special2_control);
+    special3_decoder unit_special3(instruction, special3_control);
     always_comb begin
         ctl =  decoder_util::get_default_control();
 
@@ -27,7 +30,7 @@ module main_decoder(input logic[31:0] instruction,output signals::control_t ctl)
             main_opcode::RTYPE:   ctl = rtype_control;
             main_opcode::REGIMM:  ctl = regimm_control;
             main_opcode::SPECIAL2:ctl = special2_control;
-
+            main_opcode::SPECIAL3:ctl = special3_control;
             
             main_opcode::J, main_opcode::JAL: begin
                 ctl.opd_use = selector::OPERAND_USE_NONE;

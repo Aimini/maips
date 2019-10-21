@@ -25,6 +25,7 @@ typedef enum logic[5:0] {
     BGTZL    = 6'b010111,
     //--
     SPECIAL2 = 6'b011100,
+    SPECIAL3 = 6'b011111,
     LB       = 6'b100000,
     LH       = 6'b100001,
     LWL      = 6'b100010,

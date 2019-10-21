@@ -3,7 +3,7 @@
 
 module register_partial_data_mux(
  input selector::register_source reg_src,
- input logic[31:0] alu_out,pcadd4,rs,hi,lo,cp0,mul_div_lo,
+ input logic[31:0] alu_out,pcadd4,rs,hi,lo,cp0,mul_div_lo,special3,
  input logic flag,llbit,
 output logic[31:0] data);
     always_comb begin
@@ -26,6 +26,8 @@ output logic[31:0] data);
                 data = lo;
             selector::REG_SRC_CP0:
                 data = cp0;
+            selector::REG_SRC_SPECIAL3:
+                data = special3;
             default:
                 data = 'x;
         endcase

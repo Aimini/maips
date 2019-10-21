@@ -91,7 +91,10 @@ module top_test();
         '{"sw",         1'b1,  1'b0,  1'b1,  1'b0},
         '{"lbu",        1'b1,  1'b0,  1'b1,  1'b0},
         '{"lhu",        1'b1,  1'b0,  1'b1,  1'b0},
-        '{"lwr_swr",    1'b0,  1'b0,  1'b1,  1'b0}
+        '{"lwr_swr",    1'b0,  1'b0,  1'b1,  1'b0},
+        '{"lwl_swl",    1'b0,  1'b0,  1'b1,  1'b0},
+        '{"ext",        1'b0,  1'b0,  1'b1,  1'b0},
+        '{"ins",        1'b0,  1'b0,  1'b1,  1'b0}
       };
 
     string manual_target_name[] = {
@@ -274,7 +277,7 @@ module top_test();
         $display("");
         $display("-------------------------------------------------------------------------------------");
         $display("-------- testing %s...",test_filename);
-        $readmemh(test_filename, unit_top.unit_memory.unit_ins_rom.im);
+        $readmemh(test_filename, unit_top.unit_memory.unit_ins_rom.im,);
         $readmemh(data_filename, unit_top.unit_memory.unit_user_ram.datas);
 
         reset = 1;
@@ -312,6 +315,39 @@ module top_test();
         end
         $display("-------- %s finish.",test_filename);
         
+    endtask
+
+    task automatic new_execution(input check_target_t target);
+        string target_name = target.name;
+        string test_filename =  get_test_filename(target_name);
+        string data_filename =  get_data_filename(target_name);
+        logic exit = 0;
+        logic assert_equal_hit = '0;
+        logic assert_not_equal_hit = '0;
+        logic check_register_file_hit = '0;
+        $display("");
+        $display("");
+        $display("-------------------------------------------------------------------------------------");
+        $display("-------- testing %s...",test_filename);
+        $readmemh(test_filename, unit_top.unit_memory.unit_ins_rom.im);
+        $readmemh(data_filename, unit_top.unit_memory.unit_user_ram.datas);
+
+        reset = 1;
+        @(negedge clk) begin
+            reset = 1;
+        end
+        
+
+        while (~exit) begin
+           do_one_cycle(
+               target_name,
+               assert_equal_hit,
+            assert_not_equal_hit,
+            check_register_file_hit,
+            exit);
+        end
+        $display("-------- %s finish.",test_filename);
+
     endtask
 
     check_target_t manual_check_target;

@@ -9,6 +9,7 @@
 `include "src/pipeline/stage_execute_partial/dest_reg_mux.sv"
 `include "src/pipeline/stage_execute_partial/multiply_div_wrapper.sv"
 `include "src/alu/alu.sv"
+`include "src/alu/alu_logic/alu_logic_special3.sv"
 `include "src/alu/div_mul/div_mul.sv"
 `include "src/common/util.sv"
 `include "src/pipeline/forward/main_forwarder.sv"
@@ -31,7 +32,7 @@ input logic llbit); //forward
     selector::register_source reg_src;
     logic[31:0] pcadd4,cp0,rs_data,rt_data;
     logic[31:0] hi_data,lo_data;//forwarded result
-    logic[31:0] dest_reg_data,alu_out;
+    logic[31:0] dest_reg_data,alu_out,special3_out;
     logic flag_selected;//
     logic write_reg_selected;
     selector::destnation_regiter dest_reg_select;
@@ -52,6 +53,11 @@ input logic llbit); //forward
     .y(alu_out),
     .flag(alu_flag));
 
+    alu_logic_special3 unit_special3(.a(alu_a),.b(alu_b),
+    .msbd(unpack.rd),.lsb(unpack.sa),
+    .y(special3_out),
+    .funct(p_out.control.alu_funct));
+
     multiply_div_wrapper  unit_div_mul(
         .clk(pif.clk),          .reset(pif.reset),
         .clear(pif.bubble),     .hold_result(pif.stall),
@@ -69,7 +75,8 @@ input logic llbit); //forward
     register_partial_data_mux unit_reg_partial_data_mux(
         .reg_src(reg_src),
         .alu_out(alu_out),.pcadd4(pcadd4),.rs(rs_data),
-        .hi(hi_data),.lo(lo_data),.cp0(cp0),.mul_div_lo(lo_out_mul_div),
+        .hi(hi_data),.lo(lo_data),.cp0(cp0),
+        .mul_div_lo(lo_out_mul_div),.special3(special3_out),
         .flag(flag_selected),.llbit(llbit),
         .data(dest_reg_data));
 
