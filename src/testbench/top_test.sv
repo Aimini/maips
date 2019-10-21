@@ -192,7 +192,7 @@ module top_test();
             case(dbg_arg[0])
                 0:begin
                     exit = 1;
-                    $display("exit.");
+                    //$display("exit.");
                 end
                 /*  assert equal  */
                 1: begin
@@ -227,6 +227,10 @@ module top_test();
                         message = {message,one_char};
                     end
                     $write(message);
+                end
+
+                4:  begin
+                    $write("%d", dbg_arg[1]);
                 end
 
                 /*  check register file  */
@@ -277,7 +281,7 @@ module top_test();
         $display("");
         $display("-------------------------------------------------------------------------------------");
         $display("-------- testing %s...",test_filename);
-        $readmemh(test_filename, unit_top.unit_memory.unit_ins_rom.im,);
+        $readmemh(test_filename, unit_top.unit_memory.unit_ins_rom.im);
         $readmemh(data_filename, unit_top.unit_memory.unit_user_ram.datas);
 
         reset = 1;
@@ -317,36 +321,61 @@ module top_test();
         
     endtask
 
-    task automatic new_execution(input check_target_t target);
-        string target_name = target.name;
-        string test_filename =  get_test_filename(target_name);
-        string data_filename =  get_data_filename(target_name);
-        logic exit = 0;
+
+    task automatic new_execution(input string program_name);
+        int file = 0, index = 0,result  = 0;
+        logic exit             = '0;
         logic assert_equal_hit = '0;
         logic assert_not_equal_hit = '0;
         logic check_register_file_hit = '0;
+        logic[31:0] word_buffer;
+        int unsigned i = 0;
         $display("");
         $display("");
         $display("-------------------------------------------------------------------------------------");
-        $display("-------- testing %s...",test_filename);
-        $readmemh(test_filename, unit_top.unit_memory.unit_ins_rom.im);
-        $readmemh(data_filename, unit_top.unit_memory.unit_user_ram.datas);
+        $display("-------- booting %s...",program_name);
 
+        file = $fopen("c/temp/hello.text.bin","rb");           
+        i = 0;  
+        while(!$feof(file))    begin
+            result = $fread(word_buffer,file);
+            word_buffer = {<<8{word_buffer}};
+            unit_top.unit_memory.unit_ins_rom.im[i >> 2] = word_buffer;
+            i += result;
+        end
+        $fclose(file);
+        $display("text segment 0x%x bytes",i);
+
+        file = $fopen("c/temp/hello.data.bin","rb");           
+        i = 0;  
+        while(!$feof(file))    begin
+            result = $fread(word_buffer,file);
+            word_buffer = {<<8{word_buffer}};
+            unit_top.unit_memory.unit_user_ram.datas[i >> 2] = word_buffer;
+            i += result;
+        end
+        $fclose(file);
+        $display("data segment 0x%x bytes",i);
+        $display("#################################################################");
+        $display("#################################################################");
         reset = 1;
         @(negedge clk) begin
             reset = 1;
         end
-        
-
+        @(negedge clk) begin
+            reset = 0;
+        end
         while (~exit) begin
            do_one_cycle(
-               target_name,
+               "",
                assert_equal_hit,
             assert_not_equal_hit,
             check_register_file_hit,
             exit);
         end
-        $display("-------- %s finish.",test_filename);
+        $display("#################################################################");
+        $display("#################################################################");
+        $display("-------- %s finish.",program_name);
 
     endtask
 
@@ -355,9 +384,10 @@ module top_test();
         // for(int i = 0; i < all_targets.size(); ++i)
         //     new_test(.target(all_targets[i]));
         // $finish;
-        for(int i = all_targets.size() - 1; i < all_targets.size(); ++i)
-            new_test(.target(all_targets[i]));
-        $finish;
+        // for(int i = all_targets.size() - 1; i < all_targets.size(); ++i)
+        //     new_test(.target(all_targets[i]));
+        // $finish;
+        new_execution("ignore");
         //new_test(.target(all_targets[all_targets.size() - 3]));
         //new_test(.target(all_targets[all_targets.size() - 2]));
         //new_test(.target(all_targets[all_targets.size() - 1]));
