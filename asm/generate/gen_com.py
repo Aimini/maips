@@ -118,8 +118,8 @@ def get_one_writable_reg():
     return get_random_exclude_reg(k = 1,exclude = [0])[0]
 
 def set_immed(reg,immed):
-    return """lui  ${0},   0x{1:0>4X}
-ori ${0},   0x{2:0>4X}""".format(reg,(immed >>16) & 0xFFFF, immed & 0xFFFF)
+    return """lui  ${0},   0x{1:0>4X} # li ${0}, {3:0>8X}
+ori ${0},   0x{2:0>4X}""".format(reg,(immed >>16) & 0xFFFF, immed & 0xFFFF,immed)
 ####################################################
 # call exit function in modelsim
 # using base_reg as momory address base

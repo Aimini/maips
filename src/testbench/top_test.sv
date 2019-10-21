@@ -90,7 +90,8 @@ module top_test();
         '{"sh",         1'b1,  1'b0,  1'b1,  1'b0},
         '{"sw",         1'b1,  1'b0,  1'b1,  1'b0},
         '{"lbu",        1'b1,  1'b0,  1'b1,  1'b0},
-        '{"lhu",        1'b1,  1'b0,  1'b1,  1'b0}
+        '{"lhu",        1'b1,  1'b0,  1'b1,  1'b0},
+        '{"lwr_swr",    1'b0,  1'b0,  1'b1,  1'b0}
       };
 
     string manual_target_name[] = {
@@ -318,7 +319,7 @@ module top_test();
         // for(int i = 0; i < all_targets.size(); ++i)
         //     new_test(.target(all_targets[i]));
         // $finish;
-        for(int i = all_targets.size() - 2; i < all_targets.size(); ++i)
+        for(int i = all_targets.size() - 1; i < all_targets.size(); ++i)
             new_test(.target(all_targets[i]));
         $finish;
         //new_test(.target(all_targets[all_targets.size() - 3]));

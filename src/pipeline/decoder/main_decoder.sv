@@ -89,7 +89,9 @@ module main_decoder(input logic[31:0] instruction,output signals::control_t ctl)
                 endcase
             end
 
-            main_opcode::LB, main_opcode::LH,  main_opcode::LW,main_opcode::LBU, main_opcode::LHU: begin
+            main_opcode::LB, main_opcode::LH,  main_opcode::LW,
+            main_opcode::LBU, main_opcode::LHU,
+            main_opcode::LWR,main_opcode::LWL: begin
                 ctl = decoder_util::get_mem_addr_control();
                 ctl.opd_use = selector::OPERAND_USE_RS;
                 case(unpack.opcode)
@@ -98,18 +100,23 @@ module main_decoder(input logic[31:0] instruction,output signals::control_t ctl)
                     main_opcode::LW: ctl.read_mode = selector::MEM_READ_WORD;
                     main_opcode::LBU: ctl.read_mode = selector::MEM_READ_UNSIGN_BYTE;
                     main_opcode::LHU: ctl.read_mode = selector::MEM_READ_UNSIGN_HALF;
+                    main_opcode::LWR: ctl.read_mode = selector::MEM_READ_LWR;
+                    main_opcode::LWL: ctl.read_mode = selector::MEM_READ_LWL;
                     default: ctl.read_mode = selector::MEM_READ_NCARE;
                 endcase
                 decoder_util::write_rt(ctl, selector::REG_SRC_MEM);
             end
 
-            main_opcode::SB, main_opcode::SH, main_opcode::SW: begin
+            main_opcode::SB, main_opcode::SH, main_opcode::SW,
+            main_opcode::SWR, main_opcode::SWL: begin
                 ctl = decoder_util::get_mem_addr_control();
                 ctl.write_mem = '1;
                 case(unpack.opcode)
                     main_opcode::SB: ctl.write_mode = selector::MEM_WRITE_BYTE;
                     main_opcode::SH: ctl.write_mode = selector::MEM_WRITE_HALF;
                     main_opcode::SW: ctl.write_mode = selector::MEM_WRITE_WORD;
+                    main_opcode::SWR: ctl.write_mode = selector::MEM_WRITE_SWR;
+                    main_opcode::SWL: ctl.write_mode = selector::MEM_WRITE_SWL;
                     default: ctl.write_mode = selector::MEM_WRITE_NCARE;
                 endcase
             end

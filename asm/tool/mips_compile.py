@@ -64,7 +64,7 @@ if len(sys.argv) > 1:
     # dump 
     use_special_dump = len(sys.argv)  > 2
     command = ['java','-jar',str(Mars_dir),sys.argv[1],'-1']
-    
+    command_asm = ['java','-jar',str(Mars_dir),sys.argv[1],'a']
     dump_range = '0x00400000-0x0FFFFFFC'
     dump_text = '.text'
     dump_data = ['dump','.data','HexText',str(datadumpdir)]
@@ -77,15 +77,14 @@ if len(sys.argv) > 1:
         
     dump_segment.append(str(hextextdir))
     command.extend(dump_segment)
-    command.extend(dump_data)
     command.extend(dump_reg)
     command.extend(dump_asm)
-
+    command_asm.extend(dump_data)
     f = open(special_dumpdir,mode='wb')
     cmd_str = ' '.join(command)
     #print(cmd_str)
     os.system(cmd_str)
-
+    os.system(' '.join(command_asm))
     # if no data to dump ,still create empty file
     with open(datadumpdir,"a") as f:
         pass

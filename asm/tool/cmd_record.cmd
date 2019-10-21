@@ -70,3 +70,4 @@ generate\sb_sh_sw.py sh
 generate\sb_sh_sw.py sw
 generate\lbu_lhu.py lbu
 generate\lbu_lhu.py lbu
+generate\lwr_swr.py
