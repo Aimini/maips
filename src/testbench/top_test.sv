@@ -96,7 +96,8 @@ module top_test();
         '{"ext",        1'b0,  1'b0,  1'b1,  1'b0},
         '{"ins",        1'b0,  1'b0,  1'b1,  1'b0},
         '{"seb",        1'b1,  1'b0,  1'b1,  1'b0},
-        '{"seh",        1'b1,  1'b0,  1'b1,  1'b0}
+        '{"seh",        1'b1,  1'b0,  1'b1,  1'b0},
+        '{"wsbh",       1'b1,  1'b0,  1'b1,  1'b0}
       };
 
     string manual_target_name[] = {
@@ -386,7 +387,7 @@ module top_test();
         // for(int i = 0; i < all_targets.size(); ++i)
         //     new_test(.target(all_targets[i]));
         // $finish;
-        for(int i = all_targets.size() - 2; i < all_targets.size(); ++i)
+        for(int i = all_targets.size() - 1; i < all_targets.size(); ++i)
             new_test(.target(all_targets[i]));
         $finish;
         // new_execution("ignore");

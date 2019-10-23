@@ -74,3 +74,6 @@ generate\lwr_swr.py
 generate\lwl_swl.py
 generate\ins_ext.py ext
 generate\ins_ext.py ins
+generate\seb_seh.py seb
+generate\seb_seh.py seh
+generate\wsbh.py seh

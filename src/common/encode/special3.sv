@@ -6,7 +6,7 @@ package special3;
      } funct;
 
     typedef enum logic[4:0] { 
-        WSBH    = 5'b00000,
+        WSBH    = 5'b00010,
         SEB     = 5'b10000,
         SEH     = 5'b11000
     } sa;
