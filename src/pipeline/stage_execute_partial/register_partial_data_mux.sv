@@ -2,8 +2,8 @@
 `define REGISTER_PARTIAL_DATA_MUX__
 
 module register_partial_data_mux(
- input selector::register_source reg_src,
- input logic[31:0] alu_out,pcadd4,rs,hi,lo,cp0,mul_div_lo,special3,
+ input selector::register_source reg_src,input logic using_delay_slot,
+ input logic[31:0] alu_out,pcadd4,pcadd8,rs,hi,lo,cp0,mul_div_lo,special3,
  input logic flag,llbit,
 output logic[31:0] data);
     always_comb begin
@@ -12,8 +12,12 @@ output logic[31:0] data);
                 data = alu_out;
             selector::REG_SRC_MUL:
                 data = mul_div_lo;
-            selector::REG_SRC_PCADD4:
-                data = pcadd4;
+            selector::REG_SRC_LINKADDR: begin
+                    if(using_delay_slot)
+                        data = pcadd8;
+                    else
+                        data = pcadd4;
+                end
             selector::REG_SRC_RS:
                 data = rs;  
             selector::REG_SRC_FLAG:

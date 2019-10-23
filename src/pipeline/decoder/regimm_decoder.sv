@@ -17,7 +17,7 @@ module regimm_decoder(input logic[31:0] instruction,output signals::control_t ct
                 decoder_util::branch_with(ctl,selector::FLAG_LT);
                 if(unpack.rt === regimm::BLTZAL |unpack.rt === regimm::BLTZALL) begin
                     ctl.write_reg = '1;
-                    ctl.reg_src = selector::REG_SRC_PCADD4;
+                    ctl.reg_src = selector::REG_SRC_LINKADDR;
                     ctl.dest_reg = selector::DEST_REG_31;
                 end
             end
@@ -29,7 +29,7 @@ module regimm_decoder(input logic[31:0] instruction,output signals::control_t ct
                 decoder_util::branch_with(ctl,selector::FLAG_GE);
                 if(unpack.rt === regimm::BGEZAL |unpack.rt === regimm::BGEZALL) begin
                     ctl.write_reg = '1;
-                    ctl.reg_src = selector::REG_SRC_PCADD4;
+                    ctl.reg_src = selector::REG_SRC_LINKADDR;
                     ctl.dest_reg = selector::DEST_REG_31;
                 end
             end
