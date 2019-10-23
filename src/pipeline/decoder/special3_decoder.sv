@@ -28,11 +28,11 @@ module special3_decoder(input logic[31:0] instruction,output signals::control_t 
 
             special3::BSHFL: begin
                 ctl.opd_use = selector::OPERAND_USE_RS;
-                ctl.alu_srcA = selector::ALU_SRCA_RS;
-                case(unpack.funct)
+                ctl.alu_srcA = selector::ALU_SRCA_RT;
+                case(unpack.sa)
                     special3::WSBH: ctl.alu_funct = selector::ALU_SWAP_BYTE_IN_HALF;
-                    special3::SEB:  ctl.alu_funct = selector::ALU_SIGN_EXT_HALF;
-                    special3::SEH:  ctl.alu_funct = selector::ALU_EXTRACT_BIT;
+                    special3::SEB:  ctl.alu_funct = selector::ALU_SIGN_EXT_BYTE;
+                    special3::SEH:  ctl.alu_funct = selector::ALU_SIGN_EXT_HALF;
                 endcase
                 decoder_util::write_rd(ctl,selector::REG_SRC_SPECIAL3);
             end

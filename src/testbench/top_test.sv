@@ -94,7 +94,9 @@ module top_test();
         '{"lwr_swr",    1'b0,  1'b0,  1'b1,  1'b0},
         '{"lwl_swl",    1'b0,  1'b0,  1'b1,  1'b0},
         '{"ext",        1'b0,  1'b0,  1'b1,  1'b0},
-        '{"ins",        1'b0,  1'b0,  1'b1,  1'b0}
+        '{"ins",        1'b0,  1'b0,  1'b1,  1'b0},
+        '{"seb",        1'b1,  1'b0,  1'b1,  1'b0},
+        '{"seh",        1'b1,  1'b0,  1'b1,  1'b0}
       };
 
     string manual_target_name[] = {
@@ -384,10 +386,10 @@ module top_test();
         // for(int i = 0; i < all_targets.size(); ++i)
         //     new_test(.target(all_targets[i]));
         // $finish;
-        // for(int i = all_targets.size() - 1; i < all_targets.size(); ++i)
-        //     new_test(.target(all_targets[i]));
-        // $finish;
-        new_execution("ignore");
+        for(int i = all_targets.size() - 2; i < all_targets.size(); ++i)
+            new_test(.target(all_targets[i]));
+        $finish;
+        // new_execution("ignore");
         //new_test(.target(all_targets[all_targets.size() - 3]));
         //new_test(.target(all_targets[all_targets.size() - 2]));
         //new_test(.target(all_targets[all_targets.size() - 1]));
