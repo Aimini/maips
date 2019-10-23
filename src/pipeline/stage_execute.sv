@@ -16,6 +16,7 @@
 
 module stage_execute(pipeline_interface.port pif,
 input forward_info_t forward, output logic wait_result,
+input logic using_delay_slot,
 input logic llbit); //forward
 
     logic[31:0] alu_a,alu_b;
@@ -73,8 +74,8 @@ input logic llbit); //forward
         .a(alu_a),.b(alu_b));
 
     register_partial_data_mux unit_reg_partial_data_mux(
-        .reg_src(reg_src),
-        .alu_out(alu_out),.pcadd4(pcadd4),.rs(rs_data),
+        .reg_src(reg_src),.using_delay_slot(using_delay_slot),
+        .alu_out(alu_out),.pcadd4(pcadd4),.pcadd8(p_out.pcadd8),.rs(rs_data),
         .hi(hi_data),.lo(lo_data),.cp0(cp0),
         .mul_div_lo(lo_out_mul_div),.special3(special3_out),
         .flag(flag_selected),.llbit(llbit),
@@ -127,12 +128,14 @@ input logic llbit); //forward
         endcase
     end
     
+    /** write signal select**/
     always_comb begin
         case(p_out.control.write_cond)
             selector::REG_WRITE_WHEN_FLAG:  write_reg_selected = flag_selected;
             selector::REG_WRITE_WHEN_LLBIT: write_reg_selected = llbit;
-            default:      
-                write_reg_selected = '1;
+            selector::REG_WRITE_ALWAYS: write_reg_selected = reconnect.signal_out.control.write_reg;
+            default:
+                write_reg_selected = 'x;
         endcase
     end
     

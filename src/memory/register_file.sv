@@ -17,6 +17,23 @@ module register_file  #(parameter out = 2,parameter addr = 5,parameter width = 3
         else if(we & waddr !== 0) begin
             file[waddr] <= din;
         end
+        
+        if(we) begin
+            foreach(waddr[i]) begin
+                assert(waddr[i] !== 'x)
+                else begin
+                    $error("register file write address have X value.");
+                    $stop;
+                end
+            end
+            foreach(din[i]) begin
+                assert(din[i] !== 'x)
+                else begin
+                    $error("register file write data have X value.");
+                    $stop;
+                end
+            end
+        end
     end
 
     always_comb begin

@@ -50,7 +50,7 @@ typedef enum{
 } hilo_source;
 /** register source **/
 typedef enum {
-    REG_SRC_ALU,   REG_SRC_PCADD4,
+    REG_SRC_ALU,   REG_SRC_LINKADDR,
     REG_SRC_RS,    REG_SRC_FLAG,
     REG_SRC_LLBIT, REG_SRC_HI,
     REG_SRC_LO,    REG_SRC_MUL,

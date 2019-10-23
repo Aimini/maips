@@ -58,7 +58,8 @@ module stage_decode(pipeline_interface.port pif,input forward_info_t forward);
 
     assign p_out.pc =     reconnect.signal_out.pc;
     assign p_out.pcadd4 = reconnect.signal_out.pcadd4;
-
+    assign p_out.pcadd8 = reconnect.signal_out.pcadd8;
+    
     assign p_out.pcjump = 
         {p_out.pcadd4[31:28],
          p_out.instruction[25:0],

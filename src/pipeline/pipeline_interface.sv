@@ -9,7 +9,7 @@ typedef struct
     /*signal::unpack_t unpack;*/
     signals::control_t control;
     signals::flag_t flag;
-    logic[31:0] pc,pcadd4; //fetch
+    logic[31:0] pc,pcadd4,pcadd8; //fetch
     logic[31:0] instruction,rs,rt,cp0; //decode
     logic[31:0] lo,hi;
     logic[31:0] pcjump,pc_branch;

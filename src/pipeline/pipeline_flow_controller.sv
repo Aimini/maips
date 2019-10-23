@@ -13,6 +13,7 @@ module pipeline_flow_controller(
 pipeline_interface.controller pif_decode,pif_execute,
 pif_memory,pif_write_back,
 input logic execute_busy, data_memory_busy, instruction_memory_busy,
+input logic using_delay_slot,
 output logic load,
 output logic[31:0] pc,
 output logic stall_fetch);
@@ -50,7 +51,9 @@ output logic stall_fetch);
         if(ps_decode.control.pc_src == selector::PC_SRC_JUMP) begin
             load = '1;
             pc = ps_decode.pcjump;
-            pif_decode.nullify = '1;
+            if(!using_delay_slot) begin
+                pif_decode.nullify = '1;
+            end
         end
 
         //execute BEQ,BNE,BEQL,BNEL,BLEZ,BGTZ
@@ -58,15 +61,20 @@ output logic stall_fetch);
             ps_execute.flag_selected === '1) begin
                 load = '1;
                 pc = ps_execute.pc_branch;
+                
                 pif_decode.nullify = '1;
-                pif_execute.nullify = '1;
+                if(!using_delay_slot) begin
+                    pif_execute.nullify = '1;
+                end
         end
         // execute JR,JALR
         if(ps_execute.control.pc_src === selector::PC_SRC_REGISTER) begin
                 load = '1;
                 pc = ps_execute.rs;
                 pif_decode.nullify = '1;
-                pif_execute.nullify = '1;
+                if(!using_delay_slot) begin
+                    pif_execute.nullify = '1;
+                end
         end
 /************** stall or bubble to clear data hazard  **********/
         if(instruction_memory_busy) begin

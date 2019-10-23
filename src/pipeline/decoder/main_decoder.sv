@@ -37,7 +37,7 @@ module main_decoder(input logic[31:0] instruction,output signals::control_t ctl)
                 ctl.pc_src = selector::PC_SRC_JUMP;
                 if(unpack.opcode == main_opcode::JAL) begin
                     ctl.write_reg = 1;
-                    ctl.reg_src =  selector::REG_SRC_PCADD4;
+                    ctl.reg_src =  selector::REG_SRC_LINKADDR;
                     ctl.dest_reg = selector::DEST_REG_31;
                 end  
             end

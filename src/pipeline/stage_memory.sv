@@ -13,6 +13,7 @@ module stage_memory(pipeline_interface.port pif,
     logic[31:0] mem_data_out,mem_data_in,mem_addr;
     logic[3:0] byte_mask;
     logic write_mem;
+    logic prev_stall;
     
     selector::mem_read_type read_mode;
     selector::mem_write_type write_mode;
@@ -33,6 +34,12 @@ module stage_memory(pipeline_interface.port pif,
     assign  reconnect.nullify = pif.nullify;
     assign  reconnect.stall = pif.stall;
     assign  reconnect.bubble = pif.bubble;
+    always_ff @(posedge pif.clk) begin
+        if(pif.reset)
+            prev_stall <= 0;
+        else
+            prev_stall <= pif.stall | pif.bubble;
+    end
 
     always_comb begin
         pif.signal_out = reconnect.signal_out;
@@ -49,7 +56,7 @@ module stage_memory(pipeline_interface.port pif,
         mem_addr = pif.signal_out.mem_addr;
         mif.addr = pif.signal_out.mem_addr;
         mif.din  = mem_data_in;
-        mif.write  =  write_mem;
+        mif.write  =  write_mem & ~(prev_stall);
         mif.mask = byte_mask;
         mem_data_out = mif.dout;
     end

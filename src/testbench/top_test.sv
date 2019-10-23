@@ -336,9 +336,9 @@ module top_test();
         $display("");
         $display("");
         $display("-------------------------------------------------------------------------------------");
-        $display("-------- booting %s...",program_name);
+        $display("-------- loading text and data %s...",program_name);
 
-        file = $fopen("c/temp/hello.text.bin","rb");           
+        file = $fopen({"c/temp/",program_name,".text.bin"},"rb");           
         i = 0;  
         while(!$feof(file))    begin
             result = $fread(word_buffer,file);
@@ -349,7 +349,7 @@ module top_test();
         $fclose(file);
         $display("text segment 0x%x bytes",i);
 
-        file = $fopen("c/temp/hello.data.bin","rb");           
+        file = $fopen({"c/temp/",program_name,".data.bin"},"rb");           
         i = 0;  
         while(!$feof(file))    begin
             result = $fread(word_buffer,file);
@@ -387,10 +387,10 @@ module top_test();
         // for(int i = 0; i < all_targets.size(); ++i)
         //     new_test(.target(all_targets[i]));
         // $finish;
-        for(int i = all_targets.size() - 1; i < all_targets.size(); ++i)
-            new_test(.target(all_targets[i]));
-        $finish;
-        // new_execution("ignore");
+        // for(int i = all_targets.size() - 1; i < all_targets.size(); ++i)
+        //     new_test(.target(all_targets[i]));
+        // $finish;
+        new_execution("main");
         //new_test(.target(all_targets[all_targets.size() - 3]));
         //new_test(.target(all_targets[all_targets.size() - 2]));
         //new_test(.target(all_targets[all_targets.size() - 1]));

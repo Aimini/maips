@@ -22,6 +22,8 @@ memory_interface.controller data_mif);
     logic data_memory_busy,instruction_memory_busy;
     logic execute_busy;
     logic stall_fetch;
+    logic using_delay_slot;
+    assign using_delay_slot = '1;
 
 
 
@@ -37,7 +39,7 @@ memory_interface.controller data_mif);
 
     pipeline_flow_controller unit_flow_controller
     (.pif_decode(pif_decode),
-    .pif_execute(pif_execute),
+    .pif_execute(pif_execute),.using_delay_slot(using_delay_slot),
     .pif_memory(pif_memory),
     .pif_write_back(pif_write_back),
     .execute_busy(execute_busy),.data_memory_busy(data_memory_busy),
@@ -52,7 +54,8 @@ memory_interface.controller data_mif);
     .mif(ins_mif),
     .instruction(pif_decode.signal_in.instruction),
     .pc(pif_decode.signal_in.pc),
-    .pc_add4(pif_decode.signal_in.pcadd4));
+    .pc_add4(pif_decode.signal_in.pcadd4),
+    .pc_add8(pif_decode.signal_in.pcadd8));
 
     stage_decode unit_decode(.pif(pif_decode),
         .forward(decode_forward_info));
@@ -61,6 +64,7 @@ memory_interface.controller data_mif);
 
     stage_execute unit_execute(.pif(pif_execute),
         .forward(execute_forward_info),.wait_result(execute_busy),
+        .using_delay_slot(using_delay_slot),
         .llbit(1'b0));
 
 

@@ -3,7 +3,7 @@ module stage_fetch(
  input logic stall, load,
  input logic[31:0]  pc_in,
  memory_interface.rom_controller mif,
- output logic[31:0] instruction, pc, pc_add4);
+ output logic[31:0] instruction, pc, pc_add4,pc_add8);
     logic[31:0] pc_reg;
 
     
@@ -21,5 +21,6 @@ module stage_fetch(
         instruction =  mif.dout;
         pc = pc_reg;
         pc_add4 = pc_reg + 4;
+        pc_add8 = pc_reg + 8;
     end
 endmodule
