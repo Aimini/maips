@@ -7,7 +7,7 @@ def my_gen(A,C,E):
         reg = [random.choice(range(0,32)) for x in range(3)]
         A("li   ${0},0x{1:0>8X}".format(reg[2],va));
         A("addu ${0},${1},${2}".format(*reg));
-    reg = [random.choice(range(1,32)) for x in range(2)]
+    reg = get_random_exclude_reg(k = 2)
     C(reg[0],reg[1])
     E(reg[0])
 
