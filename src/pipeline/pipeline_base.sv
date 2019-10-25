@@ -1,9 +1,10 @@
+`include "src/pipeline/pipeline_interface.sv"
+
 module pipeline_base (pipeline_interface.port pif, input logic nullify_instruction = '0);
     pipeline_signal_t signal_reg;
 
     assign pif.signal_out = signal_reg;
     
-
     always_ff @(posedge pif.clk) begin
         if(pif.reset)
             signal_reg <= '{

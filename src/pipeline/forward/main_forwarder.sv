@@ -10,9 +10,19 @@ typedef struct{
 
 
 typedef struct {
-    fowrad_element_t rs,rt,lo,hi;
+    fowrad_element_t rs,rt,lo,hi,cop0;
 } forward_info_t;
 
+
+function automatic void process_forward_data(
+    ref pipeline_signal_t ps,
+    input forward_info_t forward_info);
+        ps.rs = forward_info.rs.f   ? forward_info.rs.data   : ps.rs;
+        ps.rt = forward_info.rt.f   ? forward_info.rt.data   : ps.rt;
+        ps.hi = forward_info.hi.f   ? forward_info.hi.data   : ps.hi;
+        ps.lo = forward_info.lo.f   ? forward_info.lo.data   : ps.lo;
+        ps.cop0 =forward_info.cop0.f  ? forward_info.cop0.data :  ps.cop0;
+endfunction
 
 module main_forwarder(
 input pipeline_signal_t ps_decode,ps_execute,
@@ -76,6 +86,13 @@ execute_forward_info);
             decode_forward_info.hi.f = '1;
             decode_forward_info.hi.data = ps_memory.dest_hi_data;
         end 
+        /********* cop0 *********************/
+        if(ps_memory.control.write_cop0) begin
+            execute_forward_info.cop0.f = '1;
+            execute_forward_info.cop0.data = ps_memory.dest_cop0_data;
+            decode_forward_info.cop0.f = '1;
+            decode_forward_info.cop0.data = ps_memory.dest_cop0_data;
+        end
         
     end
   

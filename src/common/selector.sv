@@ -54,7 +54,7 @@ typedef enum {
     REG_SRC_RS,    REG_SRC_FLAG,
     REG_SRC_LLBIT, REG_SRC_HI,
     REG_SRC_LO,    REG_SRC_MUL,
-    REG_SRC_CP0,   REG_SRC_MEM,
+    REG_SRC_COP0,   REG_SRC_MEM,
     REG_SRC_SPECIAL3,
     REG_SRC_NCARE
 } register_source;
@@ -75,7 +75,7 @@ typedef enum  {
     ALU_SRCB_NCARE} alu_sourceB;
 typedef enum  { ALU_SRCSA_SA,ALU_SRCSA_RS,
 ALU_SRCSA_NCARE  } 
-alu_sourceShift;
+alu_shift_source;
 
 typedef enum {
     DEST_REG_RD, DEST_REG_RT,

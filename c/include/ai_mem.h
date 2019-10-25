@@ -22,9 +22,13 @@ void *memset(void *dest, int c, size_t n)
 
 char * strcpy(char *dest, const char *src)
 {
-	while (*dest && *src)
-		*dest++ = *src++;
-	*dest = 0;
+	while ((*dest++ = *src++));
+	return dest;
+}
+
+char * strncpy(char *dest, const char *src, size_t n)
+{
+	while (n-- && (*dest++ = *src++));
 	return dest;
 }
 

@@ -3,7 +3,7 @@
 
 module register_partial_data_mux(
  input selector::register_source reg_src,input logic using_delay_slot,
- input logic[31:0] alu_out,pcadd4,pcadd8,rs,hi,lo,cp0,mul_div_lo,special3,
+ input logic[31:0] alu_out,pcadd4,pcadd8,rs,hi,lo,cop0,mul_div_lo,special3,
  input logic flag,llbit,
 output logic[31:0] data);
     always_comb begin
@@ -28,8 +28,8 @@ output logic[31:0] data);
                 data = hi;
             selector::REG_SRC_LO:
                 data = lo;
-            selector::REG_SRC_CP0:
-                data = cp0;
+            selector::REG_SRC_COP0:
+                data = cop0;
             selector::REG_SRC_SPECIAL3:
                 data = special3;
             default:

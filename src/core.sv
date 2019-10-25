@@ -55,7 +55,8 @@ memory_interface.controller data_mif);
     .instruction(pif_decode.signal_in.instruction),
     .pc(pif_decode.signal_in.pc),
     .pc_add4(pif_decode.signal_in.pcadd4),
-    .pc_add8(pif_decode.signal_in.pcadd8));
+    .pc_add8(pif_decode.signal_in.pcadd8),
+    .pc_sub4(pif_decode.signal_in.pcsub4));
 
     stage_decode unit_decode(.pif(pif_decode),
         .forward(decode_forward_info));
@@ -78,14 +79,23 @@ memory_interface.controller data_mif);
     assign pif_execute.signal_in = pif_decode.signal_out;
     assign pif_memory.signal_in  = pif_execute.signal_out;
     assign pif_write_back.signal_in = pif_memory.signal_out;
-
+    /*** GPR write back ***/
     assign pif_decode.signal_in.dest_reg       = pif_write_back.signal_out.dest_reg;
     assign pif_decode.signal_in.dest_reg_data  = pif_write_back.signal_out.dest_reg_data;
     assign pif_decode.signal_in.control.write_reg = pif_write_back.signal_out.control.write_reg;
+
+    /** hi lo write back **/
     assign pif_decode.signal_in.control.write_hi  = pif_memory.signal_out.control.write_hi;
     assign pif_decode.signal_in.control.write_lo  = pif_memory.signal_out.control.write_lo;
     assign pif_decode.signal_in.dest_hi_data  = pif_memory.signal_out.dest_hi_data;
     assign pif_decode.signal_in.dest_lo_data  = pif_memory.signal_out.dest_lo_data;
+
+    /*** cp write back ***/
+    assign pif_decode.signal_in.dest_cop0_rd  = pif_memory.signal_out.dest_cop0_rd;
+    assign pif_decode.signal_in.dest_cop0_sel = pif_memory.signal_out.dest_cop0_sel;
+    assign pif_decode.signal_in.control.write_cop0  = pif_memory.signal_out.control.write_cop0;
+    assign pif_decode.signal_in.dest_cop0_data  =     pif_memory.signal_out.dest_cop0_data;
+
     assign instruction_memory_busy = ins_mif.busy;
 
 endmodule

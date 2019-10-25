@@ -82,13 +82,13 @@ int main()
 {
 	int match = 0;
 	int iter = 11;
-	double de = 1.0f;
+	double de = 1.55f;
 	char str[STACK_LIMIT];
-	str[0] = 0;
-	strcpy(str, "Hello World!\n");
+	str[STACK_LIMIT - 1] = 0;
+	strncpy(str, "Hello World!\n",STACK_LIMIT - 1);
 	print_str("------------------------------------------\n");
 	print_str(str);
-	strcpy(str, "  from AI!  \n");
+	strncpy(str, "  from AI!  \n",STACK_LIMIT - 1);
 	print_str(str);
 	test_print_int();
 	print_str("\n");
@@ -100,11 +100,12 @@ int main()
 	printf("using string result is %s, match decimal %d places.\n",str,match);
 
 	de = calculate_e_double(iter);
-	snprintf(str,STACK_LIMIT,"%.30lf",de);
+	snprintf(str,STACK_LIMIT,"%.29lf",de);
+	print_str(str);
 	match = compare_to_e(str) - 2;
 	printf("using double result is %s, match decimal %d places.\n",str,match);
-	//print_str("--------------- exit  --------------------\n");
-	//strcpy(str, "  Goodbyte! \n");
-	//print_str(str);
+	print_str("--------------- exit  --------------------\n");
+	strncpy(str, "  Goodbyte! \n",STACK_LIMIT - 1);
+	print_str(str);
 	sys_exit();
 }

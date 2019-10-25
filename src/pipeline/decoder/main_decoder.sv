@@ -5,6 +5,7 @@
 `include "src/common/util.sv"
 `include "src/common/encode/main_opcode.sv"
 `include "src/pipeline/decoder/rtype_decoder.sv"
+`include "src/pipeline/decoder/cop0_decoder.sv"
 `include "src/pipeline/decoder/special2_decoder.sv"
 `include "src/pipeline/decoder/special3_decoder.sv"
 `include "src/pipeline/decoder/regimm_decoder.sv"
@@ -17,10 +18,12 @@ module main_decoder(input logic[31:0] instruction,output signals::control_t ctl)
     signals::control_t special2_control;
     signals::control_t special3_control;
     signals::unpack_t  unpack;
+    
 
     extract_instruction unit_ei(instruction,unpack);
     rtype_decoder unit_rtype(instruction, rtype_control);
     regimm_decoder unit_regimm(instruction,regimm_control);
+    cop0_decoder unit_cop0(instruction, cop0_control);
     special2_decoder unit_special2(instruction, special2_control);
     special3_decoder unit_special3(instruction, special3_control);
     always_comb begin
@@ -29,6 +32,7 @@ module main_decoder(input logic[31:0] instruction,output signals::control_t ctl)
         case(unpack.opcode)
             main_opcode::RTYPE:   ctl = rtype_control;
             main_opcode::REGIMM:  ctl = regimm_control;
+            main_opcode::COP0:    ctl = cop0_control;
             main_opcode::SPECIAL2:ctl = special2_control;
             main_opcode::SPECIAL3:ctl = special3_control;
             
@@ -58,7 +62,7 @@ module main_decoder(input logic[31:0] instruction,output signals::control_t ctl)
                         decoder_util::branch_with(ctl,selector::FLAG_GT);
                 endcase
             end
-
+        
             main_opcode::ADDI,main_opcode::ADDIU: begin
                 ctl = decoder_util::get_sign_immed_control();
                 ctl.opd_use = selector::OPERAND_USE_RS;
@@ -67,7 +71,7 @@ module main_decoder(input logic[31:0] instruction,output signals::control_t ctl)
                 if(unpack.opcode == main_opcode::ADDI)
                     ctl.exc_chk = selector::EXC_CHK_OVERFLOW;
             end
-
+            
             main_opcode::SLTI,main_opcode::SLTIU: begin
                 ctl = decoder_util::get_sign_immed_control();
                 ctl.opd_use = selector::OPERAND_USE_RS;
