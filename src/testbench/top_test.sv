@@ -396,7 +396,7 @@ module top_test();
     endtask
 
     check_target_t manual_check_target;
-    int test = 0;
+    int test = 1;
     int test_number = 1; // if test_number > 0 ,test last <test_number> case, else test all.
     initial begin
         // for(int i = 0; i < all_targets.size(); ++i)

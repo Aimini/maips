@@ -1,4 +1,1 @@
-
-extern "C" {
-	#include "ai_io.h"
-}
+#include "ai_io.h"

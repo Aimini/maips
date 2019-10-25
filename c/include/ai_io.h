@@ -1,7 +1,13 @@
 #ifndef __AI_IO__
 #define __AI_IO__
+
 #include "ai_sys.h"
 #include "printf-master/printf.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void _putchar(char c)
 {
 	sys_print_char4(c);
@@ -54,4 +60,9 @@ void print_int(int i) {
 		}
 	}
 }
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

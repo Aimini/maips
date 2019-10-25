@@ -29,15 +29,15 @@ module register_cop0(input logic clk,reset,
     localparam implement_num = 9;
     localparam implement_num_width = $clog2(implement_num);
     const config_t configurations[implement_num - 1:0] = '{
-        '{5'b01000, 3'b000,   32'hx,        32'h0,       32'h0 }, //BadVaddr
-        '{5'b01001, 3'b000,   32'hx,        32'h0,       32'h0 }, //Count
-        '{5'b01011, 3'b000,   32'hx,        32'h0,       32'h0 }, // Compare
+        '{5'b01000, 3'b000,   32'h00000000, 32'h0,       32'h0 }, //BadVaddr
+        '{5'b01001, 3'b000,   32'h00000000, 32'h0,       32'h0 }, //Count
+        '{5'b01011, 3'b000,   32'h00000000, 32'h0,       32'h0 }, // Compare
         '{5'b01100, 3'b000,   32'h00400004, 32'hEFBF00E8,32'h0 }, // Status
         '{5'b01101, 3'b000,   32'h00000000, 32'h0F7F0083,32'h0 }, // Cause
-        '{5'b01110, 3'b000,   32'hx,        32'h0,       32'h0 }, // EPC *
+        '{5'b01110, 3'b000,   32'h00000000, 32'h0,       32'h0 }, // EPC *
         '{5'b01111, 3'b001,   32'h80000000, 32'hC0000FFF,32'h80000000 }, // EBase *
-        '{5'b10001, 3'b000,   32'hx,        32'h0,       32'h0 }, // LLAddr *
-        '{5'b11110, 3'b000,   32'hx,        32'h0,       32'h0 }  // ErrorEPC *
+        '{5'b10001, 3'b000,   32'h00000000, 32'h0,       32'h0 }, // LLAddr *
+        '{5'b11110, 3'b000,   32'h00000000, 32'h0,       32'h0 }  // ErrorEPC *
     };
     const config_t invalid_config =     '{5'bx, 3'bx,   32'hx,        32'hx,       32'hx };
     const config_t full_access_config = '{5'bx, 3'bx,   32'hx,        32'h00000000,32'h00000000 };
@@ -58,6 +58,11 @@ module register_cop0(input logic clk,reset,
                 file[i] <= configurations[i].initial_value;
             end
         end else if(we) begin
+            assert (write_index < implement_num )
+            else begin
+                $error("write invalid cop0 register.");
+                $stop;
+            end
             file[write_index] <=  data_write & ~write_config.fixed_value_mask | write_config.fixed_value_mask & write_config.fixed_value;
         end
     end
@@ -66,6 +71,7 @@ module register_cop0(input logic clk,reset,
     */
     function automatic logic[implement_num_width - 1:0] get_index_by_rd_sel(
         input logic [4:0] rd,input logic[2:0] sel);
+
         logic[implement_num_width - 1:0] i;
         for(i = '0; i < implement_num; ++i) begin
             if(configurations[i].rd === rd & configurations[i].sel === sel) begin
@@ -75,10 +81,11 @@ module register_cop0(input logic clk,reset,
         return implement_num;
     endfunction
 
-    function automatic config_t get_config_by_index(logic[implement_num_width - 1:0] i);
-        return full_access_config; // allow full access when test
-        if(write_index < implement_num) begin
-            return  configurations[write_index];
+    function automatic config_t get_config_by_index(input logic[implement_num_width - 1:0] i);
+
+        //return full_access_config; // allow full access when test
+        if(i < implement_num) begin
+            return  configurations[i];
         end else begin
             return invalid_config;
         end
