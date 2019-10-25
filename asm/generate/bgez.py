@@ -20,7 +20,7 @@ def my_gen1(A,C,E):
     #generate some meaing less code
     for i in range(32):
         A("li ${0},{0}".format(i))
-        #shouldn't excute to there
+        #shouldn't execute to there
         A("j wrong")
     
     A("next:")
@@ -30,7 +30,7 @@ def my_gen1(A,C,E):
         A("mark{}:".format(i))
         A("li ${},{}".format(reg, random.choice(range(0,2**31))))
         A("bgez ${},mark{}".format(reg,i + 1))
-        #shouldn't excute to there
+        #shouldn't execute to there
         A("bgez ${},wrong".format(reg))
         A("j  wrong")
 

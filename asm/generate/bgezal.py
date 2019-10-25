@@ -32,7 +32,7 @@ def my_gen1(A,C,E):
     #generate some meaing less code
     for i in range(32):
         A("li ${0},{0}".format(i))
-        #shouldn't excute to there
+        #shouldn't execute to there
         A("j wrong")
     
     A("next:")
