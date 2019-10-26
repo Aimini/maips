@@ -50,7 +50,7 @@ double calculate_e_double(int iter) {
 }
 
 
-int compare_to_e(char * in) {
+int compare_to_e(const char * in) {
 	const char * const e =
 		"2."
 		"71828182845904523536028747135266249775724709369995";

@@ -19,10 +19,25 @@ module cop0_decoder(input logic[31:0] instruction,output signals::control_t ctl)
                 ctl.opd_use  = selector::OPERAND_USE_NONE;
                 decoder_util::write_rt(ctl,selector::REG_SRC_COP0);
             end
+
         
             default:
-                {ctl.opd_use, ctl.pc_src, ctl.exc_chk}  = 
-                {selector::OPERAND_USE_NONE, selector::PC_SRC_EXECPTION, selector::EXC_CHK_RESERVERD};
+                if(cop0::match_c0funct(unpack.rs)) begin
+                    case(unpack.funct)
+                         cop0::ERET: begin
+                            ctl.opd_use = selector::OPERAND_USE_NONE;
+                            ctl.pc_src = selector::PC_SRC_ERET;
+                            ctl.cop0_excctl.clear_erl_exl = '1;
+                         end
+
+                         default:
+                            {ctl.opd_use, ctl.pc_src, ctl.exc_chk}  = 
+                        {selector::OPERAND_USE_NONE, selector::PC_SRC_EXECPTION, selector::EXC_CHK_RESERVERD};
+                    endcase
+                end else begin
+                    {ctl.opd_use, ctl.pc_src, ctl.exc_chk}  = 
+                    {selector::OPERAND_USE_NONE, selector::PC_SRC_EXECPTION, selector::EXC_CHK_RESERVERD};
+                end
         endcase
     end
 endmodule

@@ -13,4 +13,5 @@ typedef enum logic[4:0] {
       ERET = 6'b011000
    } C0funct;
 
+  
 endpackage: cop0

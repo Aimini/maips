@@ -1,6 +1,7 @@
 `ifndef PACKAGE_SIGNAL__
 `define PACKAGE_SIGNAL__
 
+`include "src/memory/cop0/register_cop0.sv"
 `include "src/common/selector.sv"
 
 package signals;

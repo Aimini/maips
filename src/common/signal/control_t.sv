@@ -1,5 +1,3 @@
-
-
 typedef struct{
     /** alu function ***/
     selector::alu_function alu_funct;
@@ -22,6 +20,8 @@ typedef struct{
     selector::write_register_condition write_cond;
     selector::execption_check_t exc_chk;
 
+    cop0_info::cop0_excctl_t cop0_excctl;
+
     logic write_cop0;
     logic write_reg;
     logic write_mem;
@@ -38,6 +38,7 @@ function control_t nullify_control(input control_t ctl);
     ctl.write_reg = '0;
     ctl.write_hi = '0;
     ctl.write_lo = '0;
+    ctl.cop0_excctl = '{default:'0};
     return ctl;
 endfunction
 
@@ -48,6 +49,7 @@ function control_t get_clear_control();
         selector::DEST_REG_NCARE,   selector::PC_SRC_NEXT,      selector::FLAG_NCARE,
         selector::REG_SRC_NCARE,    selector::MEM_READ_NCARE,   selector::MEM_WRITE_NCARE,
         selector::OPERAND_USE_NONE, selector::REG_WRITE_ALWAYS, selector::EXC_CHK_NONE,
+        cop0_info::cop0_excctl_t'{default:'0},
         1'b0, 1'b0, 1'b0, 1'b0, 1'b0
     };
 endfunction

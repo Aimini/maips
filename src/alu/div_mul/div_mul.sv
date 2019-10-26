@@ -7,7 +7,7 @@
     div: do division, div has high priority
 
     the mul, div, sub, add, a, b are registered by
-    excute pipline register, so we can assume it's
+    execute pipline register, so we can assume it's
     not change in caculate when we generate 
     waiting_result signal correctly.
     
@@ -36,7 +36,7 @@ module div_mul #(parameter N = 32)
     //when doing mul and div, count witch step now.
     logic [NN - 1:0] tick_count;
 
-    // storage hi and lo, when excute MADD,or MSUB,
+    // storage hi and lo, when execute MADD,or MSUB,
     // we nned hi and low to sub then Multiply result
     logic [N - 1:0] thi, tlo; // temp hi,lo,storage multiply and division intermediate result;
     

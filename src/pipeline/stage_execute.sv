@@ -130,6 +130,7 @@ input logic llbit); //forward
         pif.signal_out.pc_branch  = p_out.pcadd4 + (sign_immed << 2);
         pif.signal_out.mem_addr   = p_out.rs     + sign_immed;
         pif.signal_out.control.write_reg = write_reg_selected;
+        
         case(pif.signal_out.control.hilo_src)
             selector::HILO_SRC_RS: begin
                 pif.signal_out.dest_hi_data = p_out.rs;

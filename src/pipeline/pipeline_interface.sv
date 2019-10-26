@@ -2,7 +2,7 @@
 `define PIPLINE_INTERFACE__
 
 `include "src/common/signals.sv"
-
+`include "src/memory/cop0/register_cop0.sv"
 
 typedef struct 
 {
@@ -16,7 +16,8 @@ typedef struct
     logic[31:0] dest_cop0_data;     //memory, write cop0
     logic[4:0]  dest_cop0_rd;     //memory, write cop0
     logic[2:0]  dest_cop0_sel;     //memory, write cop0
-
+    cop0_info::cop0_excreg_t cop0excreg;
+    
     logic[31:0] lo,hi;
     logic[31:0] pcjump,pc_branch;
     logic[31:0] alu_out,dest_reg_data; //execute
@@ -38,13 +39,13 @@ interface pipeline_interface (input logic clk,reset);
         to get result anf forwarding to you.
         for example :
          lw $s0, 0($t0) # foward result at writeback
-         mult $s0,$s1   # Ops ! I' need $s0 and excute!
+         mult $s0,$s1   # Ops ! I' need $s0 and execute!
          # in this case, lw will produce a bubble for mult, mult can't 
          start caculate before get $s0.
         and for example:
           lw $s0, 0($t0)   # writeback
           xori $s1,$0, 0x3 # memory
-          mult $s0,$s1    # excute
+          mult $s0,$s1    # execute
           # in this case, when lw wait memory read, lw create a
           # stall;but mult can caculate with correct operand!
         

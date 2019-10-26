@@ -15,6 +15,7 @@ typedef enum  {
 typedef enum { 
     PC_SRC_NEXT, PC_SRC_BRANCH,
     PC_SRC_JUMP, PC_SRC_REGISTER,
+    PC_SRC_ERET,
     PC_SRC_EXECPTION} pc_source;
 /* exception check*/
 typedef enum {

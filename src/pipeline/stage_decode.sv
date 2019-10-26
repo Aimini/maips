@@ -18,7 +18,8 @@ module stage_decode(pipeline_interface.port pif,input forward_info_t forward);
     logic [31:0]  hi_reg, lo_reg;
     logic [4:0] dest_cop0_rd;
     logic [2:0]dest_cop0_sel;
-
+    cop0_info::cop0_excctl_t cop0_excctl;
+    cop0_info::cop0_excreg_t cop0_excreg;
     logic write_reg,write_cop0;
     pipeline_signal_t p_out;
     
@@ -40,7 +41,11 @@ module stage_decode(pipeline_interface.port pif,input forward_info_t forward);
      register_cop0  unit_cop0(
          .clk(pif.clk), .reset(pif.reset),  .we(write_cop0),
       .write_rd(dest_cop0_rd), .write_sel(dest_cop0_sel),.din(dest_cop0_data), 
-      .read_rd(unpack.rd),   .read_sel(unpack.sel), .dout(cop0_data));
+      .read_rd(unpack.rd),   .read_sel(unpack.sel), .dout(cop0_data),
+      //------------------exception control ----------------------
+      .excctl(cop0_excctl),
+      //---------- output
+      .excreg(cop0_excreg));
 
     always @(posedge pif.clk) begin
        /* $display("decode [opcode:%6b, rs:%2d, rt:%2d, rd:%2d]",unpack.opcode, unpack.rs, unpack.rt, unpack.rd);*/
@@ -77,7 +82,7 @@ module stage_decode(pipeline_interface.port pif,input forward_info_t forward);
     assign dest_cop0_sel =  pif.signal_in.dest_cop0_sel;
     assign dest_cop0_data = pif.signal_in.dest_cop0_data;
     assign write_cop0    =  pif.signal_in.control.write_cop0;
-
+    assign cop0_excctl   =  pif.signal_in.control.cop0_excctl;
     assign p_out.dest_cop0_sel = unpack.sel;
     assign p_out.dest_cop0_rd  = unpack.rd;
     always_comb begin
@@ -86,6 +91,7 @@ module stage_decode(pipeline_interface.port pif,input forward_info_t forward);
         p_out.rs = rs_data; p_out.rt = rt_data;
         p_out.hi = hi_reg;  p_out.lo = lo_reg;
         p_out.cop0 = cop0_data;
+        p_out.cop0excreg = cop0_excreg;
         /*      DONT. CHANGE. SEQENCE. */
         process_forward_data(p_out, forward);
         //-----------------------------------------------------

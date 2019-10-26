@@ -69,12 +69,24 @@ output logic stall_fetch);
         end
         // execute JR,JALR
         if(ps_execute.control.pc_src === selector::PC_SRC_REGISTER) begin
-                load = '1;
-                pc = ps_execute.rs;
-                pif_decode.nullify = '1;
-                if(!using_delay_slot) begin
-                    pif_execute.nullify = '1;
-                end
+            load = '1;
+            pc = ps_execute.rs;
+            pif_decode.nullify = '1;
+            if(!using_delay_slot) begin
+                pif_execute.nullify = '1;
+            end
+        end
+        //------------------ execute ERET
+        if(ps_execute.control.pc_src === selector::PC_SRC_ERET) begin
+            static cop0_info::status_t status_unpack = ps_execute.cop0excreg.Status;
+            load = '1;
+            if(status_unpack.erl == '1)
+                pc = ps_execute.cop0excreg.ErrorEPC;
+            else
+                pc = ps_execute.cop0excreg.EPC;
+                
+            pif_decode.nullify = '1;
+            pif_execute.nullify = '1;
         end
 /************** stall or bubble to clear data hazard  **********/
         if(instruction_memory_busy) begin

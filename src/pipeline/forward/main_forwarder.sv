@@ -11,6 +11,8 @@ typedef struct{
 
 typedef struct {
     fowrad_element_t rs,rt,lo,hi,cop0;
+
+    fowrad_element_t EPC,ErrorEPC,Status;
 } forward_info_t;
 
 
@@ -55,6 +57,16 @@ execute_forward_info);
         return get_clear_element();
     endfunction
 
+    function automatic fowrad_element_t test_cp0(input pipeline_signal_t ps, logic [4:0] rd,logic [4:0] sel);
+        if(ps.control.write_cop0 !== 0) begin
+            if(ps.dest_cop0_rd === rd &&  ps.dest_cop0_sel === sel) begin
+                return fowrad_element_t'{f:'1 , data: ps.dest_cop0_data};
+            end
+        end
+        return get_clear_element();
+    endfunction
+    
+
     always_comb begin
         execute_forward_info = get_clear_info(); 
         decode_forward_info  = get_clear_info();
@@ -88,12 +100,21 @@ execute_forward_info);
         end 
         /********* cop0 *********************/
         if(ps_memory.control.write_cop0) begin
-            execute_forward_info.cop0.f = '1;
-            execute_forward_info.cop0.data = ps_memory.dest_cop0_data;
-            decode_forward_info.cop0.f = '1;
-            decode_forward_info.cop0.data = ps_memory.dest_cop0_data;
+            execute_forward_info.cop0 = test_cp0(ps_memory,execute_unpack.rd,execute_unpack.sel);
+            decode_forward_info.cop0  = test_cp0(ps_memory,decode_unpack.rd, decode_unpack.sel);
         end
-        
+
+        /********* cop0  exception associated register*********************/
+        if(ps_memory.control.write_cop0) begin
+            execute_forward_info.EPC = test_cp0(ps_memory,cop0_info::RD_EPC,cop0_info::SEL_EPC);
+            decode_forward_info.EPC  = test_cp0(ps_memory,cop0_info::RD_EPC,cop0_info::SEL_EPC);
+
+            execute_forward_info.ErrorEPC = test_cp0(ps_memory,cop0_info::RD_ERROREPC,cop0_infoFL::SEL_ERROREPC);
+            decode_forward_info.ErrorEPC  = test_cp0(ps_memory,cop0_info::RD_ERROREPC,cop0_info::SEL_ERROREPC);
+
+            execute_forward_info.Status = test_cp0(ps_memory,cop0_info::RD_STATUS,cop0_info::SEL_STATUS);
+            decode_forward_info.Status  = test_cp0(ps_memory,cop0_info::RD_STATUS,cop0_info::SEL_STATUS);
+        end
     end
   
 endmodule
