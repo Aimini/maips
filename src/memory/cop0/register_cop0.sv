@@ -85,6 +85,7 @@ module register_cop0(input logic clk,reset,
                 $error("write invalid cop0 register.");
                 $stop;
             end
+            file[write_index] <= data_write;
         end
         if(excctl.clear_erl_exl) begin
             if(file[status_index][cop0_info::IDX_STATUS_ERL]) begin

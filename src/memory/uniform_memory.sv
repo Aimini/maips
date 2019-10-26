@@ -21,10 +21,10 @@ memory_interface.memory ins_i,data_i);
     
     // 8 * 4 32byte debug argument
     localparam DBG_N = 3;
-    // 8M * 4byte user text 32MB
-    localparam KRL_N = 23;
-    // 1M *4byte kernel space 4MB
-    localparam USR_N = 20;
+    // 8M * 4byte kernel text 4MB
+    localparam KRL_N = 20;
+    // 1M *4byte user space 32MB
+    localparam USR_N = 23;
     memory_interface #(32) debug_data_mif();
     memory_interface #(32) kernel_data_mif();
     memory_interface #(32) user_data_mif();
@@ -38,6 +38,12 @@ memory_interface.memory ins_i,data_i);
     instruction_mem #(26,32) unit_ins_rom(
         .addr(user_ins_offset[27:2]),
         .dout(user_ins_out));
+
+    logic[31:0] kernal_ins_offset;
+     logic[31:0] kernal_ins_out;
+    instruction_mem #(26,32) unit_kernel_ins_rom(
+        .addr(kernal_ins_offset[27:2]),
+        .dout(kernal_ins_out));
 
     assign debug_data_mif.mask =  data_i.mask;
     assign kernel_data_mif.mask = data_i.mask;
@@ -65,9 +71,9 @@ memory_interface.memory ins_i,data_i);
             data_i.dout = user_data_mif.dout;
         end else 
 
-        if(32'hA000_0000 <= data_paddr & data_paddr < 32'hB000_0000) begin
+        if(32'h1000_0000 <= data_paddr & data_paddr < 32'h2000_0000) begin
             kernel_data_mif.write = data_i.write;
-            kernel_data_offset = (data_paddr - 32'hA000_0000);
+            kernel_data_offset = (data_paddr - 32'h1000_0000);
             kernel_data_mif.addr = kernel_data_offset[KRL_N + 1:2];
             data_i.dout = kernel_data_mif.dout;
         end
@@ -80,10 +86,15 @@ memory_interface.memory ins_i,data_i);
         end
 
         user_ins_offset = 'x;
+        kernal_ins_offset = 'x;
         ins_i.dout  = 'x;
         if(32'h4000_0000 <= ins_paddr & ins_paddr < 32'h8000_0000) begin
             user_ins_offset = ins_paddr - 32'h4000_0000 - 32'h0040_0000;
             ins_i.dout = user_ins_out;
+        end
+        if(32'h0000_0000 <= ins_paddr & ins_paddr < 32'h1000_0000) begin
+            kernal_ins_offset = ins_paddr - 32'h0000_0000;
+            ins_i.dout = kernal_ins_out;
         end
 
         data_i.busy = 0;

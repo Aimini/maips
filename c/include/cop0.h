@@ -52,7 +52,7 @@ void mtc0(char rd,char sel,int val){
 #undef __MTCO_DEF
 }
 
-status get_status(int value)
+status get_status()
 {
     return status(mfc0(12,0));
 }

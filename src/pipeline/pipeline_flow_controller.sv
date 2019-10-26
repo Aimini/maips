@@ -78,9 +78,8 @@ output logic stall_fetch);
         end
         //------------------ execute ERET
         if(ps_execute.control.pc_src === selector::PC_SRC_ERET) begin
-            static cop0_info::status_t status_unpack = ps_execute.cop0excreg.Status;
             load = '1;
-            if(status_unpack.erl == '1)
+            if(ps_execute.cop0excreg.Status[cop0_info::IDX_STATUS_ERL] === '1)
                 pc = ps_execute.cop0excreg.ErrorEPC;
             else
                 pc = ps_execute.cop0excreg.EPC;

@@ -3,8 +3,8 @@
 #include "cop0.h"
 #include "cai_io"
 
-void dump_status(int value){
-    status s(value);
+void dump_status(){
+    status s = get_status();
     print_str("----------------------- cop0 status -------------------------\n");
 #define TA(_X) (_X ? 'Y' : 'N')
     printf("cop(3 2 1 0)  bev  im(7 6 5 4 3 2 1 0)  erl  exl  ie\n");

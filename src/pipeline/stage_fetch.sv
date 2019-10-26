@@ -10,7 +10,7 @@ module stage_fetch(
     
     always_ff @(posedge clk)
         if(reset)
-            pc_reg <= 32'h0040_0000;//32'hBFC0_0000;
+            pc_reg <= 32'h8000_0000;//32'h8000_0000;
         else if(load)
             pc_reg <= pc_in;
         else if(!stall)

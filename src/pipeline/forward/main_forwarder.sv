@@ -109,7 +109,7 @@ execute_forward_info);
             execute_forward_info.EPC = test_cp0(ps_memory,cop0_info::RD_EPC,cop0_info::SEL_EPC);
             decode_forward_info.EPC  = test_cp0(ps_memory,cop0_info::RD_EPC,cop0_info::SEL_EPC);
 
-            execute_forward_info.ErrorEPC = test_cp0(ps_memory,cop0_info::RD_ERROREPC,cop0_infoFL::SEL_ERROREPC);
+            execute_forward_info.ErrorEPC = test_cp0(ps_memory,cop0_info::RD_ERROREPC,cop0_info::SEL_ERROREPC);
             decode_forward_info.ErrorEPC  = test_cp0(ps_memory,cop0_info::RD_ERROREPC,cop0_info::SEL_ERROREPC);
 
             execute_forward_info.Status = test_cp0(ps_memory,cop0_info::RD_STATUS,cop0_info::SEL_STATUS);

@@ -370,8 +370,30 @@ module top_test();
             unit_top.unit_memory.unit_user_ram.datas[i >> 2] = word_buffer;
             i += result;
         end
-        $fclose(file);
         $display("data segment 0x%x bytes",i);
+        /************************** load kernel **********************/
+        file = $fopen({"c/temp/kernel.text.bin"},"rb");           
+        i = 0;  
+        while(!$feof(file))    begin
+            result = $fread(word_buffer,file);
+            word_buffer = {<<8{word_buffer}};
+            unit_top.unit_memory.unit_kernel_ins_rom.im[i >> 2] = word_buffer;
+            i += result;
+        end
+        $fclose(file);
+        $display("kernel text segment 0x%x bytes",i);
+
+        file = $fopen({"c/temp/kernel.data.bin"},"rb");           
+        i = 0;  
+        while(!$feof(file))    begin
+            result = $fread(word_buffer,file);
+            word_buffer = {<<8{word_buffer}};
+            unit_top.unit_memory.unit_kernel_ram.datas[i >> 2] = word_buffer;
+            i += result;
+        end
+        $fclose(file);
+        $display("kernel data segment 0x%x bytes",i);
+
         $display("#################################################################");
         $display("#################################################################");
         reset = 1;

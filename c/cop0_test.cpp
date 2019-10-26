@@ -54,6 +54,6 @@ int main(){
         printf("%10s  %8x  %8x\n",reg_name[i],mask,value);
     }
 
-    dump_status(mfc0(12,0));
+    dump_status();
     sys_exit();
 }
