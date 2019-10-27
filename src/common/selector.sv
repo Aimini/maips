@@ -59,6 +59,18 @@ typedef enum {
     REG_SRC_SPECIAL3,
     REG_SRC_NCARE
 } register_source;
+/** cop0 source **/
+typedef enum  { 
+COP0_SRC_RT,
+COP0_SRC_STATUS,
+COP0_SRC_LLADDR,
+COP0_SRC_NCARE } cop0_source;
+
+typedef enum  { 
+DEST_COP0_STATUS,
+DEST_COP0_LLADDR,
+DEST_COP0_RDSEL,
+DEST_COP0_NCARE } destnation_cop0;
 
 typedef enum {
     REG_WRITE_WHEN_FLAG,

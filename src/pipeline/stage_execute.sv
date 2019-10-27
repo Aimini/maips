@@ -13,7 +13,7 @@
 `include "src/alu/div_mul/div_mul.sv"
 `include "src/common/util.sv"
 `include "src/pipeline/forward/main_forwarder.sv"
-`include "src/memory/cop0/cop0_write_filter.sv"
+`include "src/pipeline/stage_execute_partial/cop0_writer.sv"
 
 module stage_execute(pipeline_interface.port pif,
 input forward_info_t forward, output logic wait_result,
@@ -43,10 +43,13 @@ input logic llbit); //forward
     sign_extend #(.NI(16),.NO(32)) 
     unit_sign_extend(.i(unpack.immed), .o(sign_immed));
 
- /************************* cop0 write filter **********************/
-    cop0_write_filter unit_cop0_write_filter(
+    /************************* cop0 write filter **********************/
+    cop0_writer unit_cop0_writer(.src(p_ctl.cop0_src),
     .rd(p_out.dest_cop0_rd),.sel(p_out.dest_cop0_sel),
-    .din(p_out.rt),.dout(dest_cop0_data));
+    .eret(p_ctl.eret), .ie('0),.di('0),.exception_happen('0),
+    .rt(p_out.rt) ,.status(p_out.cop0excreg.Status),
+    .y(dest_cop0_data));
+
 
 /********************************* alu  **************************/
     alu #(32) unit_alu(.a(alu_a),.b(alu_b),.sa(unpack.sa),.rs(p_out.rs),
@@ -62,9 +65,11 @@ input logic llbit); //forward
 
     /** div mul module  signal **/
     logic[31:0] hi_out_mul_div,lo_out_mul_div;
+    logic clear_mul_div;
+    assign clear_mul_div =  pif.bubble | pif.nullify;
     multiply_div_wrapper  unit_div_mul(
-          .clk(pif.clk),          .reset(pif.reset),
-        .clear(pif.bubble), .hold_result(pif.stall),
+          .clk(pif.clk),            .reset(pif.reset),
+        .clear(clear_mul_div),.hold_result(pif.stall),
         .muldiv_funct(p_ctl.muldiv_funct),
            .rs(p_out.rs),       .rt(p_out.rt),
         .hi_in(p_out.hi),    .lo_in(p_out.lo),
@@ -72,6 +77,7 @@ input logic llbit); //forward
         .hi_out(hi_out_mul_div),
         .lo_out(lo_out_mul_div),
         .wait_result(wait_result));
+
 
     alu_source_mux unit_alu_src_mux( 
         .src_a(p_ctl.alu_srcA),.src_b(p_ctl.alu_srcB),
@@ -130,7 +136,7 @@ input logic llbit); //forward
         pif.signal_out.pc_branch  = p_out.pcadd4 + (sign_immed << 2);
         pif.signal_out.mem_addr   = p_out.rs     + sign_immed;
         pif.signal_out.control.write_reg = write_reg_selected;
-        
+
         case(pif.signal_out.control.hilo_src)
             selector::HILO_SRC_RS: begin
                 pif.signal_out.dest_hi_data = p_out.rs;
@@ -143,6 +149,25 @@ input logic llbit); //forward
             default: begin
                 pif.signal_out.dest_hi_data = 'x;
                 pif.signal_out.dest_lo_data = 'x;
+            end
+        endcase
+
+        case(pif.signal_out.control.dest_cop0)
+            selector::DEST_COP0_RDSEL: begin
+                pif.signal_out.dest_cop0_rd  = reconnect.signal_out.dest_cop0_rd;
+                pif.signal_out.dest_cop0_sel =  reconnect.signal_out.dest_cop0_sel;
+            end
+            selector::DEST_COP0_STATUS:  begin
+                pif.signal_out.dest_cop0_rd  =  cop0_info::RD_STATUS;
+                pif.signal_out.dest_cop0_sel =  cop0_info::SEL_STATUS;
+            end
+            selector::DEST_COP0_LLADDR:  begin
+                pif.signal_out.dest_hi_data = cop0_info:: RD_LLADDR;
+                pif.signal_out.dest_lo_data = cop0_info::SEL_LLADDR;
+            end
+            default: begin
+                pif.signal_out.dest_cop0_rd =  'x;
+                pif.signal_out.dest_cop0_sel = 'x;
             end
         endcase
     end

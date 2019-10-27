@@ -21,7 +21,7 @@ module register_cop0(input logic clk,reset,
     input logic [4:0] read_rd,
     input logic [2:0] read_sel,
     output logic[31:0] dout,
-    input  cop0_info::cop0_excctl_t excctl,
+    input  cop0_info::cop0_exc_data_t excdata,
     output cop0_info::cop0_excreg_t excreg);
 
     localparam implement_num = 9;
@@ -86,13 +86,6 @@ module register_cop0(input logic clk,reset,
                 $stop;
             end
             file[write_index] <= data_write;
-        end
-        if(excctl.clear_erl_exl) begin
-            if(file[status_index][cop0_info::IDX_STATUS_ERL]) begin
-               file[status_index][cop0_info::IDX_STATUS_ERL] <= '0;
-            end else begin
-                file[status_index][cop0_info::IDX_STATUS_EXL] <= '0;
-            end
         end
     end
     /****************************** define of tool function *******************************/

@@ -19,11 +19,19 @@ typedef struct {
 function automatic void process_forward_data(
     ref pipeline_signal_t ps,
     input forward_info_t forward_info);
-        ps.rs = forward_info.rs.f   ? forward_info.rs.data   : ps.rs;
-        ps.rt = forward_info.rt.f   ? forward_info.rt.data   : ps.rt;
+`define PROC_GPR(name)  ps.name = forward_info.name.f ? forward_info.name.data : ps.name;
+        `PROC_GPR(rs)
+        `PROC_GPR(rt)
+`undef PROC_GPR
+
         ps.hi = forward_info.hi.f   ? forward_info.hi.data   : ps.hi;
         ps.lo = forward_info.lo.f   ? forward_info.lo.data   : ps.lo;
-        ps.cop0 =forward_info.cop0.f  ? forward_info.cop0.data :  ps.cop0;
+        ps.cop0 = forward_info.cop0.f  ? forward_info.cop0.data :  ps.cop0;
+`define PROC_EXEREG(name)  ps.cop0excreg.name = forward_info.name.f ? forward_info.name.data : ps.cop0excreg.name;
+        `PROC_EXEREG(EPC)
+        `PROC_EXEREG(ErrorEPC)
+        `PROC_EXEREG(Status)
+`undef PROC_EXEREG
 endfunction
 
 module main_forwarder(

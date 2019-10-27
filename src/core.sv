@@ -95,7 +95,6 @@ memory_interface.controller data_mif);
     assign pif_decode.signal_in.dest_cop0_sel = pif_memory.signal_out.dest_cop0_sel;
     assign pif_decode.signal_in.control.write_cop0  = pif_memory.signal_out.control.write_cop0;
     assign pif_decode.signal_in.dest_cop0_data  =     pif_memory.signal_out.dest_cop0_data;
-    assign pif_decode.signal_in.control.cop0_excctl = pif_memory.signal_out.control.cop0_excctl;
 
     assign instruction_memory_busy = ins_mif.busy;
 

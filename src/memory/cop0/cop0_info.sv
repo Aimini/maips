@@ -64,8 +64,10 @@ typedef struct {
 */
 typedef struct {
     // if erl is 1,clear erl, else clear exl.
-    logic[31:0] clear_erl_exl;
-} cop0_excctl_t;
+    logic exception_happen;
+    logic in_bd;
+    logic[7:0] exc_code;
+} cop0_exc_data_t;
 
 
     const logic[4:0]  RD_BADVADDR = 5'b01000;

@@ -21,9 +21,9 @@ memory_interface.memory ins_i,data_i);
     
     // 8 * 4 32byte debug argument
     localparam DBG_N = 3;
-    // 8M * 4byte kernel text 4MB
+    //  1M* 4byte kernel text 4MB
     localparam KRL_N = 20;
-    // 1M *4byte user space 32MB
+    // 8M *4byte user space 32MB
     localparam USR_N = 23;
     memory_interface #(32) debug_data_mif();
     memory_interface #(32) kernel_data_mif();
@@ -34,7 +34,7 @@ memory_interface.memory ins_i,data_i);
     ram #(USR_N,32) unit_user_ram  (clk, user_data_mif);
 
     logic[31:0] user_ins_offset;
-     logic[31:0] user_ins_out;
+    logic[31:0] user_ins_out;
     instruction_mem #(26,32) unit_ins_rom(
         .addr(user_ins_offset[27:2]),
         .dout(user_ins_out));
