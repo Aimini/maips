@@ -10,13 +10,6 @@ module top_test();
 
     top unit_top(clk,reset);
 
-    logic[31:0] reg_v[1:0],reg_a[3:0],reg_s[7:0],reg_t[9:0];
-    logic[31:0]  reg_file[31:0];
-    logic write_dbg_memory,write_dbg_function_reg;
-    logic[31:0] pc_mem_stage;
-    // indicate cpu is writing dbg memory.
-    logic dbg_loaded;
-    logic[31:0] dbg_arg[7:0];
 
     typedef struct {
         string name;
@@ -25,103 +18,38 @@ module top_test();
         logic bin, kernel;
     } check_target_t;
 
-    string j_too_large = "j";
-    string jal_too_large = "jal"; // don't test j and jal if unnecessary, it'test file too large
+    // string j_too_large = "j";
+    // string jal_too_large = "jal"; // don't test j and jal if unnecessary, it'test file too large
+    `include "src/testbench/top_test/test_target.sv"
 
-    check_target_t all_targets[] = 
-    '{ 
-        '{"sw_dbg",     1'b0,  1'b0,  1'b0,  1'b1, 1'b0, 1'b0},
-        '{"lui_1",      1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"lui_2",      1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"ori_1",      1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"ori_2",      1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"sll_1",      1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"sll_2",      1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"addu",       1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"addiu",      1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"beq",        1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"bne",        1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"blez",       1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"bgtz",       1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"slti",       1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"sltiu",      1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"andi_1",     1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"andi_2",     1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"xori_1",     1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"xori_2",     1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"mthi_mfhi",  1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"mtlo_mflo",  1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"multu",      1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"divu",       1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"mult",       1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"div",        1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"maddu",      1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"madd",       1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"msubu",      1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"msub",       1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"mul",        1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"clz",        1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"clo",        1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"lw",         1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"lh",         1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"lb",         1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"jr",         1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"jalr",       1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"movz",       1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"movn",       1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"srl",        1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"rotr",       1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"sra",        1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"sllv",       1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"srlv",       1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"rotrv",      1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"srav",       1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"subu",       1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"and",        1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"or",         1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"xor",        1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"nor",        1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"slt",        1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"sltu",       1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"bltz",       1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"bltzal",     1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"bgez",       1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"bgezal",     1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"sb",         1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"sh",         1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"sw",         1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"lbu",        1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"lhu",        1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"lwr_swr",    1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"lwl_swl",    1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"ext",        1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"ins",        1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"seb",        1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"seh",        1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"wsbh",       1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"mfc0_mtc0",  1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"syscall",    1'b1,  1'b0,  1'b0,  1'b0, 1'b1, 1'b1}
-      };
 
-    string manual_target_name[] = {
-        "sys_serial_test",
-        "print_string"
-    };
+`define reg_file unit_top.unit_core.unit_decode.unit_rf.file
+`define reg_v(x) `reg_file[2 + x]
+`define reg_a(x) `reg_file[4 + x]
+`define reg_s(x) `reg_file[16 + x]
+`define reg_t(x) `reg_file[x < 8 ? x + 8 : x + 24]
 
-    assign reg_file = unit_top.unit_core.unit_decode.unit_rf.file;
-    assign reg_v  =  reg_file[3:2];
-    assign reg_a  = reg_file[7:4];
-    assign reg_s = reg_file[23:16];
-    assign reg_t = {reg_file[25:24], reg_file[15:8]};
-    always_comb begin
-        write_dbg_memory =  unit_top.unit_memory.unit_debug_ram.mif.write;
-        write_dbg_function_reg =  unit_top.unit_memory.unit_debug_ram.mif.addr == 0;
-        dbg_arg = unit_top.unit_memory.unit_debug_ram.datas;
-    end
+`define dbg_ram   unit_top.unit_memory.unit_debug_ram
+`define dbg_data  `dbg_ram.datas
+`define kernel_text unit_top.unit_memory.unit_kernel_ins_rom.im
+`define kernel_data unit_top.unit_memory.unit_kernel_ram.datas
+`define user_text   unit_top.unit_memory.unit_ins_rom.im
+`define user_data   unit_top.unit_memory.unit_user_ram.datas
+
+`define dbg_funct `dbg_data[0]
+`define dbg_arg0  `dbg_data[1]
+`define dbg_arg1  `dbg_data[2]
+
+
+    logic[31:0] pc_mem_stage;
+    // indicate cpu is writing dbg memory.
+    logic dbg_loaded;
+    logic[31:0] s;
+    
     assign pc_mem_stage = unit_top.unit_core.unit_memory.pif.signal_out.pc;
 
     always_ff @(posedge clk)
-        dbg_loaded <= write_dbg_memory & write_dbg_function_reg;
+        dbg_loaded <= `dbg_ram.mif.write & `dbg_ram.mif.addr === 0;
 
     function automatic string get_test_filename(string target,logic bin);
         if(bin)
@@ -134,7 +62,7 @@ module top_test();
         if(bin)
            return {"asm/temp/", target, ".data.bin"};
         else
-             return {"asm/temp/", target, ".asm.data.hextext"};
+           return {"asm/temp/", target, ".asm.data.hextext"};
     endfunction    
 
     function automatic string get_regchk_filename(string target);
@@ -150,24 +78,21 @@ module top_test();
 
     /* fill for sw_dbg test */
     function automatic void fill_regsiter_sw_dbg();
-       unit_top.unit_core
-       .unit_decode.unit_rf.file[2] = 32'hffff0000; //v0 = 0xFFFF0000
+       `reg_v(0) = 32'hffff0000; //v0 = 0xFFFF0000
        for(int i = 0; i < 8; ++i)
-            unit_top.unit_core
-            .unit_decode.unit_rf.file[16 + i] =  1 << i; //s0 - s7
-        unit_top.unit_core
-       .unit_decode.unit_rf.file[16] = 32'hffff0000; //s0 = 0xFFFF0000
+            `reg_s(i) =  1 << i; //s0 - s7
+        `reg_s(0) = 32'hffff0000; //s0 = 0xFFFF0000
     endfunction
 
 
-    function automatic void check_sw_dbg_arg();
-        if(dbg_arg[1] == 32'h0000_0002) begin
-            assert (dbg_arg[0] === 32'hffff_0000)
+    function automatic void check_sw_dbg_data();
+        if(`dbg_arg0  === 32'h0000_0002) begin
+            assert (`dbg_funct === 32'hffff_0000)
             else  $error("dbg(0) != 32'hffff_0000!");
             for(int i = 1; i < 8; ++i) begin
-                assert (dbg_arg[i] === (1 << i))
+                assert (`dbg_data[i] === (1 << i))
                 else begin
-                   $error("sw_dbg failed: dbg(%0d) != %8h",i,dbg_arg[i]);
+                   $error("sw_dbg failed: dbg(%0d) != %8h",i,`dbg_data[i]);
                    $stop;
                 end
             end
@@ -202,35 +127,35 @@ module top_test();
         @(negedge clk) begin
             if(dbg_loaded !== '1)
                 return;
-            case(dbg_arg[0])
+
+            case(`dbg_funct)
                 0:begin
                     exit = 1;
-                    //$display("exit.");
                 end
-                /*  assert equal  */
-                1: begin
+
+                1: begin// -------------------- assert equal ---------------------- 
                     if(!assert_equal_hit) assert_equal_hit = '1;
-                    assert(dbg_arg[1] === dbg_arg[2])
+                    assert(`dbg_arg0 === `dbg_arg1)
                     else begin
-                        $error("assert equal failed : %8h != %8h",dbg_arg[1],dbg_arg[2]);
+                        $error("assert equal failed : %8h != %8h",`dbg_data[1],`dbg_data[2]);
                         stop_print_pc();
                     end
                 end
 
                 /*  assert not equal  */
-                2:  begin
+                2:  begin// ----------------- assert not equal ---------------------- 
                     if(!assert_not_equal_hit) assert_not_equal_hit = '1;
-                    assert(dbg_arg[1] !== dbg_arg[2])
+                    assert(`dbg_arg0 !== `dbg_arg1)
                     else begin
-                         $error("assert not equal failed : %8h == %8h",dbg_arg[1],dbg_arg[2]);
+                         $error("assert not equal failed : %8h == %8h",`dbg_data[1],`dbg_data[2]);
                          stop_print_pc();
                     end
                 end
 
-                /*  print four chars in dbg_arg[1]  */
-                3:  begin
-                    logic[31:0]  four_char = dbg_arg[1];
-                    logic[7:0] one_char;
+                
+                3:  begin// ----------- print four chars in `dbg_arg0 ----------- 
+                    logic[31:0]  four_char = `dbg_arg0;
+                    logic[7:0]   one_char;
                     string message;
                     for(int i = 0; i < 4; ++i) begin
                         one_char = four_char[i*8 +:8];
@@ -242,89 +167,80 @@ module top_test();
                     $write(message);
                 end
 
-                4:  begin
-                    $write("%d", dbg_arg[1]);
+                4:  begin //------------------------ print int ---------------------
+                    $write("%d", `dbg_arg0);
                 end
 
-                /*  check register file  */
-                32'h0001_0000: begin
-                    if(!check_register_file_hit) check_register_file_hit = '1;
-                    if(dbg_arg[1] === 32'h0001_0000) begin
-                            //ignore $gp, $sp
+                32'h0001_0000: begin// ----- - check register file ------------------ 
+                    check_register_file_hit = check_register_file_hit | '1;
+                    if(`dbg_arg0 === 32'h0001_0000) begin
+                        //ignore $gp, $sp
                         $display("checking register file ignore $sp and $gp...");
-                        check_regfile(regchk_filename, reg_file, 1);
+                        check_regfile(regchk_filename, `reg_file, 1);
                     end else begin   //check all
                         $display("checking register file...");
-                        check_regfile(regchk_filename, reg_file, 0);
+                        check_regfile(regchk_filename, `reg_file, 0);
                     end
                 end
-                /*  check sw dbg  */
-                32'hffff_0000: begin
+
+                32'hffff_0000: begin// ----- - check sw dbg  ------------------ 
                     for(int i = 0; i < 8; ++i) begin
-                        $display("dbg(%0d) = %8h",i,dbg_arg[i]);
-                    end   // check dbg_arg memory 
-                    if(dbg_arg[1] === 32'h0000_0000)
+                        $display("dbg(%0d) = %8h",i,`dbg_data[i]);
+                    end   // check `dbg_data memory 
+                    if(`dbg_arg0 === 32'h0000_0000)
                         return;
 
-                    if(dbg_arg[1] === 32'h0000_0002) begin
-                        check_sw_dbg_arg();
+                    if(`dbg_arg0 === 32'h0000_0002) begin
+                        check_sw_dbg_data();
                     end else begin
-                        $error("unsupport check:%8x, sub function:%8x",dbg_arg[0],dbg_arg[1]);    
+                        $error("unsupport check:%8x, sub function:%8x",`dbg_funct,`dbg_arg0);    
                         stop_print_pc();
                     end
                 end
 
                 default: begin
-                    $error("unsupport check:%8x",dbg_arg[0]);
+                    $error("unsupport check:%8x",`dbg_data[0]);
                     stop_print_pc();
                 end
             endcase
         end
     endtask
-    
+
+`define LOAD_MEM_FILE(_MEM,_FILENAME)              \
+    begin                                          \
+        int __HANDLE = $fopen(_FILENAME,"rb");     \
+        int __I = 0;                               \
+        int __RES;                                 \
+        logic[31:0] __BUF;                         \
+        while(!$feof(__HANDLE)) begin              \
+            __RES = $fread(__BUF,__HANDLE);        \
+            __BUF = {<<8{__BUF}};                  \
+            _MEM[__I >> 2] = __BUF;                \
+            __I += __RES;                          \
+        end                                        \
+        $fclose(__HANDLE);                         \
+    end
+
     task automatic load_text_data(input check_target_t target);
-        int file = 0, index = 0,result  = 0;
-        int unsigned i = 0;
-        logic[31:0] word_buffer;
-        string test_filename =  get_test_filename(target.name,target.bin);
+        string test_filename =   get_test_filename(target.name,target.bin);
         string data_filename  =  get_data_filename(target.name,target.bin);
         if(~target.bin) begin
             if(target.kernel) begin
-                $readmemh(test_filename, unit_top.unit_memory.unit_ins_rom.im);
-                $readmemh(data_filename, unit_top.unit_memory.unit_user_ram.datas);
+                $readmemh(test_filename, `kernel_text);
+                $readmemh(data_filename, `kernel_data);
             end else begin
-                $readmemh(test_filename, unit_top.unit_memory.unit_kernel_ins_rom.im);
-                $readmemh(data_filename, unit_top.unit_memory.unit_kernel_ram.datas);
+                $readmemh(test_filename, `user_text);
+                $readmemh(data_filename, `user_data);
             end
+        end else begin
+            if(target.kernel) begin
+                 `LOAD_MEM_FILE(`kernel_text, test_filename);
+                 `LOAD_MEM_FILE(`kernel_data, data_filename);
+             end else begin
+                 `LOAD_MEM_FILE(`user_text, test_filename);
+                 `LOAD_MEM_FILE(`user_data, data_filename);
+             end
         end
-        else begin
-            file = $fopen(test_filename,"rb");           
-            i = 0;  
-            while(!$feof(file)) begin
-                result = $fread(word_buffer,file);
-                word_buffer = {<<8{word_buffer}};
-                if(target.kernel)
-                    unit_top.unit_memory.unit_kernel_ins_rom.im[i >> 2] = word_buffer;
-                else
-                    unit_top.unit_memory.unit_ins_rom.im[i >> 2] = word_buffer;
-                i += result;
-            end
-            $fclose(file);
-            
-            file = $fopen(data_filename,"rb");           
-            i = 0;  
-            while(!$feof(file)) begin
-                result = $fread(word_buffer,file);
-                word_buffer = {<<8{word_buffer}};
-                if(target.kernel)
-                    unit_top.unit_memory.unit_kernel_ram.datas[i >> 2] = word_buffer;
-                else
-                    unit_top.unit_memory.unit_user_ram.datas[i >> 2] = word_buffer;
-                i += result;
-            end
-            $fclose(file);
-        end
-
     endtask
 
 
@@ -393,60 +309,21 @@ module top_test();
     endtask
 
     task automatic new_execution(input string program_name);
-        int file = 0, index = 0,result  = 0;
         logic exit             = '0;
         logic assert_equal_hit = '0;
         logic assert_not_equal_hit = '0;
         logic check_register_file_hit = '0;
-        logic[31:0] word_buffer;
-        int unsigned i = 0;
+
         $display("");
         $display("");
         $display("-------------------------------------------------------------------------------------");
         $display("-------- loading text and data %s...",program_name);
 
-        file = $fopen({"c/temp/",program_name,".text.bin"},"rb");           
-        i = 0;  
-        while(!$feof(file))    begin
-            result = $fread(word_buffer,file);
-            word_buffer = {<<8{word_buffer}};
-            unit_top.unit_memory.unit_ins_rom.im[i >> 2] = word_buffer;
-            i += result;
-        end
-        $fclose(file);
-        $display("text segment 0x%x bytes",i);
-
-        file = $fopen({"c/temp/",program_name,".data.bin"},"rb");           
-        i = 0;  
-        while(!$feof(file))    begin
-            result = $fread(word_buffer,file);
-            word_buffer = {<<8{word_buffer}};
-            unit_top.unit_memory.unit_user_ram.datas[i >> 2] = word_buffer;
-            i += result;
-        end
-        $display("data segment 0x%x bytes",i);
+        `LOAD_MEM_FILE(unit_top.unit_memory.unit_ins_rom.im,     {"c/temp/",program_name,".text.bin"});
+        `LOAD_MEM_FILE(unit_top.unit_memory.unit_user_ram.datas, {"c/temp/",program_name,".data.bin"});
         /************************** load kernel **********************/
-        file = $fopen({"c/temp/kernel.text.bin"},"rb");           
-        i = 0;  
-        while(!$feof(file))    begin
-            result = $fread(word_buffer,file);
-            word_buffer = {<<8{word_buffer}};
-            unit_top.unit_memory.unit_kernel_ins_rom.im[i >> 2] = word_buffer;
-            i += result;
-        end
-        $fclose(file);
-        $display("kernel text segment 0x%x bytes",i);
-
-        file = $fopen({"c/temp/kernel.data.bin"},"rb");           
-        i = 0;  
-        while(!$feof(file))    begin
-            result = $fread(word_buffer,file);
-            word_buffer = {<<8{word_buffer}};
-            unit_top.unit_memory.unit_kernel_ram.datas[i >> 2] = word_buffer;
-            i += result;
-        end
-        $fclose(file);
-        $display("kernel data segment 0x%x bytes",i);
+        `LOAD_MEM_FILE(unit_top.unit_memory.unit_kernel_ins_rom.im, "c/temp/kernel.text.bin");
+        `LOAD_MEM_FILE(unit_top.unit_memory.unit_kernel_ram.datas,  "c/temp/kernel.data.bin");
 
         $display("#################################################################");
         $display("#################################################################");
@@ -460,7 +337,7 @@ module top_test();
         while (~exit) begin
            do_one_cycle(
                "",
-               assert_equal_hit,
+            assert_equal_hit,
             assert_not_equal_hit,
             check_register_file_hit,
             exit);
@@ -475,7 +352,7 @@ module top_test();
     int test = 0;
     int test_number = 1; // if test_number > 0 ,test last <test_number> case, else test all.
     initial begin
-    // new_test_by_name("addu");
+        // new_test_by_name("addu");
         if(test === 0) begin    
             for(int i = test_number > 0 ? all_targets.size() - test_number : 0; i < all_targets.size(); ++i)
                 new_test(.target(all_targets[i]));
@@ -483,16 +360,12 @@ module top_test();
         end else if (test === 1) begin
             new_execution("main");    
         end
-        
-        //new_test(.target(all_targets[all_targets.size() - 3]));
-        //new_test(.target(all_targets[all_targets.size() - 2]));
-        //new_test(.target(all_targets[all_targets.size() - 1]));
+
         manual_check_target = '{"", 1'b0,  1'b0,  1'b0,  1'b0,  1'b0,  1'b0};
         // for(int i = manual_target_name.size() - 1; i < manual_target_name.size(); ++i) begin
         //     manual_check_target.name = manual_target_name[i];
         //     new_test(.target(manual_check_target));
         // end
-        $finish;
         $finish;
     end
 
