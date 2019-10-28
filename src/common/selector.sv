@@ -62,7 +62,10 @@ typedef enum {
 /** cop0 source **/
 typedef enum  { 
 COP0_SRC_RT,
-COP0_SRC_STATUS,
+COP0_SRC_STATUS_EXL,
+COP0_SRC_STATUS_ERET,
+COP0_SRC_STATUS_IE,
+COP0_SRC_STATUS_DI,
 COP0_SRC_LLADDR,
 COP0_SRC_NCARE } cop0_source;
 

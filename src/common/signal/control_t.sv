@@ -28,7 +28,6 @@ typedef struct{
     logic write_reg;
     logic write_mem;
     logic write_hi,write_lo;
-    logic eret;
     
 } control_t;
 
@@ -41,7 +40,6 @@ function automatic control_t nullify_control(input control_t ctl);
     ctl.write_reg = '0;
     ctl.write_hi = '0;
     ctl.write_lo = '0;
-    ctl.eret = '0;
     return ctl;
 endfunction
 
@@ -54,6 +52,6 @@ function automatic control_t get_clear_control();
         selector::REG_SRC_NCARE,    selector::MEM_READ_NCARE,   selector::MEM_WRITE_NCARE,
         selector::OPERAND_USE_NONE, selector::REG_WRITE_ALWAYS, selector::EXC_CHK_NONE,
         selector::COP0_SRC_NCARE,   selector::DEST_COP0_NCARE,
-        1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0
+        1'b0, 1'b0, 1'b0, 1'b0, 1'b0
     };
 endfunction

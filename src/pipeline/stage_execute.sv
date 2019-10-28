@@ -17,6 +17,7 @@
 
 module stage_execute(pipeline_interface.port pif,
 input forward_info_t forward, output logic wait_result,
+input logic exception_happen,
 input logic using_delay_slot,
 input logic llbit); //forward
 
@@ -37,6 +38,8 @@ input logic llbit); //forward
     signals::control_t p_ctl;
 
     logic[31:0] dest_cop0_data;
+    selector::destnation_cop0 dest_cop0_decoder;
+    selector::destnation_cop0 dest_cop0;
     logic write_cop0,write_cop0_decoder;
     extract_instruction unit_ei(p_out.instruction, unpack);
 
@@ -46,10 +49,12 @@ input logic llbit); //forward
     /************************* cop0 write filter **********************/
     cop0_writer unit_cop0_writer(.src(p_ctl.cop0_src),
     .rd(p_out.dest_cop0_rd),.sel(p_out.dest_cop0_sel),
-    .eret(p_ctl.eret), .ie('0),.di('0),.exception_happen('0),
+    .dest_cop0_in(dest_cop0_decoder),
+    .exception_happen(exception_happen),
     .decoder_write(write_cop0_decoder),
     .rt(p_out.rt) ,.status(p_out.cop0excreg.Status),
     .write(write_cop0),
+    .dest_cop0(dest_cop0),
     .y(dest_cop0_data));
 
 
@@ -123,21 +128,24 @@ input logic llbit); //forward
     `COPY_PIPELINE_BASE(assign,pif,reconnect);
 
     assign write_cop0_decoder = reconnect.signal_out.control.write_cop0;
-
+    assign dest_cop0_decoder  = reconnect.signal_out.control.dest_cop0;
     always_comb begin
         pif.signal_out = reconnect.signal_out;    
         process_forward_data(pif.signal_out, forward);
        
         pif.signal_out.flag = alu_flag;
         pif.signal_out.dest_reg_data  = dest_reg_data;
-        pif.signal_out.dest_cop0_data  = dest_cop0_data;
+        pif.signal_out.dest_cop0_data = dest_cop0_data;
         pif.signal_out.alu_out   = alu_out;
         pif.signal_out.dest_reg  = dest_reg;
         pif.signal_out.flag_selected = flag_selected;
+
         pif.signal_out.pc_branch  = p_out.pcadd4 + (sign_immed << 2);
         pif.signal_out.mem_addr   = p_out.rs     + sign_immed;
         pif.signal_out.control.write_reg  = write_reg_selected;
         pif.signal_out.control.write_cop0 = write_cop0;
+        pif.signal_out.control.dest_cop0  = dest_cop0;
+
         case(pif.signal_out.control.hilo_src)
             selector::HILO_SRC_RS: begin
                 pif.signal_out.dest_hi_data = p_out.rs;

@@ -30,10 +30,9 @@ module cop0_decoder(input logic[31:0] instruction,output signals::control_t ctl)
                             ctl.opd_use =   selector::OPERAND_USE_NONE;
 
                             ctl.pc_src =    selector::PC_SRC_ERET;
-                            ctl.cop0_src =  selector::COP0_SRC_STATUS;
+                            ctl.cop0_src =  selector::COP0_SRC_STATUS_ERET;
                             ctl.dest_cop0 = selector::DEST_COP0_STATUS;
                             ctl.write_cop0 = '1;
-                            ctl.eret = '1;
                          end
 
                          default:

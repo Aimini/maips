@@ -43,10 +43,10 @@ output logic stall_fetch);
         pif_memory.nullify = '0;     pif_memory.stall = '0;
         pif_write_back.nullify = '0; pif_write_back.stall = '0;
 
-        pif_decode.bubble = '0;
-        pif_execute.bubble = '0;
-        pif_memory.bubble = '0;
-        pif_write_back.bubble = '0;
+        pif_decode.bubble = '0;     pif_decode.keep_exception = '0;
+        pif_execute.bubble = '0;    pif_execute.keep_exception = '0;
+        pif_memory.bubble = '0;     pif_memory.keep_exception = '0;
+        pif_write_back.bubble = '0; pif_write_back.keep_exception = '0;
 
 /******************** clear control hazard  ****************/
         //decode  J,JAL
@@ -96,6 +96,8 @@ output logic stall_fetch);
 
             pif_decode.nullify = '1;
             pif_execute.nullify = '1;
+            pif_memory.nullify = '1;
+            pif_memory.keep_exception = '1;
         end
 /************** stall or bubble to clear data hazard  **********/
         if(instruction_memory_busy) begin

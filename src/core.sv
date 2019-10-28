@@ -42,7 +42,7 @@ memory_interface.controller data_mif);
     .decode_forward_info(decode_forward_info),
     .execute_forward_info(execute_forward_info));
 
-    exception_controller unit_exc_ctl(
+    exception_controller unit_exception_control(
     .ps_execute(pif_execute.signal_out), .ps_memory(pif_memory.signal_out),
     .exc_data(exc_data),.exception_happen(exception_happen),
     .exc_addr(exc_addr));
@@ -79,6 +79,7 @@ memory_interface.controller data_mif);
     stage_execute unit_execute(.pif(pif_execute),
         .forward(execute_forward_info),.wait_result(execute_busy),
         .using_delay_slot(using_delay_slot),
+        .exception_happen(exception_happen),
         .llbit(1'b0));
 
 

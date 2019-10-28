@@ -19,36 +19,25 @@
 */
 module cop0_writer(input selector::cop0_source src,
 input logic[4:0] rd,input logic[2:0] sel,
-input logic eret,ie,di,exception_happen,
+// dest cop0 from decoder
+input selector::destnation_cop0 dest_cop0_in,
+input logic exception_happen,
 input logic decoder_write,
-input logic[31:0] status,rt,
+input logic[31:0] status, rt,
 output logic write,
+output selector::destnation_cop0  dest_cop0,
 output logic[31:0] y);
 
-    logic[31:0] status_out;
     selector::cop0_source exc_src;
     always_comb begin : modify_status
-        status_out = status;
+        dest_cop0 = dest_cop0_in;
         exc_src = src;
         write = decoder_write;
         if(exception_happen) begin
-            status_out[cop0_info::IDX_STATUS_EXL] <= '1;
-            exc_src = selector::COP0_SRC_STATUS;
+            exc_src = selector::COP0_SRC_STATUS_EXL;
+            dest_cop0 = selector::DEST_COP0_STATUS;
             write = '1;
         end
-
-        if(eret)
-            if(status[cop0_info::IDX_STATUS_ERL]) begin
-                status_out[cop0_info::IDX_STATUS_ERL] <= '0;
-            end else begin
-                status_out[cop0_info::IDX_STATUS_EXL] <= '0;
-            end
-
-        if(ie)
-            status_out[cop0_info::IDX_STATUS_IE] <= '1;
-
-        if(di)
-            status_out[cop0_info::IDX_STATUS_IE] <= '0;    
     end
 
     logic[31:0] rt_out;
@@ -57,6 +46,6 @@ output logic[31:0] y);
     .din(rt),.dout(rt_out));
 
     cop0_mux unit_cop0_mux(.src(exc_src),
-        .status(status_out),.rt(rt_out),.y(y));
+        .status(status),.rt(rt_out),.y(y));
 endmodule
 `endif
