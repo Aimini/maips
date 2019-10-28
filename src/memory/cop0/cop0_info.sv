@@ -16,7 +16,12 @@ package cop0_info;
         logic[3:0] exc_code;    //x  Required  RW :exception code
         logic[1:0] reserved3;
     } cause_t;
-
+    localparam logic[4:0] IDX_CAUSE_BD = 31;
+    localparam logic[4:0] IDX_CAUSE_IV = 23;
+    localparam logic[4:0] IDX_CAUSE_IP_E = 15;
+    localparam logic[4:0] IDX_CAUSE_IP_S = 8;
+    localparam logic[4:0] IDX_CAUSE_EXCCODE_E = 6;
+    localparam logic[4:0] IDX_CAUSE_EXCCODE_S = 2;
     typedef struct packed {
         logic[3:0] cu;  // xxxx Required       RW : Control Coprocessor access; 0 : not allowed; 1: allowed
         logic rp;       // 0    ignore for no reduce power RW: 
@@ -40,6 +45,7 @@ package cop0_info;
         logic exl;       //x  Required          RW: exception level  0 : Normal  1: Eexception
         logic ie;        //0  Required          RW: interrupt enable 0 : disable :enable
     } status_t;
+    const logic[4:0] IDX_STATUS_BEV = 22;
     const logic[4:0] IDX_STATUS_ERL = 2;
     const logic[4:0] IDX_STATUS_EXL = 1;
     const logic[4:0] IDX_STATUS_IE = 0;
@@ -57,16 +63,18 @@ package cop0_info;
 */
 typedef struct {
     // used by ert
-    logic[31:0] EPC,ErrorEPC,Status;
+    logic[31:0] EPC,ErrorEPC,Status,EBase;
 } cop0_excreg_t;
 /*
     the data should be used to print
 */
 typedef struct {
+    // status will write through the mtc0, so will only care about cause and other
     // if erl is 1,clear erl, else clear exl.
     logic exception_happen;
     logic in_bd;
-    logic[7:0] exc_code;
+    logic[4:0] exc_code;
+    logic[31:0] epc;
 } cop0_exc_data_t;
 
 

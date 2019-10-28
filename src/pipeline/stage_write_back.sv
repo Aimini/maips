@@ -8,10 +8,7 @@ module stage_write_back(pipeline_interface.port pif);
 
     pipeline_base unit_pb(.pif(reconnect),.nullify_instruction('0));
     
-    assign  reconnect.signal_in = pif.signal_in;
-    assign  reconnect.nullify = pif.nullify;
-    assign  reconnect.stall = pif.stall;
-    assign  reconnect.bubble = pif.bubble;
+    `COPY_PIPELINE_BASE(assign,pif,reconnect);
 
     always_comb begin
         pif.signal_out = reconnect.signal_out;

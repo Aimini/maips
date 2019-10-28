@@ -13,7 +13,9 @@ module pipeline_flow_controller(
 pipeline_interface.controller pif_decode,pif_execute,
 pif_memory,pif_write_back,
 input logic execute_busy, data_memory_busy, instruction_memory_busy,
+input logic exception_happen,
 input logic using_delay_slot,
+input logic[31:0] exc_addr,
 output logic load,
 output logic[31:0] pc,
 output logic stall_fetch);
@@ -84,6 +86,14 @@ output logic stall_fetch);
             else
                 pc = ps_execute.cop0excreg.EPC;
                 
+            pif_decode.nullify = '1;
+            pif_execute.nullify = '1;
+        end
+
+        if(exception_happen) begin
+            load = '1;
+            pc = exc_addr;
+
             pif_decode.nullify = '1;
             pif_execute.nullify = '1;
         end

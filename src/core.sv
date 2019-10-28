@@ -7,6 +7,8 @@
 `include "src/pipeline/stage_write_back.sv"
 `include "src/pipeline/forward/main_forwarder.sv"
 `include "src/pipeline/pipeline_flow_controller.sv"
+`include "src/pipeline/exception_controller.sv"
+
 module core(input logic clk,reset,
 memory_interface.rom_controller ins_mif,
 memory_interface.controller data_mif);
@@ -17,12 +19,16 @@ memory_interface.controller data_mif);
     pif_memory(.clk(clk),.reset(reset)),
     pif_write_back(.clk(clk),.reset(reset));
 
+    logic[31:0] exc_addr;
+    cop0_info::cop0_exc_data_t exc_data;
+     
     logic load_pc;
     logic[31:0] pc_value;
     logic data_memory_busy,instruction_memory_busy;
     logic execute_busy;
     logic stall_fetch;
     logic using_delay_slot;
+    logic exception_happen;
     assign using_delay_slot = '1;
 
 
@@ -36,6 +42,11 @@ memory_interface.controller data_mif);
     .decode_forward_info(decode_forward_info),
     .execute_forward_info(execute_forward_info));
 
+    exception_controller unit_exc_ctl(
+    .ps_execute(pif_execute.signal_out), .ps_memory(pif_memory.signal_out),
+    .exc_data(exc_data),.exception_happen(exception_happen),
+    .exc_addr(exc_addr));
+
 
     pipeline_flow_controller unit_flow_controller
     (.pif_decode(pif_decode),
@@ -44,6 +55,7 @@ memory_interface.controller data_mif);
     .pif_write_back(pif_write_back),
     .execute_busy(execute_busy),.data_memory_busy(data_memory_busy),
     .instruction_memory_busy(instruction_memory_busy),
+    .exception_happen(exception_happen),.exc_addr(exc_addr),
     .load(load_pc),
     .pc(pc_value),
     .stall_fetch(stall_fetch));
@@ -59,7 +71,8 @@ memory_interface.controller data_mif);
     .pc_sub4(pif_decode.signal_in.pcsub4));
 
     stage_decode unit_decode(.pif(pif_decode),
-        .forward(decode_forward_info));
+        .forward(decode_forward_info),
+        .cop0_excdata(exc_data));
     
 
 

@@ -8,7 +8,7 @@
 `include "src/memory/cop0/register_cop0.sv"
 `include "src/pipeline/forward/main_forwarder.sv"
 
-module stage_decode(pipeline_interface.port pif,input forward_info_t forward);
+module stage_decode(pipeline_interface.port pif,input forward_info_t forward,input cop0_info::cop0_exc_data_t cop0_excdata);
     
     signals::unpack_t unpack;
     signals::control_t ctl;
@@ -18,7 +18,6 @@ module stage_decode(pipeline_interface.port pif,input forward_info_t forward);
     logic [31:0]  hi_reg, lo_reg;
     logic [4:0] dest_cop0_rd;
     logic [2:0]dest_cop0_sel;
-    cop0_info::cop0_exc_data_t cop0_excdata;
     cop0_info::cop0_excreg_t cop0_excreg;
     logic write_reg,write_cop0;
     pipeline_signal_t p_out;
@@ -60,14 +59,10 @@ module stage_decode(pipeline_interface.port pif,input forward_info_t forward);
        end
     end
 
-    assign reconnect.signal_in = pif.signal_in;
-    assign reconnect.nullify = pif.nullify;
-    assign reconnect.stall = pif.stall;
-    assign reconnect.bubble = pif.bubble;
+    `COPY_PIPELINE_BASE(assign,pif,reconnect);
    
+   /*** almost all piplien out signal are produced by decode stage**/
     assign pif.signal_out = p_out;
-
-
     
     assign p_out.pcjump = 
         {p_out.pcadd4[31:28],

@@ -50,16 +50,25 @@ interface pipeline_interface (input logic clk,reset);
           # stall;but mult can caculate with correct operand!
         
     **/
-    logic nullify,stall,bubble;
+    logic nullify,stall,bubble,keep_exception;
     
     pipeline_signal_t signal_in;
     pipeline_signal_t signal_out;
 
-    modport port(input clk,reset,nullify,stall,bubble,signal_in,
+    modport port(input clk,reset,nullify,stall,bubble,signal_in,keep_exception,
     output signal_out);
     modport controller(input signal_out,
-    output nullify,stall,bubble);
+    output nullify,stall,bubble,keep_exception);
 endinterface
 
+/*** copy pipline's base signal***/
+`define  COPY_PIPELINE_BASE(ASSIGN,FROM,TO)          \
+    ASSIGN TO.signal_in = FROM.signal_in;           \
+    ASSIGN TO.nullify = FROM.nullify;               \
+    ASSIGN TO.stall = FROM.stall;                   \
+    ASSIGN TO.bubble = FROM.bubble;                 \
+    ASSIGN TO.keep_exception = FROM.keep_exception; \
+
+    
 `endif
 

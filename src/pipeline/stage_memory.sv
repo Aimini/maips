@@ -30,10 +30,8 @@ module stage_memory(pipeline_interface.port pif,
      /* control signal*/
 
 
-    assign  reconnect.signal_in = pif.signal_in;
-    assign  reconnect.nullify = pif.nullify;
-    assign  reconnect.stall = pif.stall;
-    assign  reconnect.bubble = pif.bubble;
+    `COPY_PIPELINE_BASE(assign,pif,reconnect);
+    
     always_ff @(posedge pif.clk) begin
         if(pif.reset)
             prev_stall <= 0;

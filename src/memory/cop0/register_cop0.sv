@@ -37,7 +37,7 @@ module register_cop0(input logic clk,reset,
     } config_t;
 
 
-
+/*************************** define of cop0 write mask ***************************************/
     const config_t configurations[implement_num - 1:0] = '{
         '{cop0_info::RD_BADVADDR , cop0_info::SEL_BADVADDR,   32'h00000000, 32'h0,       32'h0 }, //BadVaddr
         '{cop0_info::RD_COUNT    , cop0_info::SEL_COUNT   ,   32'h00000000, 32'h0,       32'h0 }, //Count
@@ -49,17 +49,22 @@ module register_cop0(input logic clk,reset,
         '{cop0_info::RD_LLADDR   , cop0_info::SEL_LLADDR  ,   32'h00000000, 32'h0,       32'h0 }, // LLAddr *
         '{cop0_info::RD_ERROREPC , cop0_info::SEL_ERROREPC,   32'h00000000, 32'h0,       32'h0 }  // ErrorEPC *
     };    
-    index_t status_index,cause_index,epc_index,errorepc_index;
-
-    assign status_index =   get_index_by_rd_sel(cop0_info::RD_STATUS  ,cop0_info::SEL_STATUS);
-    assign cause_index =    get_index_by_rd_sel(cop0_info::RD_CAUSE   ,cop0_info::SEL_CAUSE);
-    assign epc_index =      get_index_by_rd_sel(cop0_info::RD_EPC     ,cop0_info::SEL_EPC);
-    assign errorepc_index = get_index_by_rd_sel(cop0_info::RD_ERROREPC,cop0_info::SEL_ERROREPC);
 
     const config_t invalid_config =     '{5'bx, 3'bx,   32'hx,        32'hx,       32'hx };
     const config_t full_access_config = '{5'bx, 3'bx,   32'hx,        32'h00000000,32'h00000000 };
 
+
+
+    /****************************** get_index *******************************/
+    
+    const index_t status_index =   get_index_by_rd_sel(cop0_info::RD_STATUS  ,cop0_info::SEL_STATUS);
+    const index_t cause_index =    get_index_by_rd_sel(cop0_info::RD_CAUSE   ,cop0_info::SEL_CAUSE);
+    const index_t epc_index =      get_index_by_rd_sel(cop0_info::RD_EPC     ,cop0_info::SEL_EPC);
+    const index_t errorepc_index = get_index_by_rd_sel(cop0_info::RD_ERROREPC,cop0_info::SEL_ERROREPC);
+    const index_t ebase_index    = get_index_by_rd_sel(cop0_info::RD_EBASE   ,cop0_info::SEL_EBASE);
+
     reg_t file[implement_num - 1:0];
+
      /************** write configuration  **************/
     reg_t data_write;
     index_t write_index;
@@ -70,28 +75,46 @@ module register_cop0(input logic clk,reset,
     logic[implement_num_width - 1:0] read_index;
     config_t read_config;
 
-    /** status and cause register than processed by excctl***/
-    reg_t  exc_status,exc_cause;
 
 
+    /********************* always logic ***********************************/
     always_ff @(posedge clk) begin
         if(reset) begin
             foreach(file[i]) begin
                 file[i] <= configurations[i].initial_value;
             end
-        end else if(we) begin
-            assert (write_index < implement_num )
-            else begin
-                $error("write invalid cop0 register.");
-                $stop;
+        end else begin
+            if(we) begin
+                assert (write_index < implement_num )
+                else begin
+                    $error("write invalid cop0 register.");
+                    $stop;
+                end
+                file[write_index] <= data_write;
             end
-            file[write_index] <= data_write;
+            if(excdata.exception_happen) begin
+                file[epc_index] <= excdata.epc;
+                file[cause_index][cop0_info::IDX_CAUSE_BD] <= excdata.in_bd;
+                file[cause_index][cop0_info::IDX_CAUSE_EXCCODE_E:cop0_info::IDX_CAUSE_EXCCODE_S] <= excdata.exc_code;
+            end
         end
+            
+         
+
     end
     /****************************** define of tool function *******************************/
     /*
      get configuration index
     */
+    function automatic reg_t get_value_masked(input index_t idx,input reg_t value);
+        config_t c = get_config_by_index(idx);
+        return  value & ~c.fixed_value_mask | c.fixed_value & c.fixed_value_mask;
+    endfunction 
+
+     function automatic reg_t get_value_masked_file(input index_t idx);
+        return  get_value_masked(idx,file[idx]);
+    endfunction 
+
     function automatic index_t get_index_by_rd_sel(
         input logic [4:0] rd,input logic[2:0] sel);
 
@@ -115,34 +138,28 @@ module register_cop0(input logic clk,reset,
         end
     endfunction
 
-    /****************************** get_index *******************************/
-    // always_comb begin : exc_reg_index
-    //     status_index =   get_index_by_rd_sel(RD_STATUS  ,SEL_STATUS);
-    //     cause_index =    get_index_by_rd_sel(RD_CAUSE   ,SEL_CAUSE);
-    //     epc_index =      get_index_by_rd_sel(RD_EPC     ,SEL_EPC);
-    //     errorepc_index = get_index_by_rd_sel(RD_ERROREPC,SEL_ERROREPC);
-    // end
-
-    assign excreg.ErrorEPC = file[errorepc_index];
-    assign excreg.EPC      = file[epc_index];
-    assign excreg.Status   = file[status_index];
+/*************************** output exception register ***************************************/
+    always_comb begin
+        excreg.ErrorEPC = get_value_masked_file(errorepc_index);
+        excreg.EPC      = get_value_masked_file(epc_index);
+        excreg.Status   = get_value_masked_file(status_index);
+        excreg.EBase   =  get_value_masked_file(ebase_index);
+    end
 
     /********************* data write process *******************************/
     always_comb begin
         write_index =  get_index_by_rd_sel(write_rd,write_sel);
         write_config = get_config_by_index(write_index);
-        data_write = din & ~write_config.fixed_value_mask | write_config.fixed_value_mask & write_config.fixed_value;
+        data_write = get_value_masked(write_index,din);
     end
     
     
     always_comb begin
         read_index =  get_index_by_rd_sel(read_rd,read_sel);
         read_config = get_config_by_index(read_index);
-        data_read = file[read_index] & ~read_config.fixed_value_mask | read_config.fixed_value & read_config.fixed_value_mask;
+        data_read = get_value_masked_file(read_index);
         dout = data_read;
     end 
-    
-
 endmodule
 
 `endif

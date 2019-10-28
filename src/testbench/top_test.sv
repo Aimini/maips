@@ -22,6 +22,7 @@ module top_test();
         string name;
         logic assert_equal, assert_not_equal, check_register_file;
         logic sw_dbg_target;
+        logic bin, kernel;
     } check_target_t;
 
     string j_too_large = "j";
@@ -29,76 +30,77 @@ module top_test();
 
     check_target_t all_targets[] = 
     '{ 
-        '{"sw_dbg",     1'b0,  1'b0,  1'b0,  1'b1},
-        '{"lui_1",      1'b0,  1'b0,  1'b1,  1'b0},
-        '{"lui_2",      1'b0,  1'b0,  1'b1,  1'b0},
-        '{"ori_1",      1'b0,  1'b0,  1'b1,  1'b0},
-        '{"ori_2",      1'b0,  1'b0,  1'b1,  1'b0},
-        '{"sll_1",      1'b0,  1'b0,  1'b1,  1'b0},
-        '{"sll_2",      1'b0,  1'b0,  1'b1,  1'b0},
-        '{"addu",       1'b0,  1'b0,  1'b1,  1'b0},
-        '{"addiu",      1'b0,  1'b0,  1'b1,  1'b0},
-        '{"beq",        1'b0,  1'b0,  1'b1,  1'b0},
-        '{"bne",        1'b0,  1'b0,  1'b1,  1'b0},
-        '{"blez",       1'b0,  1'b0,  1'b1,  1'b0},
-        '{"bgtz",       1'b0,  1'b0,  1'b1,  1'b0},
-        '{"slti",       1'b1,  1'b0,  1'b1,  1'b0},
-        '{"sltiu",      1'b1,  1'b0,  1'b1,  1'b0},
-        '{"andi_1",     1'b0,  1'b0,  1'b1,  1'b0},
-        '{"andi_2",     1'b0,  1'b0,  1'b1,  1'b0},
-        '{"xori_1",     1'b0,  1'b0,  1'b1,  1'b0},
-        '{"xori_2",     1'b0,  1'b0,  1'b1,  1'b0},
-        '{"mthi_mfhi",  1'b1,  1'b0,  1'b1,  1'b0},
-        '{"mtlo_mflo",  1'b1,  1'b0,  1'b1,  1'b0},
-        '{"multu",      1'b1,  1'b0,  1'b1,  1'b0},
-        '{"divu",       1'b1,  1'b0,  1'b1,  1'b0},
-        '{"mult",       1'b1,  1'b0,  1'b1,  1'b0},
-        '{"div",        1'b1,  1'b0,  1'b1,  1'b0},
-        '{"maddu",      1'b1,  1'b0,  1'b1,  1'b0},
-        '{"madd",       1'b1,  1'b0,  1'b1,  1'b0},
-        '{"msubu",      1'b1,  1'b0,  1'b1,  1'b0},
-        '{"msub",       1'b1,  1'b0,  1'b1,  1'b0},
-        '{"mul",        1'b1,  1'b0,  1'b1,  1'b0},
-        '{"clz",        1'b1,  1'b0,  1'b1,  1'b0},
-        '{"clo",        1'b1,  1'b0,  1'b1,  1'b0},
-        '{"lw",         1'b1,  1'b0,  1'b1,  1'b0},
-        '{"lh",         1'b1,  1'b0,  1'b1,  1'b0},
-        '{"lb",         1'b1,  1'b0,  1'b1,  1'b0},
-        '{"jr",         1'b0,  1'b0,  1'b1,  1'b0},
-        '{"jalr",       1'b0,  1'b0,  1'b1,  1'b0},
-        '{"movz",       1'b1,  1'b0,  1'b1,  1'b0},
-        '{"movn",       1'b1,  1'b0,  1'b1,  1'b0},
-        '{"srl",        1'b1,  1'b0,  1'b1,  1'b0},
-        '{"rotr",       1'b1,  1'b0,  1'b1,  1'b0},
-        '{"sra",        1'b1,  1'b0,  1'b1,  1'b0},
-        '{"sllv",       1'b1,  1'b0,  1'b1,  1'b0},
-        '{"srlv",       1'b1,  1'b0,  1'b1,  1'b0},
-        '{"rotrv",      1'b1,  1'b0,  1'b1,  1'b0},
-        '{"srav",       1'b1,  1'b0,  1'b1,  1'b0},
-        '{"subu",       1'b0,  1'b0,  1'b1,  1'b0},
-        '{"and",        1'b1,  1'b0,  1'b1,  1'b0},
-        '{"or",         1'b1,  1'b0,  1'b1,  1'b0},
-        '{"xor",        1'b1,  1'b0,  1'b1,  1'b0},
-        '{"nor",        1'b1,  1'b0,  1'b1,  1'b0},
-        '{"slt",        1'b1,  1'b0,  1'b1,  1'b0},
-        '{"sltu",       1'b1,  1'b0,  1'b1,  1'b0},
-        '{"bltz",       1'b0,  1'b0,  1'b1,  1'b0},
-        '{"bltzal",     1'b1,  1'b0,  1'b1,  1'b0},
-        '{"bgez",       1'b0,  1'b0,  1'b1,  1'b0},
-        '{"bgezal",     1'b1,  1'b0,  1'b1,  1'b0},
-        '{"sb",         1'b1,  1'b0,  1'b1,  1'b0},
-        '{"sh",         1'b1,  1'b0,  1'b1,  1'b0},
-        '{"sw",         1'b1,  1'b0,  1'b1,  1'b0},
-        '{"lbu",        1'b1,  1'b0,  1'b1,  1'b0},
-        '{"lhu",        1'b1,  1'b0,  1'b1,  1'b0},
-        '{"lwr_swr",    1'b0,  1'b0,  1'b1,  1'b0},
-        '{"lwl_swl",    1'b0,  1'b0,  1'b1,  1'b0},
-        '{"ext",        1'b0,  1'b0,  1'b1,  1'b0},
-        '{"ins",        1'b0,  1'b0,  1'b1,  1'b0},
-        '{"seb",        1'b1,  1'b0,  1'b1,  1'b0},
-        '{"seh",        1'b1,  1'b0,  1'b1,  1'b0},
-        '{"wsbh",       1'b1,  1'b0,  1'b1,  1'b0},
-        '{"mfc0_mtc0",  1'b1,  1'b0,  1'b1,  1'b0}
+        '{"sw_dbg",     1'b0,  1'b0,  1'b0,  1'b1, 1'b0, 1'b0},
+        '{"lui_1",      1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"lui_2",      1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"ori_1",      1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"ori_2",      1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"sll_1",      1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"sll_2",      1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"addu",       1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"addiu",      1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"beq",        1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"bne",        1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"blez",       1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"bgtz",       1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"slti",       1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"sltiu",      1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"andi_1",     1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"andi_2",     1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"xori_1",     1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"xori_2",     1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"mthi_mfhi",  1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"mtlo_mflo",  1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"multu",      1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"divu",       1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"mult",       1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"div",        1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"maddu",      1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"madd",       1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"msubu",      1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"msub",       1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"mul",        1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"clz",        1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"clo",        1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"lw",         1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"lh",         1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"lb",         1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"jr",         1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"jalr",       1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"movz",       1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"movn",       1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"srl",        1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"rotr",       1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"sra",        1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"sllv",       1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"srlv",       1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"rotrv",      1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"srav",       1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"subu",       1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"and",        1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"or",         1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"xor",        1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"nor",        1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"slt",        1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"sltu",       1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"bltz",       1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"bltzal",     1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"bgez",       1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"bgezal",     1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"sb",         1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"sh",         1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"sw",         1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"lbu",        1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"lhu",        1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"lwr_swr",    1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"lwl_swl",    1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"ext",        1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"ins",        1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"seb",        1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"seh",        1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"wsbh",       1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"mfc0_mtc0",  1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"syscall",    1'b1,  1'b0,  1'b0,  1'b0, 1'b1, 1'b1}
       };
 
     string manual_target_name[] = {
@@ -121,17 +123,24 @@ module top_test();
     always_ff @(posedge clk)
         dbg_loaded <= write_dbg_memory & write_dbg_function_reg;
 
-    function automatic string get_test_filename(string target);
-        return {"asm/temp/", target, ".asm.hextext"};
+    function automatic string get_test_filename(string target,logic bin);
+        if(bin)
+            return {"asm/temp/", target, ".text.bin"};
+        else
+            return {"asm/temp/", target, ".asm.hextext"};
     endfunction
 
-    function automatic string get_data_filename(string target);
-        return {"asm/temp/", target, ".asm.data.hextext"};
-    endfunction
+    function automatic string get_data_filename(string target,logic bin);
+        if(bin)
+           return {"asm/temp/", target, ".data.bin"};
+        else
+             return {"asm/temp/", target, ".asm.data.hextext"};
+    endfunction    
 
     function automatic string get_regchk_filename(string target);
         return  {"asm/temp/", target, ".asm.reg.hextext"};
     endfunction
+
 
     /* stop and dump pc */
     function automatic void stop_print_pc();
@@ -272,21 +281,67 @@ module top_test();
             endcase
         end
     endtask
+    
+    task automatic load_text_data(input check_target_t target);
+        int file = 0, index = 0,result  = 0;
+        int unsigned i = 0;
+        logic[31:0] word_buffer;
+        string test_filename =  get_test_filename(target.name,target.bin);
+        string data_filename  =  get_data_filename(target.name,target.bin);
+        if(~target.bin) begin
+            if(target.kernel) begin
+                $readmemh(test_filename, unit_top.unit_memory.unit_ins_rom.im);
+                $readmemh(data_filename, unit_top.unit_memory.unit_user_ram.datas);
+            end else begin
+                $readmemh(test_filename, unit_top.unit_memory.unit_kernel_ins_rom.im);
+                $readmemh(data_filename, unit_top.unit_memory.unit_kernel_ram.datas);
+            end
+        end
+        else begin
+            file = $fopen(test_filename,"rb");           
+            i = 0;  
+            while(!$feof(file)) begin
+                result = $fread(word_buffer,file);
+                word_buffer = {<<8{word_buffer}};
+                if(target.kernel)
+                    unit_top.unit_memory.unit_kernel_ins_rom.im[i >> 2] = word_buffer;
+                else
+                    unit_top.unit_memory.unit_ins_rom.im[i >> 2] = word_buffer;
+                i += result;
+            end
+            $fclose(file);
+            
+            file = $fopen(data_filename,"rb");           
+            i = 0;  
+            while(!$feof(file)) begin
+                result = $fread(word_buffer,file);
+                word_buffer = {<<8{word_buffer}};
+                if(target.kernel)
+                    unit_top.unit_memory.unit_kernel_ram.datas[i >> 2] = word_buffer;
+                else
+                    unit_top.unit_memory.unit_user_ram.datas[i >> 2] = word_buffer;
+                i += result;
+            end
+            $fclose(file);
+        end
+
+    endtask
+
 
     task automatic new_test(input check_target_t target);
         string target_name = target.name;
-        string test_filename =  get_test_filename(target_name);
-        string data_filename =  get_data_filename(target_name);
         logic exit = 0;
         logic assert_equal_hit = '0;
         logic assert_not_equal_hit = '0;
         logic check_register_file_hit = '0;
+
+        load_text_data(target);
+
         $display("");
         $display("");
         $display("-------------------------------------------------------------------------------------");
-        $display("-------- testing %s...",test_filename);
-        $readmemh(test_filename, unit_top.unit_memory.unit_ins_rom.im);
-        $readmemh(data_filename, unit_top.unit_memory.unit_user_ram.datas);
+        $display("-------- testing %s...",target_name);
+
 
         reset = 1;
         @(negedge clk) begin
@@ -321,11 +376,10 @@ module top_test();
             $error("asm file require check register file but program not require!");
             $stop;
         end
-        $display("-------- %s finish.",test_filename);
-        
+        $display("-------- %s finish.",target_name);
     endtask
 
-    task automatic new_test_by_name(string name);
+    task automatic new_test_by_name(string name,uisng);
         logic found = '0;
        for(int i = 0; i < all_targets.size(); ++i) begin
             if(name == all_targets[i].name) begin
@@ -418,12 +472,9 @@ module top_test();
     endtask
 
     check_target_t manual_check_target;
-    int test = 1;
+    int test = 0;
     int test_number = 1; // if test_number > 0 ,test last <test_number> case, else test all.
     initial begin
-        // for(int i = 0; i < all_targets.size(); ++i)
-        //     new_test(.target(all_targets[i]));
-        // $finish;
     // new_test_by_name("addu");
         if(test === 0) begin    
             for(int i = test_number > 0 ? all_targets.size() - test_number : 0; i < all_targets.size(); ++i)
@@ -436,7 +487,7 @@ module top_test();
         //new_test(.target(all_targets[all_targets.size() - 3]));
         //new_test(.target(all_targets[all_targets.size() - 2]));
         //new_test(.target(all_targets[all_targets.size() - 1]));
-        manual_check_target = '{"", 1'b0,  1'b0,  1'b0,  1'b0};
+        manual_check_target = '{"", 1'b0,  1'b0,  1'b0,  1'b0,  1'b0,  1'b0};
         // for(int i = manual_target_name.size() - 1; i < manual_target_name.size(); ++i) begin
         //     manual_check_target.name = manual_target_name[i];
         //     new_test(.target(manual_check_target));

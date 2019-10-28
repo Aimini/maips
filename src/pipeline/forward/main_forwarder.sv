@@ -3,6 +3,8 @@
 
 
 `include "src/common/util.sv"
+`include "src/pipeline/pipeline_interface.sv"
+
 typedef struct{
     logic f;
     logic[31:0] data;
@@ -12,7 +14,7 @@ typedef struct{
 typedef struct {
     fowrad_element_t rs,rt,lo,hi,cop0;
 
-    fowrad_element_t EPC,ErrorEPC,Status;
+    fowrad_element_t EPC,ErrorEPC,Status,EBase;
 } forward_info_t;
 
 
@@ -31,6 +33,7 @@ function automatic void process_forward_data(
         `PROC_EXEREG(EPC)
         `PROC_EXEREG(ErrorEPC)
         `PROC_EXEREG(Status)
+        `PROC_EXEREG(EBase)
 `undef PROC_EXEREG
 endfunction
 
@@ -122,6 +125,9 @@ execute_forward_info);
 
             execute_forward_info.Status = test_cp0(ps_memory,cop0_info::RD_STATUS,cop0_info::SEL_STATUS);
             decode_forward_info.Status  = test_cp0(ps_memory,cop0_info::RD_STATUS,cop0_info::SEL_STATUS);
+
+            execute_forward_info.EBase = test_cp0(ps_memory,cop0_info::RD_EBASE,cop0_info::SEL_EBASE);
+            decode_forward_info.EBase  = test_cp0(ps_memory,cop0_info::RD_EBASE,cop0_info::SEL_EBASE);
         end
     end
   
