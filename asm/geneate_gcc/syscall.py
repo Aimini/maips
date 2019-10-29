@@ -102,7 +102,29 @@ def gen_trap_immedtype(op,condition):
         return 0
     return trap_inner
 
+def gen_add_sub(sub):
+    g = gen_oprand()
+    if sub:
+        op = "sub"
+        f = lambda a,b: a - b
+    else:
+        op = "add"
+        f = lambda a,b: a + b
+    def arithmatic_inner(A):
+        a,b = next(g)
+        regs = get_random_exclude_reg(k = 2)
+        A(set_immed(regs[0],a))
+        A(set_immed(regs[1],b))
+        A("{} ${},${}".format(op,*regs))
 
+        a = a +  ((a & 0x80000000) << 1)
+        b = b +  ((b & 0x80000000) << 1)
+        res = f(a,b) & 0x1FFFFFFFF
+
+        if ((res >>32) ^(res >> 31)) & 1:
+            return 1
+        return 0
+    return arithmatic_inner
 
 configs = {
     "syscall":[gen_syscall,0x08],
@@ -119,6 +141,8 @@ configs = {
     "tltiu"  :[gen_trap_immedtype("tltiu",lambda a,b: a <  cutto_sign16(b) & 0xFFFFFFFF) ,13],
     "teqi"   :[gen_trap_immedtype("teqi", lambda a,b: cutto_sign32(a) == cutto_sign16(b)) ,13],
     "tnei"   :[gen_trap_immedtype("tnei", lambda a,b: cutto_sign32(a) != cutto_sign16(b)) ,13],
+    "ov_add"    :[gen_add_sub(False),12],
+    "ov_sub"    :[gen_add_sub(True) ,12],
 }
 
 test_name = sys.argv[1]

@@ -33,6 +33,11 @@ module exception_controller(
                 if(!ps_execute.flag_selected)
                     exception_happen = '0;
             end
+            selector::EXC_CHK_OVERFLOW: begin
+                exc_data.exc_code = EXCCODE_OV;
+                if(!ps_execute.flag.overflow)
+                    exception_happen = '0;
+            end
             default: begin 
                 exc_data.exc_code = 'x;
                 exception_happen = '0;

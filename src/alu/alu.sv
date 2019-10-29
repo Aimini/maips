@@ -14,11 +14,13 @@ module alu #(parameter N = 32)
 
     logic[N - 1:0] alu_logic_y,alu_arithmatic_y;
     logic sub;
-    logic carry;
+    logic carry; 
+    logic overflow;
     logic[$clog2(N) - 1:0] alu_sa;
     signals::compare_t compare_result;
     
     assign flag.carry = carry;
+    assign flag.overflow = overflow;
     assign flag.compare = compare_result;
     assign sub = (funct === selector::ALU_SUB);
 
@@ -28,7 +30,7 @@ module alu #(parameter N = 32)
 
     alu_arithmatic #(N) unit_alu_arithmatic(.a(a),.b(b),
     .sub(sub),
-    .y(alu_arithmatic_y),.carry(carry));
+    .y(alu_arithmatic_y),.carry(carry),.overflow(overflow));
 
     comparator  #(N) unit_comparator(.a(a),.b(b),.signal(compare_result));
 
