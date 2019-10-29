@@ -160,11 +160,14 @@ def my_gen1(A,C,E):
 .align 4
 
 __start:
-    li $gp,_gp
+    lui $gp,_gp_hi
+    ori $gp,_gp_lo
     li $sp,0x90040000
 
-    li $k0,_bss_start
-    li $k1,_bss_end
+    lui $k0,_bss_start_hi
+    ori $k0,_bss_start_lo
+    lui $k1,_bss_end_hi
+    ori $k1,_bss_end_lo
 initial_bss:
     beq     $k1,  $k0, initial_bss_end
     sw      $0 ,0($k0)
