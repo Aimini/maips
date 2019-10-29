@@ -126,6 +126,27 @@ def gen_add_sub(sub):
         return 0
     return arithmatic_inner
 
+def gen_addi():
+    g = gen_oprand_immed()
+    f = lambda a,b: a + b
+
+    def arithmatic_inner(A):
+        a,b = next(g)
+        reg = get_random_exclude_reg(k = 1)[0]
+        A(set_immed(reg,a))
+        A("addi ${},{}".format(reg,b))
+
+        b = cutto_sign16(b) & 0xFFFFFFFF
+        a = a +  ((a & 0x80000000) << 1)
+        b = b +  ((b & 0x80000000) << 1)
+        res = f(a,b) & 0x1FFFFFFFF
+
+        if ((res >>32) ^ (res >> 31)) & 1:
+            return 1
+        return 0
+    return arithmatic_inner
+
+
 configs = {
     "syscall":[gen_syscall,0x08],
     "break"  :[gen_break,9],
@@ -143,6 +164,7 @@ configs = {
     "tnei"   :[gen_trap_immedtype("tnei", lambda a,b: cutto_sign32(a) != cutto_sign16(b)) ,13],
     "ov_add"    :[gen_add_sub(False),12],
     "ov_sub"    :[gen_add_sub(True) ,12],
+    "ov_addi"    :[gen_addi() ,12],
 }
 
 test_name = sys.argv[1]

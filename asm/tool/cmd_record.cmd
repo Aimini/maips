@@ -92,3 +92,6 @@ geneate_gcc\syscall.py tlti
 geneate_gcc\syscall.py tltiu
 geneate_gcc\syscall.py teqi
 geneate_gcc\syscall.py tnei
+
+geneate_gcc\syscall.py ov_add
+geneate_gcc\syscall.py ov_sub
