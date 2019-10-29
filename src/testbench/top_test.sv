@@ -41,15 +41,26 @@ module top_test();
 `define dbg_arg1  `dbg_data[2]
 
 
-    logic[31:0] pc_mem_stage;
+    logic[31:0] pc_mem_stage,insruction_fetch_stage;
+    logic[31:0] invalid_instruction_count; 
     // indicate cpu is writing dbg memory.
     logic dbg_loaded;
-    logic[31:0] s;
     
     assign pc_mem_stage = unit_top.unit_core.unit_memory.pif.signal_out.pc;
-
-    always_ff @(posedge clk)
+    assign insruction_fetch_stage =  unit_top.unit_core.unit_fetch.instruction;
+    always_ff @(posedge clk) begin
         dbg_loaded <= `dbg_ram.mif.write & `dbg_ram.mif.addr === 0;
+
+        if(insruction_fetch_stage === 'x) begin
+            invalid_instruction_count <= invalid_instruction_count + 1;
+            if(invalid_instruction_count === 5)
+                stop_print_pc();
+        end else begin
+            invalid_instruction_count <= 0;
+        end
+    end
+
+
 
     function automatic string get_test_filename(string target,logic bin);
         if(bin)
@@ -350,7 +361,7 @@ module top_test();
 
     check_target_t manual_check_target;
     int test = 0;
-    int test_number = 1; // if test_number > 0 ,test last <test_number> case, else test all.
+    int test_number = 6; // if test_number > 0 ,test last <test_number> case, else test all.
     initial begin
         // new_test_by_name("addu");
         if(test === 0) begin    

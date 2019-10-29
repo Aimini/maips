@@ -28,7 +28,7 @@ arg[0]
     - note: this one is for sw-dbg. when we begin test
     sw dbg, modelsim will auto fill $s0 and $v0 to
     0xFFFF0000, to other $si to (i << i), asm file 
-    excute process that store $s0-$s7 to 0xffff0000-0xffff001C. 
+    execute process that store $s0-$s7 to 0xffff0000-0xffff001C. 
 
 ##################################################################
 
@@ -81,5 +81,11 @@ SWL,LWL
 INS,EXT
 SEB,SEH
 WSBH
+SYSCALL,BREAK
+TGE,TGEU
+TLT,TLTU
+TEQ,TNE
+
+TGEI,TGEIU,TLTI,TLTIU,TEQI,TNEI
 //------------
 ADDI(NOEXCEUPTION)

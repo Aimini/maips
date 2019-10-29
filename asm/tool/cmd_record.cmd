@@ -85,3 +85,10 @@ geneate_gcc\syscall.py tlt
 geneate_gcc\syscall.py tltu
 geneate_gcc\syscall.py teq
 geneate_gcc\syscall.py tne
+
+geneate_gcc\syscall.py tgei
+geneate_gcc\syscall.py tgeiu
+geneate_gcc\syscall.py tlti
+geneate_gcc\syscall.py tltiu
+geneate_gcc\syscall.py teqi
+geneate_gcc\syscall.py tnei
