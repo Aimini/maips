@@ -19,18 +19,25 @@ module exception_controller(
     const logic[4:0] EXCCODE_OV =    5'hC;
     const logic[4:0] EXCCODE_TR =    5'hD;
     logic[31:0] addr_offset;
-    always_comb begin : gen_cop0_excctl
-        exception_happen = '0;
-        addr_offset = 32'h180;
+    always_comb begin : generate_exception_code_control
+        exception_happen = '1;
         case(ps_execute.control.exc_chk)
             selector::EXC_CHK_SYSCALL: begin
-                exception_happen = '1;
                 exc_data.exc_code = EXCCODE_SYS;
             end
-            default:
-                 exc_data.exc_code = 'x;
+            selector::EXC_CHK_BREAK: begin
+                exc_data.exc_code = EXCCODE_BP;
+            end
+            selector::EXC_CHK_TRAP: begin
+                exc_data.exc_code = EXCCODE_TR;
+                if(!ps_execute.flag_selected)
+                    exception_happen = '0;
+            end
+            default: begin 
+                exc_data.exc_code = 'x;
+                exception_happen = '0;
+            end
         endcase
-        
         exc_data.exception_happen = exception_happen;
     end
 
@@ -50,6 +57,7 @@ module exception_controller(
     end
 
     always_comb begin : exception_address
+        addr_offset = 32'h180;
         if(ps_execute.cop0excreg.Status[cop0_info::IDX_STATUS_BEV])
             exc_addr = 32'hBFC0_0200 + addr_offset;
         else

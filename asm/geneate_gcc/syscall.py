@@ -53,9 +53,48 @@ def random_get_alu():
 def gen_syscall(A):
     A("syscall")
     return 1
+
+def gen_break(A):
+    A("break")
+    return 1
+
+
+
+
+def gen_oprand():
+    for x in get_bound(32):
+        for y in get_bound(32):
+            yield x,y
+
+    while(True):
+        yield get_u32(),get_u32()
+
+
+def gen_trap(op,condition):
+    g = gen_oprand()
+    def trap_inner(A):
+        a,b = next(g)
+        regs = get_random_exclude_reg(k = 2)
+        A(set_immed(regs[0],a))
+        A(set_immed(regs[1],b))
+        A("{} ${},${}".format(op,*regs))
+        if condition(a,b):
+            return 1
+        return 0
+    return trap_inner
+
+
 configs = {
-    "syscall":[gen_syscall,0x08]
+    "syscall":[gen_syscall,0x08],
+    "break"  :[gen_break,9],
+    "tge"    :[gen_trap("tge" ,lambda a,b:cutto_sign32(a) >= cutto_sign32(b)) ,13],
+    "tgeu"   :[gen_trap("tgeu",lambda a,b: a >= b),13],
+    "tlt"    :[gen_trap("tlt" ,lambda a,b: cutto_sign32(a) < cutto_sign32(b)) ,13],
+    "tltu"   :[gen_trap("tltu",lambda a,b: a <  b) ,13],
+    "teq"    :[gen_trap("teq" ,lambda a,b: a == b) ,13],
+    "tne"    :[gen_trap("tne" ,lambda a,b: a != b) ,13]
 }
+
 test_name = sys.argv[1]
 current_config = configs[test_name]
 r = gen(test_name)
@@ -86,22 +125,35 @@ initial_bss_end:
     b __next
 ###################   exception handler   ###################
 .org 0x180 
-    mfc0 $k0,$13,0
-    ext  $k0,$k0,2,5
+    mfc0 $k0,$13,0    # get cause
+    ext  $k0,$k0,2,5  # get exc code
 
-    lui  $24,   0x0000 # li $24, 00000008
-    ori $24,   0x0008
-    lui $2, 0xffff
-    sw  $24, 4($2)
-    sw  $k0, 8($2)
-    lui  $24,   0x0000 # li $24, 00000001
+    mfc0 $k1,$12,0    # get status
+    ext  $k1,$k1,1,1  # get exl
+
+    lui $24,   0x0000 # check causeExcCode
+    ori $24,   0x{exccode:4>0X}
+    lui $2,    0xffff
+    sw  $24,   4($2)
+    sw  $k0,   8($2)
+    lui $24,   0x0000 # li $24, 00000001
     ori $24,   0x0001
     sw  $24, 0($2) 
+
+    lui $24,   0x0000 # check statusEXL
+    ori $24,   0x1
+    lui $2,    0xffff
+    sw  $24,   4($2)
+    sw  $k1,   8($2)
+    lui $24,   0x0000 # li $24, 00000001
+    ori $24,   0x0001
+    sw  $24, 0($2) 
+
     mfc0  $k0,$14
     addiu $k0,$k0,4
     mtc0  $k0,$14
     eret
-##############################################################""")
+##############################################################""".format(exccode = exccode))
 
     
 
@@ -109,16 +161,25 @@ initial_bss_end:
     A("__next:")
     A("la $a0, exception_count")
     A("sw $0, 0($a0)")
-    for x in range(1000):
+
+    def make_exception_count():
         inc = f(A)
-        total += inc
         A( "la     $a0, exception_count")
         A( "lw     $a1, 0($a0)")
         A(f"addiu  $a1, $a1,{inc}")
         A( "sw     $a1, 0($a0)")
+        return inc
+
+    for x in range(5000):
+        total += make_exception_count()
         A(assert_equal_immed("a1",total))
 
 
+    for x in range(1000):
+        for x in range(get_random_below(20)):
+            A(random_get_alu())
+        total += make_exception_count()
+        A(assert_equal_immed("a1",total))
 
     A(exit_using())
     A(".data")

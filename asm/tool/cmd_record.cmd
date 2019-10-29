@@ -77,3 +77,11 @@ generate\ins_ext.py ins
 generate\seb_seh.py seb
 generate\seb_seh.py seh
 generate\wsbh.py seh
+geneate_gcc\syscall.py syscall
+geneate_gcc\syscall.py break
+geneate_gcc\syscall.py tge
+geneate_gcc\syscall.py tgeu
+geneate_gcc\syscall.py tlt
+geneate_gcc\syscall.py tltu
+geneate_gcc\syscall.py teq
+geneate_gcc\syscall.py tne

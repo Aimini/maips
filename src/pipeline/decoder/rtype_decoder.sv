@@ -63,6 +63,12 @@ module rtype_decoder(input logic[31:0] instruction,output signals::control_t ctl
                 { selector::PC_SRC_EXECPTION,selector::EXC_CHK_SYSCALL};
             end
 
+            rtype::BREAK: begin
+                ctl.opd_use = selector::OPERAND_USE_NONE;
+                { ctl.pc_src,                ctl.exc_chk}  = 
+                { selector::PC_SRC_EXECPTION,selector::EXC_CHK_BREAK};
+            end
+
             rtype::JR: begin
                 ctl.opd_use = selector::OPERAND_USE_RS;
                 ctl.pc_src =  selector::PC_SRC_REGISTER;
@@ -153,6 +159,23 @@ module rtype_decoder(input logic[31:0] instruction,output signals::control_t ctl
                     decoder_util::write_flag_to_rd(ctl, selector::FLAG_LTU);
                 else
                     decoder_util::write_flag_to_rd(ctl, selector::FLAG_LT);
+            end
+
+            rtype::TGE,rtype::TGEU,
+            rtype::TLT,rtype::TLTU,
+            rtype::TEQ,rtype::TNE:begin
+                ctl = decoder_util::get_standard_control();
+                ctl.exc_chk = selector::EXC_CHK_TRAP;
+                case(unpack.funct)
+                    rtype::TGE:  ctl.flag_sel = selector::FLAG_GE;
+                    rtype::TGEU:ctl.flag_sel = selector::FLAG_GEU;
+                    rtype::TLT: ctl.flag_sel = selector::FLAG_LT;
+                    rtype::TLTU:ctl.flag_sel = selector::FLAG_LTU;
+                    rtype::TEQ: ctl.flag_sel = selector::FLAG_EQ;
+                    rtype::TNE: ctl.flag_sel = selector::FLAG_NE;
+                    default:
+                        ctl.flag_sel = selector::FLAG_NCARE;
+                endcase
             end
 
             default:begin
