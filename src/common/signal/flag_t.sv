@@ -1,4 +1,4 @@
 typedef struct {
     compare_t compare;
-    logic carry;
+    logic carry,overflow;
 } flag_t;
