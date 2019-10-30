@@ -98,6 +98,20 @@ def gen_addi():
         return 0
     return arithmatic_inner
 
+def gen_reserved(A):
+    reserved_instructions = [
+        "TLBR",
+        "SDC2 $4,0($2)",
+        "DERET"
+    ]
+    if get_random_below(10) > 6:
+        A(random.choice(reserved_instructions))
+        return 1
+    else:
+        for x in range(20):
+            A("li ${},{}".format(get_random_below(32),get_random_below(2**32)))
+        A(random_get_alu())
+        return 0
 
 configs = {
     "syscall":[gen_syscall,0x08],
@@ -117,6 +131,7 @@ configs = {
     "ov_add"    :[gen_add_sub(False),12],
     "ov_sub"    :[gen_add_sub(True) ,12],
     "ov_addi"    :[gen_addi() ,12],
+    "reserved"   :[gen_reserved,10]
 }
 
 test_name = sys.argv[1]

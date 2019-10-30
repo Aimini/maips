@@ -102,3 +102,4 @@ geneate_gcc\address.py unalign_load
 geneate_gcc\address.py unalign_store
 geneate_gcc\address.py unalign_pc
 
+geneate_gcc\syscall.py reversed
