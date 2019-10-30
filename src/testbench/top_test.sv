@@ -61,20 +61,19 @@ module top_test();
     end
 
 
-
-    function automatic string get_test_filename(string target,logic bin);
+    typedef string name_group_t[4];
+    function automatic name_group_t get_filename_names(string target,logic bin);
+        string   subffix = "hextext";
+        name_group_t  names = '{"ktext", "kdata","text", "data"};
+        name_group_t  ret;
         if(bin)
-            return {"asm/temp/", target, ".text.bin"};
-        else
-            return {"asm/temp/", target, ".asm.hextext"};
+            subffix = "bin";
+        foreach(names[i]) begin
+            ret[i] = {"asm/temp/", target, ".",names[i],".bin"};
+        end
+        return ret;
     endfunction
 
-    function automatic string get_data_filename(string target,logic bin);
-        if(bin)
-           return {"asm/temp/", target, ".data.bin"};
-        else
-           return {"asm/temp/", target, ".asm.data.hextext"};
-    endfunction    
 
     function automatic string get_regchk_filename(string target);
         return  {"asm/temp/", target, ".asm.reg.hextext"};
@@ -217,40 +216,40 @@ module top_test();
         end
     endtask
 
-`define LOAD_MEM_FILE(_MEM,_FILENAME)              \
+`define LOAD_MEM_FILE(_MEM,_FILENAME,_DISP)        \
     begin                                          \
         int __HANDLE = $fopen(_FILENAME,"rb");     \
-        int __I = 0;                               \
         int __RES;                                 \
         logic[31:0] __BUF;                         \
-        while(!$feof(__HANDLE)) begin              \
-            __RES = $fread(__BUF,__HANDLE);        \
-            __BUF = {<<8{__BUF}};                  \
-            _MEM[__I >> 2] = __BUF;                \
-            __I += __RES;                          \
-        end                                        \
-        $fclose(__HANDLE);                         \
+        if(__HANDLE) begin                         \
+            __RES = $fread(_MEM,__HANDLE);         \
+            $fclose(__HANDLE);                                \
+            $display("read %x bytes in %s sgement",__RES,_DISP);\
+        end else begin                                        \
+            $display("invalid filename \"%s\"",_FILENAME,);   \
+        end                                                   \
     end
 
     task automatic load_text_data(input check_target_t target);
-        string test_filename =   get_test_filename(target.name,target.bin);
-        string data_filename  =  get_data_filename(target.name,target.bin);
+        string ktext_file_name;
+        string kdata_file_name;
+        string text_file_name;
+        string data_file_name;
+        name_group_t names =  get_filename_names(target.name,target.bin);
+        ktext_file_name  = names[0];
+        kdata_file_name  = names[1];
+        text_file_name   = names[2];
+        data_file_name   = names[3];
         if(~target.bin) begin
-            if(target.kernel) begin
-                $readmemh(test_filename, `kernel_text);
-                $readmemh(data_filename, `kernel_data);
-            end else begin
-                $readmemh(test_filename, `user_text);
-                $readmemh(data_filename, `user_data);
-            end
+            $readmemh(ktext_file_name, `kernel_text);
+            $readmemh(kdata_file_name, `kernel_data);
+            $readmemh(text_file_name, `user_text);
+            $readmemh(data_file_name, `user_data);
         end else begin
-            if(target.kernel) begin
-                 `LOAD_MEM_FILE(`kernel_text, test_filename);
-                 `LOAD_MEM_FILE(`kernel_data, data_filename);
-             end else begin
-                 `LOAD_MEM_FILE(`user_text, test_filename);
-                 `LOAD_MEM_FILE(`user_data, data_filename);
-             end
+            `LOAD_MEM_FILE(`kernel_text, ktext_file_name,"ktext");
+            `LOAD_MEM_FILE(`kernel_data, kdata_file_name,"kdata");
+            `LOAD_MEM_FILE(`user_text,   text_file_name, "text");
+            `LOAD_MEM_FILE(`user_data,   data_file_name, "data");
         end
     endtask
 
@@ -330,11 +329,11 @@ module top_test();
         $display("-------------------------------------------------------------------------------------");
         $display("-------- loading text and data %s...",program_name);
 
-        `LOAD_MEM_FILE(unit_top.unit_memory.unit_ins_rom.im,     {"c/temp/",program_name,".text.bin"});
-        `LOAD_MEM_FILE(unit_top.unit_memory.unit_user_ram.datas, {"c/temp/",program_name,".data.bin"});
+        `LOAD_MEM_FILE(`user_text, {"c/temp/",program_name,".text.bin"}, "user text");
+        `LOAD_MEM_FILE(`user_data, {"c/temp/",program_name,".data.bin"}, "user data");
         /************************** load kernel **********************/
-        `LOAD_MEM_FILE(unit_top.unit_memory.unit_kernel_ins_rom.im, "c/temp/kernel.text.bin");
-        `LOAD_MEM_FILE(unit_top.unit_memory.unit_kernel_ram.datas,  "c/temp/kernel.data.bin");
+        `LOAD_MEM_FILE(`kernel_text, "c/temp/kernel.text.bin", "kernel text");
+        `LOAD_MEM_FILE(`kernel_data, "c/temp/kernel.data.bin", "kernel data");
 
         $display("#################################################################");
         $display("#################################################################");

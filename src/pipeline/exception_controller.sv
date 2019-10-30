@@ -50,6 +50,8 @@ module exception_controller(
         exc_data.load_addr = '0;
         exc_data.badvaddr = 'x;
         exc_data.exc_code = 'x;
+        exc_data.load_ce = '0;
+        exc_data.ce = 'x;
         
      // prevent nullified pipeline signal cause accident exception
         if(ps_execute.fetch) begin            
@@ -92,7 +94,12 @@ module exception_controller(
                     end
                 endcase
             end
-        //if(ps_execute.instruction)
+            if(~in_kernel_mode & unpack.opcode === main_opcode::COP0) begin
+                exc_data.load_ce = '1;
+                exc_data.ce = '0;
+                exc_data.exc_code = EXCCODE_CU;
+                exception_happen = '1;
+            end
         end
         exc_data.exception_happen = exception_happen;
     end

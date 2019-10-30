@@ -10,7 +10,7 @@ class gen:
 
     def gen(self,generate_funct):
         self.__replace = []
-        
+        compiler= "tool\\gcc_compile.py "
         with open(self.asm_filename,"w") as f:
             self.__asm_file = f
             A = lambda code :self.ASM(code)
@@ -18,9 +18,10 @@ class gen:
             E = lambda b: self.EXIT(b)
             self.ASM(".text")
             # callback
-            r = generate_funct(A,C,E)
-
-        compile_cmd = "tool\\gcc_compile.py " + str(self.asm_filename) +" -o temp\\" + self.name
+            compiler = generate_funct(A,C,E)
+        if compiler is "" or compiler is None:
+             compiler= "tool\\gcc_compile.py"
+        compile_cmd = ' '.join([compiler, str(self.asm_filename),"-o","temp\\" + self.name])
         os.system("tool\\set_evn.cmd")
         os.system(compile_cmd)
 
