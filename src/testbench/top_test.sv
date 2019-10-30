@@ -324,7 +324,7 @@ module top_test();
         logic assert_equal_hit = '0;
         logic assert_not_equal_hit = '0;
         logic check_register_file_hit = '0;
-
+    
         $display("");
         $display("");
         $display("-------------------------------------------------------------------------------------");

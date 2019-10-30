@@ -96,7 +96,7 @@ module stage_decode(pipeline_interface.port pif,input forward_info_t forward,inp
         p_out.pc =      reconnect.signal_out.pc;
         p_out.pcadd4 =  reconnect.signal_out.pcadd4;
         p_out.pcadd8 =  reconnect.signal_out.pcadd8;
-
+        p_out.fetch  =  reconnect.signal_out.fetch;
     end
 endmodule
 `endif

@@ -94,6 +94,7 @@ memory_interface.controller data_mif);
     assign pif_memory.signal_in  = pif_execute.signal_out;
     assign pif_write_back.signal_in = pif_memory.signal_out;
     /*** GPR write back ***/
+    assign pif_decode.signal_in.fetch = '1;
     assign pif_decode.signal_in.dest_reg       = pif_write_back.signal_out.dest_reg;
     assign pif_decode.signal_in.dest_reg_data  = pif_write_back.signal_out.dest_reg_data;
     assign pif_decode.signal_in.control.write_reg = pif_write_back.signal_out.control.write_reg;

@@ -95,3 +95,10 @@ geneate_gcc\syscall.py tnei
 
 geneate_gcc\syscall.py ov_add
 geneate_gcc\syscall.py ov_sub
+
+geneate_gcc\syscall.py ov_addi
+
+geneate_gcc\address.py unalign_load
+geneate_gcc\address.py unalign_store
+geneate_gcc\address.py unalign_pc
+

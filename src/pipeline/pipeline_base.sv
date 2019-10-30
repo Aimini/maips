@@ -19,6 +19,7 @@ module pipeline_base (pipeline_interface.port pif, input logic nullify_instructi
             signal_reg.control <=  signals::get_clear_control();
             if(nullify_instruction)
                 signal_reg.instruction <= '0;
+            signal_reg.fetch <= '0;
             // bacause of write status when exception happen
             // must keep cop0 data and write_cop0 signal
             if(pif.keep_exception) begin

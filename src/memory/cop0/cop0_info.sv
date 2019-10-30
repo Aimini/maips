@@ -46,6 +46,7 @@ package cop0_info;
         logic ie;        //0  Required          RW: interrupt enable 0 : disable :enable
     } status_t;
     const logic[4:0] IDX_STATUS_BEV = 22;
+    const logic[4:0] IDX_STATUS_UM =  4;
     const logic[4:0] IDX_STATUS_ERL = 2;
     const logic[4:0] IDX_STATUS_EXL = 1;
     const logic[4:0] IDX_STATUS_IE = 0;
@@ -75,6 +76,8 @@ typedef struct {
     logic in_bd;
     logic[4:0] exc_code;
     logic[31:0] epc;
+    logic load_addr;
+    logic[31:0] badvaddr;
 } cop0_exc_data_t;
 
 

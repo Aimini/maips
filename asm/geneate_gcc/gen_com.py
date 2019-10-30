@@ -305,3 +305,25 @@ def parameter_iter_pass(*args,callback):
 def repeat_function(funct,*args,time = 1):
     for x in range(time):
         yield funct(*args)
+
+
+def random_get_alu():
+    reg = get_random_exclude_reg(k = 3)
+    triple_arg = f"${reg[0]},${reg[1]},${reg[2]}"
+    double_arg = f"${reg[0]},${reg[1]}"
+    single_arg = f"${reg[0]}"
+    statement = [f"addu {triple_arg}",
+    f"subu  {triple_arg}",
+    f"and   {triple_arg}",
+    f"or    {triple_arg}",
+    f"xor   {triple_arg}",
+    f"nor   {triple_arg}",
+    f"slt   {triple_arg}",
+    f"sltu  {triple_arg}",
+    f"mult  {double_arg}",
+    f"multu {double_arg}",
+    f"mfhi  {single_arg}",
+    f"mthi {single_arg}",
+    f"mflo {single_arg}",
+    f"mtlo {single_arg}"]
+    return random.choice(statement)

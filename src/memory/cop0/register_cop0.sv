@@ -62,6 +62,7 @@ module register_cop0(input logic clk,reset,
     const index_t epc_index =      get_index_by_rd_sel(cop0_info::RD_EPC     ,cop0_info::SEL_EPC);
     const index_t errorepc_index = get_index_by_rd_sel(cop0_info::RD_ERROREPC,cop0_info::SEL_ERROREPC);
     const index_t ebase_index    = get_index_by_rd_sel(cop0_info::RD_EBASE   ,cop0_info::SEL_EBASE);
+    const index_t badvaddr_index = get_index_by_rd_sel(cop0_info::RD_BADVADDR,cop0_info::SEL_BADVADDR);
 
     reg_t file[implement_num - 1:0];
 
@@ -96,6 +97,8 @@ module register_cop0(input logic clk,reset,
                 file[epc_index] <= excdata.epc;
                 file[cause_index][cop0_info::IDX_CAUSE_BD] <= excdata.in_bd;
                 file[cause_index][cop0_info::IDX_CAUSE_EXCCODE_E:cop0_info::IDX_CAUSE_EXCCODE_S] <= excdata.exc_code;
+                if(excdata.load_addr)
+                     file[badvaddr_index] <= excdata.badvaddr;
             end
         end
             

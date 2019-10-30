@@ -10,6 +10,7 @@ typedef struct
     signals::control_t control;
     signals::flag_t flag;
     logic[31:0] pc,pcadd4,pcadd8,pcsub4; //fetch
+    logic fetch; // you can use it to determine a valid pipline
     logic[31:0] instruction,rs,rt; //decode
     
     logic[31:0] cop0;               //decode
