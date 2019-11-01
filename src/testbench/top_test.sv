@@ -360,7 +360,7 @@ module top_test();
 
     check_target_t manual_check_target;
     int test = 0;
-    int test_number = 4; // if test_number > 0 ,test last <test_number> case, else test all.
+    int test_number = 1; // if test_number > 0 ,test last <test_number> case, else test all.
     initial begin
         // new_test_by_name("addu");
         if(test === 0) begin    

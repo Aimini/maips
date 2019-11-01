@@ -22,9 +22,10 @@ module exception_controller(
     const logic[4:0] EXCCODE_TR =    5'hD;
 
     logic[31:0] addr_offset;
-    logic[31:0] status;
+    logic[31:0] status,cause;
     logic in_kernel_mode,read_mem,write_mem;
     logic read_error,store_error;
+    logic interrupt_main_enable;
     signals::control_t p_ctl;
     signals::unpack_t unpack;
 
@@ -41,9 +42,13 @@ module exception_controller(
         
         
         // rasing edge
+        interrupt_main_enable = status[cop0_info::IDX_STATUS_IE] 
+         & ~(status[cop0_info::IDX_STATUS_EXL] | status[cop0_info::IDX_STATUS_ERL]);
+
         soft_interrupt = (`GET_STATUS_SOFT_INT(ps_execute) & ~`GET_STATUS_SOFT_INT(ps_memory));
         interrupt_masked =  {hardware_int,soft_interrupt} & status[cop0_info::IDX_STATUS_IM_E:cop0_info::IDX_STATUS_IM_S];
-        any_interrupt =  status[cop0_info::IDX_STATUS_IE] & (|interrupt_masked);
+        interrupt_masked =  {8{interrupt_main_enable}} & interrupt_masked;
+        any_interrupt =  | (interrupt_masked);
         exc_data.ext_int = interrupt_masked[7:2];
         accept_hardware_interrupt = | (exc_data.ext_int);
     end
@@ -67,6 +72,7 @@ module exception_controller(
     assign write_mem = p_ctl.write_mem;
 
     assign status = ps_execute.cop0_excreg.Status;
+    assign cause  = ps_execute.cop0_excreg.Cause;
     assign in_kernel_mode = status[cop0_info::IDX_STATUS_ERL] 
         | status[cop0_info::IDX_STATUS_EXL] | ~status[cop0_info::IDX_STATUS_UM];
 
@@ -151,7 +157,10 @@ module exception_controller(
     end
 
     always_comb begin : exception_address
-        addr_offset = 32'h180;
+        if(exc_data.exc_code === EXCCODE_INT && cause[cop0_info::IDX_CAUSE_IV])
+            addr_offset = 32'h200;
+        else
+            addr_offset = 32'h180;
         if(ps_execute.cop0_excreg.Status[cop0_info::IDX_STATUS_BEV])
             exc_addr = 32'hBFC0_0200 + addr_offset;
         else

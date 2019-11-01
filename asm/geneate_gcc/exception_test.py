@@ -115,7 +115,7 @@ def exception_gen(test_name,current_config):
             inc = f(A)
             return inc
 
-        for x in range(5000):
+        for x in range(2000):
             total += make_exception_count()
             A("""
             la  $a0, exception_count
