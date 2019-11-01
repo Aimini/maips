@@ -51,7 +51,10 @@ package cop0_info;
     const logic[4:0] IDX_STATUS_UM =  4;
     const logic[4:0] IDX_STATUS_ERL = 2;
     const logic[4:0] IDX_STATUS_EXL = 1;
+    localparam logic[4:0] IDX_STATUS_IM_E = 15;
+    localparam logic[4:0] IDX_STATUS_IM_S = 8;
     const logic[4:0] IDX_STATUS_IE = 0;
+    
     typedef struct packed {
         logic[1:0] hi1;         //10    ignore      R
         logic[17:0] base;       //0     Required    RW
@@ -66,7 +69,7 @@ package cop0_info;
 */
 typedef struct {
     // used by ert
-    logic[31:0] EPC,ErrorEPC,Status,EBase;
+    logic[31:0] EPC,ErrorEPC,Status,EBase,Cause;
 } cop0_excreg_t;
 /*
     the data should be used to print
@@ -75,6 +78,7 @@ typedef struct {
     // status will write through the mtc0, so will only care about cause and other
     // if erl is 1,clear erl, else clear exl.
     logic exception_happen;
+    
     logic in_bd;
     logic[4:0] exc_code;
     logic[31:0] epc;
@@ -82,6 +86,8 @@ typedef struct {
     logic[31:0] badvaddr;
     logic load_ce;
     logic [1:0] ce;
+
+    logic [5:0] ext_int;
 } cop0_exc_data_t;
 
 

@@ -22,7 +22,8 @@ module register_cop0(input logic clk,reset,
     input logic [2:0] read_sel,
     output logic[31:0] dout,
     input  cop0_info::cop0_exc_data_t excdata,
-    output cop0_info::cop0_excreg_t excreg);
+    output cop0_info::cop0_excreg_t excreg,
+    output logic count_overflow);
 
     localparam implement_num = 9;
     localparam implement_num_width = $clog2(implement_num);
@@ -63,7 +64,8 @@ module register_cop0(input logic clk,reset,
     const index_t errorepc_index = get_index_by_rd_sel(cop0_info::RD_ERROREPC,cop0_info::SEL_ERROREPC);
     const index_t ebase_index    = get_index_by_rd_sel(cop0_info::RD_EBASE   ,cop0_info::SEL_EBASE);
     const index_t badvaddr_index = get_index_by_rd_sel(cop0_info::RD_BADVADDR,cop0_info::SEL_BADVADDR);
-
+    const index_t count_index    = get_index_by_rd_sel(cop0_info::RD_COUNT   ,cop0_info::SEL_COUNT);
+    const index_t compare_index  = get_index_by_rd_sel(cop0_info::RD_COMPARE ,cop0_info::SEL_COMPARE);
     reg_t file[implement_num - 1:0];
 
      /************** write configuration  **************/
@@ -85,6 +87,7 @@ module register_cop0(input logic clk,reset,
                 file[i] <= configurations[i].initial_value;
             end
         end else begin
+            file[count_index] <= file[count_index] + 1;
             if(we) begin
                 assert (write_index < implement_num )
                 else begin
@@ -97,14 +100,21 @@ module register_cop0(input logic clk,reset,
                 file[epc_index] <= excdata.epc;
                 file[cause_index][cop0_info::IDX_CAUSE_BD] <= excdata.in_bd;
                 file[cause_index][cop0_info::IDX_CAUSE_EXCCODE_E:cop0_info::IDX_CAUSE_EXCCODE_S] <= excdata.exc_code;
+`ifndef COP0_CAUSE_EIP // dcefine of external hardware interrupt.
+`define COP0_CAUSE_EIP file[cause_index][cop0_info::IDX_CAUSE_IP_E: cop0_info::IDX_CAUSE_IP_S + 2]
+`endif
+                `COP0_CAUSE_EIP <= excdata.ext_int  | `COP0_CAUSE_EIP;
+`undef COP0_CAUSE_EIP
                 if(excdata.load_addr)
                      file[badvaddr_index] <= excdata.badvaddr;
+                if(excdata.exception_happen)
+                    file[status_index][cop0_info::IDX_STATUS_EXL] <= '1;
+                
             end
         end
-            
-         
-
     end
+    
+
     /****************************** define of tool function *******************************/
     /*
      get configuration index
@@ -140,6 +150,9 @@ module register_cop0(input logic clk,reset,
             return invalid_config;
         end
     endfunction
+    /****************************** count ***********************************/
+    assign count_overflow = file[count_index] === file[compare_index];
+
 
 /*************************** output exception register ***************************************/
     always_comb begin
@@ -147,6 +160,7 @@ module register_cop0(input logic clk,reset,
         excreg.EPC      = get_value_masked_file(epc_index);
         excreg.Status   = get_value_masked_file(status_index);
         excreg.EBase   =  get_value_masked_file(ebase_index);
+        excreg.Cause   =  get_value_masked_file(cause_index);
     end
 
     /********************* data write process *******************************/
@@ -160,7 +174,7 @@ module register_cop0(input logic clk,reset,
     always_comb begin
         read_index =  get_index_by_rd_sel(read_rd,read_sel);
         read_config = get_config_by_index(read_index);
-        data_read = get_value_masked_file(read_index);
+        data_read =   get_value_masked_file(read_index);
         dout = data_read;
     end 
 endmodule

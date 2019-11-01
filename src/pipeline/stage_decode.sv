@@ -8,7 +8,8 @@
 `include "src/memory/cop0/register_cop0.sv"
 `include "src/pipeline/forward/main_forwarder.sv"
 
-module stage_decode(pipeline_interface.port pif,input forward_info_t forward,input cop0_info::cop0_exc_data_t cop0_excdata);
+module stage_decode(pipeline_interface.port pif,input forward_info_t forward, input bit_replace_info_t replace
+,output logic cop0_count_overflow);
     
     signals::unpack_t unpack;
     signals::control_t ctl;
@@ -19,9 +20,11 @@ module stage_decode(pipeline_interface.port pif,input forward_info_t forward,inp
     logic [4:0] dest_cop0_rd;
     logic [2:0]dest_cop0_sel;
     cop0_info::cop0_excreg_t cop0_excreg;
+    cop0_info::cop0_exc_data_t cop0_excdata;
     logic write_reg,write_cop0;
     pipeline_signal_t p_out;
     
+
 
     pipeline_interface reconnect(.clk(pif.clk),.reset(pif.reset));
 
@@ -44,7 +47,7 @@ module stage_decode(pipeline_interface.port pif,input forward_info_t forward,inp
       //------------------exception control ----------------------
       .excdata(cop0_excdata),
       //---------- output
-      .excreg(cop0_excreg));
+      .excreg(cop0_excreg),.count_overflow(cop0_count_overflow));
 
     always @(posedge pif.clk) begin
        /* $display("decode [opcode:%6b, rs:%2d, rt:%2d, rd:%2d]",unpack.opcode, unpack.rs, unpack.rt, unpack.rd);*/
@@ -76,6 +79,7 @@ module stage_decode(pipeline_interface.port pif,input forward_info_t forward,inp
     assign dest_cop0_rd  =  pif.signal_in.dest_cop0_rd;
     assign dest_cop0_sel =  pif.signal_in.dest_cop0_sel;
     assign dest_cop0_data = pif.signal_in.dest_cop0_data;
+    assign cop0_excdata =   pif.signal_in.cop0_excdata;
     assign write_cop0    =  pif.signal_in.control.write_cop0;
     // assign cop0_excctl   =  pif.signal_in.control.cop0_excctl;
     assign p_out.dest_cop0_sel = unpack.sel;
@@ -86,9 +90,10 @@ module stage_decode(pipeline_interface.port pif,input forward_info_t forward,inp
         p_out.rs = rs_data; p_out.rt = rt_data;
         p_out.hi = hi_reg;  p_out.lo = lo_reg;
         p_out.cop0 = cop0_data;
-        p_out.cop0excreg = cop0_excreg;
+        p_out.cop0_excreg = cop0_excreg;
         /*      DONT. CHANGE. SEQENCE. */
         process_forward_data(p_out, forward);
+        process_bit_replace(p_out,replace);
         //-----------------------------------------------------
         p_out.instruction = reconnect.signal_out.instruction;
         p_out.control = ctl;

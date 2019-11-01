@@ -17,13 +17,15 @@ typedef struct
     logic[31:0] dest_cop0_data;     //memory, write cop0
     logic[4:0]  dest_cop0_rd;     //memory, write cop0
     logic[2:0]  dest_cop0_sel;     //memory, write cop0
-    cop0_info::cop0_excreg_t cop0excreg;
+    cop0_info::cop0_excreg_t cop0_excreg;
 
     logic[31:0] lo,hi;
     logic[31:0] pcjump,pc_branch;
     logic[31:0] alu_out,dest_reg_data; //execute
     logic[31:0] dest_lo_data,dest_hi_data;
     logic[31:0] mem_addr; //execute
+    
+    cop0_info::cop0_exc_data_t cop0_excdata;
 
     logic flag_selected;
     logic[31:0] mem_data;  // memory

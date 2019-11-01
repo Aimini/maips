@@ -18,14 +18,14 @@ cmd = ["mips-mti-elf-g++",
        "-nostartfiles", "-nostdlib",
        "-mno-check-zero-division -O0",
        ' '.join(passed),
-       "-Wl,--gc-sections,-G64,-T,tool\\main.lds",
+       "-Wl,--gc-sections,-G64,-T,tool\\kernel.lds",
        "& mips-mti-elf-objdump -S -D {}".format(outfilename),
        f"> {outfilename}.disa.txt"]
 
 
 
-dump_text = f"mips-mti-elf-objcopy {outfilename} --only-section=.text -O binary {outfilename}.text.bin"
-dump_data = f"mips-mti-elf-objcopy {outfilename} --only-section=.data -O binary {outfilename}.data.bin"
+dump_text = f"mips-mti-elf-objcopy {outfilename} --only-section=.text  --reverse-bytes=4 -O binary {outfilename}.ktext.bin"
+dump_data = f"mips-mti-elf-objcopy {outfilename} --only-section=.data  --reverse-bytes=4 -O binary {outfilename}.kdata.bin"
 print(' '.join(cmd))
 os.system(' '.join(cmd))
 os.system(dump_text)

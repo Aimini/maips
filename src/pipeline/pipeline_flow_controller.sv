@@ -81,10 +81,10 @@ output logic stall_fetch);
         //------------------ execute ERET
         if(ps_execute.control.pc_src === selector::PC_SRC_ERET) begin
             load = '1;
-            if(ps_execute.cop0excreg.Status[cop0_info::IDX_STATUS_ERL] === '1)
-                pc = ps_execute.cop0excreg.ErrorEPC;
+            if(ps_execute.cop0_excreg.Status[cop0_info::IDX_STATUS_ERL] === '1)
+                pc = ps_execute.cop0_excreg.ErrorEPC;
             else
-                pc = ps_execute.cop0excreg.EPC;
+                pc = ps_execute.cop0_excreg.EPC;
                 
             pif_decode.nullify = '1;
             pif_execute.nullify = '1;

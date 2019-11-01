@@ -4,13 +4,14 @@
 `include "src/memory/cop0/cop0_info.sv"
 `include "src/pipeline/pipeline_interface.sv"
 `include "src/pipeline/stage_execute_partial/address_error_checker.sv"
-
 module exception_controller(
  input pipeline_signal_t ps_execute, ps_memory,
  output cop0_info::cop0_exc_data_t exc_data,
+ input logic[5:0] hardware_int,
  output logic[31:0] exc_addr,
- output logic exception_happen);
+ output logic exception_happen, any_interrupt);
     
+    const logic[4:0] EXCCODE_INT  =  5'h0;
     const logic[4:0] EXCCODE_ADEL =  5'h4;
     const logic[4:0] EXCCODE_ADES =  5'h5;
     const logic[4:0] EXCCODE_SYS =   5'h8;
@@ -27,6 +28,24 @@ module exception_controller(
     signals::control_t p_ctl;
     signals::unpack_t unpack;
 
+    /*****************  check interrupt ************************/
+    logic[1:0] soft_interrupt;
+    logic[7:0] interrupt_masked;
+    // 6 interrupt, 2 level synchronizer
+    always_comb begin
+    `ifndef GET_STATUS_SOFT_INT
+    `define GET_STATUS_SOFT_INT(_PS) \
+        (_PS.cop0_excreg.Cause[cop0_info::IDX_CAUSE_IP_S +: 2])
+    `endif
+        // rasing edge
+        soft_interrupt = (~`GET_STATUS_SOFT_INT(ps_execute) & `GET_STATUS_SOFT_INT(ps_memory));
+        exc_data.ext_int = {hardware_int[5:0],soft_interrupt};
+        interrupt_masked = exc_data.ext_int & status[cop0_info::IDX_STATUS_IM_E:cop0_info::IDX_STATUS_IM_S];
+        any_interrupt =  status[cop0_info::IDX_STATUS_IE] & (|interrupt_masked);
+    end
+    `undef GET_STATUS_SOFT_INT
+
+
    /************* generate address exception *******************/
     address_error_checker unit_address_error_checker(
     .read_mode(p_ctl.read_mode),.write_mode(p_ctl.write_mode),
@@ -34,6 +53,8 @@ module exception_controller(
     .in_kernel_mode(in_kernel_mode),.read_mem(read_mem),.write_mem(write_mem),
     //------------ output 
     .read_error(read_error),.store_error(store_error));
+
+
     /*************  extract instruction *******************/
     extract_instruction unit_ei(ps_execute.instruction, unpack);
 
@@ -41,20 +62,25 @@ module exception_controller(
     assign read_mem  = (p_ctl.reg_src === selector::REG_SRC_MEM);
     assign write_mem = p_ctl.write_mem;
 
-    assign status = ps_execute.cop0excreg.Status;
+    assign status = ps_execute.cop0_excreg.Status;
     assign in_kernel_mode = status[cop0_info::IDX_STATUS_ERL] 
         | status[cop0_info::IDX_STATUS_EXL] | ~status[cop0_info::IDX_STATUS_UM];
 
     always_comb begin : generate_exception_code_control
         exception_happen = '0;
+        exc_data.exc_code = 'x;
+
         exc_data.load_addr = '0;
         exc_data.badvaddr = 'x;
-        exc_data.exc_code = 'x;
+
         exc_data.load_ce = '0;
         exc_data.ce = 'x;
         
      // prevent nullified pipeline signal cause accident exception
-        if(ps_execute.fetch) begin            
+        if(any_interrupt) begin
+            exception_happen = '1;
+            exc_data.exc_code = EXCCODE_INT;
+        end if(ps_execute.fetch) begin            
             if(read_error | store_error) begin
                 exception_happen = '1;
                 exc_data.load_addr = '1;
@@ -101,8 +127,9 @@ module exception_controller(
                 exception_happen = '1;
             end
         end
-        exc_data.exception_happen = exception_happen;
+        exc_data.exception_happen = exception_happen;  
     end
+
 
     always_comb begin : generate_target_epc
         exc_data.in_bd = 'x;
@@ -121,10 +148,10 @@ module exception_controller(
 
     always_comb begin : exception_address
         addr_offset = 32'h180;
-        if(ps_execute.cop0excreg.Status[cop0_info::IDX_STATUS_BEV])
+        if(ps_execute.cop0_excreg.Status[cop0_info::IDX_STATUS_BEV])
             exc_addr = 32'hBFC0_0200 + addr_offset;
         else
-            exc_addr = ps_execute.cop0excreg.EBase + addr_offset;
+            exc_addr = ps_execute.cop0_excreg.EBase + addr_offset;
     end
     
 endmodule
