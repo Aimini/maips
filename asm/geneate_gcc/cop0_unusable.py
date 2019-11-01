@@ -61,7 +61,6 @@ initial_bss:
     addiu   $k0,  $k0, 4
     b       initial_bss
 initial_bss_end:
-    li $k0, 0x00000008
     mtc0 $k0,$12 # set StatusBEV to zero(all to zero XD )
 
     la $k0,__user_start # set eret

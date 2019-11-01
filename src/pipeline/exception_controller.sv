@@ -9,7 +9,7 @@ module exception_controller(
  output cop0_info::cop0_exc_data_t exc_data,
  input logic[5:0] hardware_int,
  output logic[31:0] exc_addr,
- output logic exception_happen, any_interrupt);
+ output logic exception_happen, any_interrupt, accept_hardware_interrupt);
     
     const logic[4:0] EXCCODE_INT  =  5'h0;
     const logic[4:0] EXCCODE_ADEL =  5'h4;
@@ -37,11 +37,15 @@ module exception_controller(
     `define GET_STATUS_SOFT_INT(_PS) \
         (_PS.cop0_excreg.Cause[cop0_info::IDX_CAUSE_IP_S +: 2])
     `endif
+        
+        
+        
         // rasing edge
-        soft_interrupt = (~`GET_STATUS_SOFT_INT(ps_execute) & `GET_STATUS_SOFT_INT(ps_memory));
-        exc_data.ext_int = {hardware_int[5:0],soft_interrupt};
-        interrupt_masked = exc_data.ext_int & status[cop0_info::IDX_STATUS_IM_E:cop0_info::IDX_STATUS_IM_S];
+        soft_interrupt = (`GET_STATUS_SOFT_INT(ps_execute) & ~`GET_STATUS_SOFT_INT(ps_memory));
+        interrupt_masked =  {hardware_int,soft_interrupt} & status[cop0_info::IDX_STATUS_IM_E:cop0_info::IDX_STATUS_IM_S];
         any_interrupt =  status[cop0_info::IDX_STATUS_IE] & (|interrupt_masked);
+        exc_data.ext_int = interrupt_masked[7:2];
+        accept_hardware_interrupt = | (exc_data.ext_int);
     end
     `undef GET_STATUS_SOFT_INT
 
@@ -80,7 +84,7 @@ module exception_controller(
         if(any_interrupt) begin
             exception_happen = '1;
             exc_data.exc_code = EXCCODE_INT;
-        end if(ps_execute.fetch) begin            
+        end else if(ps_execute.fetch) begin            
             if(read_error | store_error) begin
                 exception_happen = '1;
                 exc_data.load_addr = '1;

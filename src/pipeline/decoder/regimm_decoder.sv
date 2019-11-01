@@ -22,6 +22,24 @@ module regimm_decoder(input logic[31:0] instruction,output signals::control_t ct
                 end
             end
 
+            regimm::TGEI,regimm::TGEIU,
+            regimm::TLTI,regimm::TLTIU,
+            regimm::TEQI,regimm::TNEI: begin
+                ctl = decoder_util::get_sign_immed_control();
+                ctl.opd_use  = selector::OPERAND_USE_RS;
+                ctl.exc_chk = selector::EXC_CHK_TRAP;
+                case(unpack.rt)
+                    regimm::TGEI: ctl.flag_sel = selector::FLAG_GE;
+                    regimm::TGEIU:ctl.flag_sel = selector::FLAG_GEU;
+                    regimm::TLTI: ctl.flag_sel = selector::FLAG_LT;
+                    regimm::TLTIU:ctl.flag_sel = selector::FLAG_LTU;
+                    regimm::TEQI: ctl.flag_sel = selector::FLAG_EQ;
+                    regimm::TNEI: ctl.flag_sel = selector::FLAG_NE;
+                    default:
+                        ctl.flag_sel = selector::FLAG_NCARE;
+                endcase
+            end
+
             regimm::BGEZ,regimm::BGEZL,regimm::BGEZAL,regimm::BGEZALL: begin
                 ctl.opd_use  = selector::OPERAND_USE_RS;
                 ctl.alu_srcA = selector::ALU_SRCA_RS;

@@ -77,6 +77,8 @@ generate\ins_ext.py ins
 generate\seb_seh.py seb
 generate\seb_seh.py seh
 generate\wsbh.py seh
+
+
 geneate_gcc\syscall.py syscall
 geneate_gcc\syscall.py break
 geneate_gcc\syscall.py tge
@@ -85,22 +87,17 @@ geneate_gcc\syscall.py tlt
 geneate_gcc\syscall.py tltu
 geneate_gcc\syscall.py teq
 geneate_gcc\syscall.py tne
-
 geneate_gcc\syscall.py tgei
 geneate_gcc\syscall.py tgeiu
 geneate_gcc\syscall.py tlti
 geneate_gcc\syscall.py tltiu
 geneate_gcc\syscall.py teqi
 geneate_gcc\syscall.py tnei
-
 geneate_gcc\syscall.py ov_add
 geneate_gcc\syscall.py ov_sub
-
 geneate_gcc\syscall.py ov_addi
-
 geneate_gcc\address.py unalign_load
 geneate_gcc\address.py unalign_store
 geneate_gcc\address.py unalign_pc
-
-geneate_gcc\syscall.py reversed
+geneate_gcc\syscall.py reserved
 geneate_gcc\soft_interrupt.py

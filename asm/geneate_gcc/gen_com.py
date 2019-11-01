@@ -220,12 +220,16 @@ sw  ${arg}, 0(${base}) """.format(base = base_reg,arg = arg_reg,reg = reg,\
 def assert_equal_immed(reg,immed,base_reg = None,arg_reg = None):
     return assert_function_immed(1,reg,immed,base_reg,arg_reg);
 
-def set_gp_and_sp():
-    return """
-    li  $sp,0x10110000
-    li  $gp,0x10090000
-    jr $31
-"""
+def print_int(reg,base_reg = None,arg_reg = None):
+    if base_reg is None or arg_reg is None:
+        base_reg,arg_reg = get_random_exclude_reg(k = 2,exclude=[reg])
+
+    code = """
+lui ${0}, 0xffff
+sw  ${2},   4(${0})
+     {3}
+sw  ${1}, 0(${0}) """.format(base_reg,arg_reg,reg,set_immed(arg_reg, 3))
+    return code
 
 def cutto_signN(val,l):
     mask = 2**l - 1;

@@ -30,7 +30,7 @@ memory_interface.controller data_mif);
     logic stall_fetch;
     logic using_delay_slot;
     
-    logic exception_happen, any_interrupt, accept_interrupt;
+    logic exception_happen, any_interrupt, accept_interrupt, accept_hardware_interrupt;
     logic count_interrupt;
     logic[5:0] hardware_interrupt_input,hardware_interrupt_synced;
     
@@ -41,7 +41,7 @@ memory_interface.controller data_mif);
         were stalled simultaneously; for aync interrupt, it's need to keep the interrupt 
         signal util memory stage came out stall status.
     */
-    assign accept_interrupt = (|hardware_interrupt_synced) & ~(pif_memory.stall | pif_memory.bubble);
+    assign accept_interrupt = accept_hardware_interrupt & ~(pif_memory.stall | pif_memory.bubble);
 
     forward_info_t decode_forward_info,execute_forward_info;
     bit_replace_info_t decode_replace_info,execute_replace_info;
@@ -65,7 +65,8 @@ memory_interface.controller data_mif);
     .ps_execute(pif_execute.signal_out), .ps_memory(pif_memory.signal_out),
     .hardware_int(hardware_interrupt_synced),
     .exc_data(exc_data),.exception_happen(exception_happen),
-    .exc_addr(exc_addr),.any_interrupt(any_interrupt));
+    .exc_addr(exc_addr),.any_interrupt(any_interrupt),
+    .accept_hardware_interrupt(accept_hardware_interrupt));
 
 
     pipeline_flow_controller unit_flow_controller

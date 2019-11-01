@@ -67,30 +67,34 @@ def exception_gen(test_name,current_config):
         b __next
     ###################   exception handler   ###################
     .org 0x180
-         
+        la     $k0, exception_count
+        lw     $k1, 0($k0)
+        addiu  $k1, $k1,1
+        sw     $k1, 0($k0)
+
         mfc0 $k0,$13,0    # get cause
         ext  $k0,$k0,2,5  # get exc code
 
-        mfc0 $k1,$12,0    # get status
-        ext  $k1,$k1,1,1  # get exl
+        lui $k1, 0xffff
+        sw  $k0, 8($k1)
+        lui $k0, 0x0000 # check causeExcCode
+        ori $k0, 0x{exccode:4>0X}
+        sw  $k0, 4($k1)
+        lui $k0, 0x0000 # li $k1, 00000001
+        ori $k0, 0x0001
+        sw  $k0, 0($k1) 
 
-        lui $24,   0x0000 # check causeExcCode
-        ori $24,   0x{exccode:4>0X}
-        lui $2,    0xffff
-        sw  $24,   4($2)
-        sw  $k0,   8($2)
-        lui $24,   0x0000 # li $24, 00000001
-        ori $24,   0x0001
-        sw  $24, 0($2) 
+        mfc0 $k0,$12,0    # get status
+        ext  $k0,$k0,1,1  # get exl
 
-        lui $24,   0x0000 # check statusEXL
-        ori $24,   0x1
-        lui $2,    0xffff
-        sw  $24,   4($2)
-        sw  $k1,   8($2)
-        lui $24,   0x0000 # li $24, 00000001
-        ori $24,   0x0001
-        sw  $24, 0($2) 
+        lui $k1, 0xffff
+        sw  $k0, 4($k1)
+        lui $k0, 0x0000 # check statusEXL
+        ori $k0, 0x1
+        sw  $k0, 8($k1)
+        lui $k0, 0x0000 # li $24, 00000001
+        ori $k0, 0x0001
+        sw  $k0, 0($k1) 
         
         {insert_exception_code}
 
@@ -109,22 +113,27 @@ def exception_gen(test_name,current_config):
 
         def make_exception_count():
             inc = f(A)
-            A( "la     $a0, exception_count")
-            A( "lw     $a1, 0($a0)")
-            A(f"addiu  $a1, $a1,{inc}")
-            A( "sw     $a1, 0($a0)")
             return inc
 
         for x in range(5000):
             total += make_exception_count()
-            A(assert_equal_immed("a1",total))
+            A("""
+            la  $a0, exception_count
+            lw  $a0, 0($a0)
+            """)
+            A(assert_equal_immed("a0",total))
 
 
         for x in range(1000):
             for x in range(get_random_below(20)):
                 A(random_get_alu())
             total += make_exception_count()
-            A(assert_equal_immed("a1",total))
+            A("""
+            la  $a0, exception_count
+            lw  $a0, 0($a0)
+            """)
+            A(assert_equal_immed("a0",total))
+
 
         A(exit_using())
         A(".data")

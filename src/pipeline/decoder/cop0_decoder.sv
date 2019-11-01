@@ -22,6 +22,18 @@ module cop0_decoder(input logic[31:0] instruction,output signals::control_t ctl)
                 decoder_util::write_rt(ctl,selector::REG_SRC_COP0);
             end
 
+            cop0::MFMC0: begin
+                ctl.opd_use  = selector::OPERAND_USE_NONE;
+                
+                if(instruction[5]) begin//EI
+                    ctl.cop0_src =  selector::COP0_SRC_STATUS_EI;
+                end  else begin //DI
+                    ctl.cop0_src =  selector::COP0_SRC_STATUS_DI;
+                end
+                ctl.dest_cop0 = selector::DEST_COP0_STATUS;
+                ctl.write_cop0 = '1;
+                decoder_util::write_rt(ctl,selector::REG_SRC_COP0);
+            end
         
             default:
                 if(cop0::match_c0funct(unpack.rs)) begin

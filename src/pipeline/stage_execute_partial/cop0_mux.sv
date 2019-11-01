@@ -15,7 +15,7 @@ output logic[31:0] y);
                 end else begin
                     status_out[cop0_info::IDX_STATUS_EXL] = '0;
                 end
-            selector::COP0_SRC_STATUS_IE:
+            selector::COP0_SRC_STATUS_EI:
                 status_out[cop0_info::IDX_STATUS_IE] = '1;
             selector::COP0_SRC_STATUS_DI:   
                 status_out[cop0_info::IDX_STATUS_IE] = '0;    

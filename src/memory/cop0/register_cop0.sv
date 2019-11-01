@@ -87,7 +87,11 @@ module register_cop0(input logic clk,reset,
                 file[i] <= configurations[i].initial_value;
             end
         end else begin
-            file[count_index] <= file[count_index] + 1;
+            if(count_overflow)
+                file[count_index] <= '0;
+            else
+                file[count_index] <= file[count_index] + 1;
+
             if(we) begin
                 assert (write_index < implement_num )
                 else begin
@@ -100,17 +104,17 @@ module register_cop0(input logic clk,reset,
                 file[epc_index] <= excdata.epc;
                 file[cause_index][cop0_info::IDX_CAUSE_BD] <= excdata.in_bd;
                 file[cause_index][cop0_info::IDX_CAUSE_EXCCODE_E:cop0_info::IDX_CAUSE_EXCCODE_S] <= excdata.exc_code;
+
+                if(excdata.load_addr)
+                     file[badvaddr_index] <= excdata.badvaddr;
+                if(excdata.exception_happen)
+                    file[status_index][cop0_info::IDX_STATUS_EXL] <= '1;
+            end
 `ifndef COP0_CAUSE_EIP // dcefine of external hardware interrupt.
 `define COP0_CAUSE_EIP file[cause_index][cop0_info::IDX_CAUSE_IP_E: cop0_info::IDX_CAUSE_IP_S + 2]
 `endif
                 `COP0_CAUSE_EIP <= excdata.ext_int  | `COP0_CAUSE_EIP;
 `undef COP0_CAUSE_EIP
-                if(excdata.load_addr)
-                     file[badvaddr_index] <= excdata.badvaddr;
-                if(excdata.exception_happen)
-                    file[status_index][cop0_info::IDX_STATUS_EXL] <= '1;
-                
-            end
         end
     end
     
