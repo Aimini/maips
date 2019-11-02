@@ -1,8 +1,8 @@
-module instruction_mem # (parameter addr_wdith = 10,parameter width = 32)
-(input logic[addr_wdith - 1:0] addr,
-output logic[width - 1:0] dout);
-    logic[width - 1:0] im[2**addr_wdith - 1:0];
-    assign dout = im[addr];
+`include "src/memory/memory_interface.sv"
+module instruction_mem # (parameter  AN = 10,DN = 32)
+(memory_interface.rom mif);
+    logic[DN - 1:0] datas[2**AN - 1:0];
 
-
+    assign mif.dout = datas[mif.addr[AN - 1:0]];
+    assign mif.busy = 0;
 endmodule

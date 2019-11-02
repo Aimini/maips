@@ -31,22 +31,22 @@ module top_test();
 
 `define dbg_ram   unit_top.unit_memory.unit_debug_ram
 `define dbg_data  `dbg_ram.datas
-`define kernel_text unit_top.unit_memory.unit_kernel_ins_rom.im
-`define kernel_data unit_top.unit_memory.unit_kernel_ram.datas
-`define user_text   unit_top.unit_memory.unit_ins_rom.im
-`define user_data   unit_top.unit_memory.unit_user_ram.datas
+`define kernel_text unit_top.unit_memory.unit_kernel_ins_rom.datas
+`define kernel_data unit_top.unit_memory.unit_kernel_ram.    datas
+`define user_text   unit_top.unit_memory.unit_user_ins_rom.  datas
+`define user_data   unit_top.unit_memory.unit_user_ram.      datas
 
 `define dbg_funct `dbg_data[0]
 `define dbg_arg0  `dbg_data[1]
 `define dbg_arg1  `dbg_data[2]
 
 
-    logic[31:0] pc_mem_stage,insruction_fetch_stage;
+    logic[31:0] pc_write_back_stage,insruction_fetch_stage;
     logic[31:0] invalid_instruction_count; 
     // indicate cpu is writing dbg memory.
     logic dbg_loaded;
     
-    assign pc_mem_stage = unit_top.unit_core.unit_memory.pif.signal_out.pc;
+    assign pc_write_back_stage = unit_top.unit_core.unit_write_back.pif.signal_out.pc;
     assign insruction_fetch_stage =  unit_top.unit_core.unit_fetch.instruction;
     always_ff @(posedge clk) begin
         dbg_loaded <= `dbg_ram.mif.write & `dbg_ram.mif.addr === 0;
@@ -82,7 +82,7 @@ module top_test();
 
     /* stop and dump pc */
     function automatic void stop_print_pc();
-        $display("pc:[%8x]",pc_mem_stage);
+        $display("pc:[%8x]",pc_write_back_stage);
         $stop;
     endfunction
 
@@ -362,14 +362,14 @@ module top_test();
     int test = 0;
     int test_number = 1; // if test_number > 0 ,test last <test_number> case, else test all.
     initial begin
-        new_test_by_name("cop0_unusable");
-        // if(test === 0) begin    
-        //     for(int i = test_number > 0 ? all_targets.size() - test_number : 0; i < all_targets.size(); ++i)
-        //         new_test(.target(all_targets[i]));
-        //     $finish;
-        // end else if (test === 1) begin
-        //     new_execution("main");    
-        // end
+        // new_test_by_name("cop0_unusable");
+        if(test === 0) begin    
+            for(int i = test_number > 0 ? all_targets.size() - test_number : 0; i < all_targets.size(); ++i)
+                new_test(.target(all_targets[i]));
+            $finish;
+        end else if (test === 1) begin
+            new_execution("main");    
+        end
 
         manual_check_target = '{"", 1'b0,  1'b0,  1'b0,  1'b0,  1'b0,  1'b0};
         // for(int i = manual_target_name.size() - 1; i < manual_target_name.size(); ++i) begin

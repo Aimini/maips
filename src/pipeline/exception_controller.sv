@@ -68,7 +68,7 @@ module exception_controller(
     extract_instruction unit_ei(ps_execute.instruction, unpack);
 
     assign p_ctl = ps_execute.control;
-    assign read_mem  = (p_ctl.reg_src === selector::REG_SRC_MEM);
+    assign read_mem  = p_ctl.read_mem;
     assign write_mem = p_ctl.write_mem;
 
     assign status = ps_execute.cop0_excreg.Status;

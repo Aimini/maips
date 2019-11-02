@@ -7,7 +7,6 @@ module stage_fetch(
     logic[31:0] pc_reg;
 
     
-    
     always_ff @(posedge clk)
         if(reset)
             pc_reg <= 32'h8000_0000;//32'h8000_0000;
@@ -18,6 +17,8 @@ module stage_fetch(
     
     always_comb begin
         mif.addr = pc_reg;
+        mif.read = '1;
+
         instruction =  mif.dout;
         pc = pc_reg;
         pc_add4 = pc_reg + 4;

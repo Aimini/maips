@@ -54,12 +54,14 @@ module stage_memory(pipeline_interface.port pif,
         write_mem   = pif.signal_out.control.write_mem;
         read_mode   = pif.signal_out.control.read_mode;
         write_mode  = pif.signal_out.control.write_mode;
+        mem_addr    = pif.signal_out.mem_addr;
 
-        mem_addr = pif.signal_out.mem_addr;
         mif.addr = pif.signal_out.mem_addr;
         mif.din  = mem_data_in;
         mif.write  =  write_mem & ~(prev_stall);
         mif.mask = byte_mask;
+        mif.read = pif.signal_out.control.read_mem;
+
         mem_data_out = mif.dout;
     end
 endmodule

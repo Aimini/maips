@@ -101,6 +101,7 @@ module main_decoder(input logic[31:0] instruction,output signals::control_t ctl)
             main_opcode::LWR,main_opcode::LWL: begin
                 ctl = decoder_util::get_mem_addr_control();
                 ctl.opd_use = selector::OPERAND_USE_RS;
+                ctl.read_mem = '1;
                 case(unpack.opcode)
                     main_opcode::LB: ctl.read_mode = selector::MEM_READ_BYTE;
                     main_opcode::LH: ctl.read_mode = selector::MEM_READ_HALF;
@@ -131,10 +132,15 @@ module main_decoder(input logic[31:0] instruction,output signals::control_t ctl)
             main_opcode::LL: begin
                 ctl = decoder_util::get_mem_addr_control();
                 ctl.opd_use = selector::OPERAND_USE_RS;
-                ctl.read_mode = selector::MEM_READ_WORD;
+                // 1. write llbit,default is write 1
                 ctl.write_llbit = '1;
+                
+                // 2. read memory to gpr
+                ctl.read_mode = selector::MEM_READ_WORD;
+                ctl.read_mem = '1;
                 decoder_util::write_rt(ctl, selector::REG_SRC_MEM);
-
+                
+                // 3. save lladdr
                 ctl.write_cop0 = '1;
                 ctl.cop0_src = selector::COP0_SRC_LLADDR;
                 ctl.dest_cop0 = selector::DEST_COP0_LLADDR;
