@@ -19,7 +19,7 @@
 */
 module cop0_writer(input selector::cop0_source src,
 input logic[4:0] rd,input logic[2:0] sel,
-input logic[31:0] status, rt,
+input logic[31:0] status, rt, mem_addr,
 output logic[31:0] y);
     logic[31:0] rt_out;
     cop0_write_filter unit_cop0_write_filter(
@@ -27,6 +27,6 @@ output logic[31:0] y);
     .din(rt),.dout(rt_out));
 
     cop0_mux unit_cop0_mux(.src(src),
-        .status(status),.rt(rt_out),.y(y));
+        .status(status),.rt(rt_out),.mem_addr(mem_addr),.y(y));
 endmodule
 `endif

@@ -77,7 +77,6 @@ DEST_COP0_NCARE } destnation_cop0;
 
 typedef enum {
     REG_WRITE_WHEN_FLAG,
-    REG_WRITE_WHEN_LLBIT,
     REG_WRITE_ALWAYS
 } write_register_condition;
 
@@ -109,6 +108,9 @@ typedef enum  {
     MEM_WRITE_WORD, MEM_WRITE_SWL,
     MEM_WRITE_SWR , MEM_WRITE_NCARE} mem_write_type;
 
+typedef enum  {
+    MEM_WRITE_ALWAYS, MEM_WRITE_WHEN_LLBIT,
+    MEM_WRITE_KEEP} mem_write_condition;
 //to avoid unnecessary stall, you must announce which
 // operand you are using.
 typedef enum {

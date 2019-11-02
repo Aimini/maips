@@ -95,7 +95,8 @@
         '{"reserved",     1'b1,  1'b0,  1'b0,  1'b0, 1'b1, 1'b1},
         '{"cop0_unusable",1'b1,  1'b0,  1'b0,  1'b0, 1'b1, 1'b1},
         '{"soft_interrupt",1'b1,  1'b0,  1'b0,  1'b0, 1'b1, 1'b1},
-        '{"di_ei",         1'b1,  1'b0,  1'b0,  1'b0, 1'b1, 1'b1}
+        '{"di_ei",         1'b1,  1'b0,  1'b0,  1'b0, 1'b1, 1'b1},
+        '{"ll_sc",         1'b1,  1'b0,  1'b0,  1'b0, 1'b1, 1'b1}
       };
 
     string manual_target_name[] = {

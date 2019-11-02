@@ -31,7 +31,6 @@ output logic wait_result); //forward
 
     logic[31:0] dest_reg_data,alu_out,special3_out;
     logic flag_selected;
-    logic write_reg_selected;
 
     logic[4:0] dest_reg;
     pipeline_signal_t p_out;
@@ -46,7 +45,7 @@ output logic wait_result); //forward
     /************************* cop0 write filter **********************/
     cop0_writer unit_cop0_writer(.src(p_ctl.cop0_src),
     .rd(p_out.dest_cop0_rd),.sel(p_out.dest_cop0_sel),
-    .rt(p_out.rt) ,.status(p_out.cop0_excreg.Status),
+    .rt(p_out.rt) ,.status(p_out.cop0_excreg.Status),.mem_addr(p_out.mem_addr),
     .y(dest_cop0_data));
 
 
@@ -97,7 +96,7 @@ output logic wait_result); //forward
             .lo(p_out.lo),       .cop0(p_out.cop0),
         .mul_div_lo(lo_out_mul_div),
         .special3(special3_out),
-        .flag(flag_selected),.llbit(llbit),
+        .flag(flag_selected),.llbit(p_out.llbit),
 
         //----------- output 
         .data(dest_reg_data));
@@ -132,7 +131,7 @@ output logic wait_result); //forward
 
         pif.signal_out.pc_branch  = p_out.pcadd4 + (sign_immed << 2);
         pif.signal_out.mem_addr   = p_out.rs     + sign_immed;
-        pif.signal_out.control.write_reg  = write_reg_selected;
+
 
         case(pif.signal_out.control.hilo_src)
             selector::HILO_SRC_RS: begin
@@ -148,37 +147,66 @@ output logic wait_result); //forward
                 pif.signal_out.dest_lo_data = 'x;
             end
         endcase
+  
+        set_write_reg(
+            .write_reg    (pif.signal_out.control.write_reg),
+            .flag_selected(flag_selected),
+            .cond         (pif.signal_out.control.write_cond));
 
-        case(pif.signal_out.control.dest_cop0)
-            selector::DEST_COP0_RDSEL: begin
-                pif.signal_out.dest_cop0_rd  = reconnect.signal_out.dest_cop0_rd;
-                pif.signal_out.dest_cop0_sel =  reconnect.signal_out.dest_cop0_sel;
-            end
-            selector::DEST_COP0_STATUS:  begin
-                pif.signal_out.dest_cop0_rd  =  cop0_info::RD_STATUS;
-                pif.signal_out.dest_cop0_sel =  cop0_info::SEL_STATUS;
-            end
-            selector::DEST_COP0_LLADDR:  begin
-                pif.signal_out.dest_hi_data = cop0_info:: RD_LLADDR;
-                pif.signal_out.dest_lo_data = cop0_info::SEL_LLADDR;
-            end
-            default: begin
-                pif.signal_out.dest_cop0_rd =  'x;
-                pif.signal_out.dest_cop0_sel = 'x;
-            end
-        endcase
+        set_rd_sel(
+            .rd  (pif.signal_out.dest_cop0_rd),
+            .sel (pif.signal_out.dest_cop0_sel),
+            .dest(pif.signal_out.control.dest_cop0));
+
+        set_write_mem( 
+            .write_mem(pif.signal_out.control.write_mem),
+            .llbit    (pif.signal_out.llbit),
+            .cond     (pif.signal_out.control.mem_write_cond));
     end
-    
-    /** write signal select**/
-    always_comb begin
-        case(p_out.control.write_cond)
-            selector::REG_WRITE_WHEN_FLAG:  write_reg_selected = flag_selected;
-            selector::REG_WRITE_WHEN_LLBIT: write_reg_selected = llbit;
-            selector::REG_WRITE_ALWAYS: write_reg_selected = reconnect.signal_out.control.write_reg;
-            default:
-                write_reg_selected = 'x;
+
+
+    function automatic void set_rd_sel(ref logic[4:0] rd, ref logic[2:0] sel,input selector::destnation_cop0 dest);
+    `ifndef _SE_SET_RD_SEL
+    `define _SE_SET_RD_SEL(_RD, _SEL) \
+        begin                     \
+            rd  = _RD;            \
+            sel = _SEL;           \
+        end   
+    `endif
+
+    case(pif.signal_out.control.dest_cop0)
+        selector::DEST_COP0_RDSEL: ;
+        selector::DEST_COP0_STATUS:`_SE_SET_RD_SEL(cop0_info::RD_STATUS,cop0_info::SEL_STATUS)
+        selector::DEST_COP0_LLADDR:`_SE_SET_RD_SEL(cop0_info::RD_LLADDR,cop0_info::SEL_LLADDR)
+        default:                   `_SE_SET_RD_SEL('x,'x)
+    endcase
+    `undef _SE_SET_RD_SEL
+    endfunction
+
+    function automatic void set_write_mem(ref logic write_mem, input logic llbit,input selector::mem_write_condition cond);
+    `ifndef _SE_SET_WRITE_MEM
+    `define _SE_SET_WRITE_MEM(_C,_R)  \
+        selector:: _C : begin         \
+            write_mem = _R;           \
+        end   
+    `endif
+
+    case(cond)
+        `_SE_SET_WRITE_MEM(MEM_WRITE_ALWAYS,        '1)
+        `_SE_SET_WRITE_MEM(MEM_WRITE_WHEN_LLBIT, llbit)
+        `_SE_SET_WRITE_MEM(MEM_WRITE_KEEP,          '0)
+        default: write_mem  = '0;
+    endcase
+    `undef _SE_SET_WRITE_MEM
+    endfunction
+
+    function automatic void set_write_reg(ref logic write_reg, input logic flag_selected, input selector::write_register_condition cond);
+        case(cond)
+            selector::REG_WRITE_WHEN_FLAG: write_reg = flag_selected;
+            selector::REG_WRITE_ALWAYS:;
+            default: write_reg  = 'x;
         endcase
-    end
+    endfunction
     
     assign p_out = pif.signal_out;
     assign p_ctl = p_out.control;

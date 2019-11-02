@@ -12,7 +12,7 @@ typedef struct{
 
 
 typedef struct {
-    fowrad_element_t rs,rt,lo,hi,cop0;
+    fowrad_element_t rs,rt,lo,hi,cop0,llbit; //llbit using 1bit only
 
     fowrad_element_t EPC,ErrorEPC,Status,EBase,Cause;
 
@@ -34,12 +34,12 @@ function automatic void process_forward_data(
 `define PROC_GPR(name)  ps.name = forward_info.name.f ? forward_info.name.data : ps.name;
         `PROC_GPR(rs)
         `PROC_GPR(rt)
+        `PROC_GPR(hi)
+        `PROC_GPR(lo)
+        `PROC_GPR(cop0)
 `undef PROC_GPR
 `endif
-
-        ps.hi = forward_info.hi.f   ? forward_info.hi.data   : ps.hi;
-        ps.lo = forward_info.lo.f   ? forward_info.lo.data   : ps.lo;
-        ps.cop0 = forward_info.cop0.f  ? forward_info.cop0.data :  ps.cop0;
+        ps.llbit = forward_info.llbit.f  ? forward_info.llbit.data[0] :  ps.llbit;
 
 `ifndef PROC_EXEREG
 `define PROC_EXEREG(name)  ps.cop0_excreg.name = forward_info.name.f ? forward_info.name.data : ps.cop0_excreg.name;
@@ -174,6 +174,14 @@ execute_replace_info);
 
             execute_forward_info.Cause = test_cp0(ps_memory,cop0_info::RD_CAUSE,cop0_info::SEL_CAUSE);
             decode_forward_info.Cause  = test_cp0(ps_memory,cop0_info::RD_CAUSE,cop0_info::SEL_CAUSE);
+        end
+
+        /******* llbit **********/
+        if(ps_memory.control.write_llbit) begin
+            execute_forward_info.llbit.f = '1;
+            execute_forward_info.llbit.data[0] = ps_memory.dest_llbit_data;
+            decode_forward_info .llbit.f = '1;
+            decode_forward_info .llbit.data[0] = ps_memory.dest_llbit_data;
         end
     end
 

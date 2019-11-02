@@ -12,13 +12,15 @@ typedef struct
     logic[31:0] pc,pcadd4,pcadd8,pcsub4; //fetch
     logic fetch; // you can use it to determine a valid pipline
     logic[31:0] instruction,rs,rt; //decode
+    logic llbit;
     
     logic[31:0] cop0;               //decode
     logic[31:0] dest_cop0_data;     //memory, write cop0
     logic[4:0]  dest_cop0_rd;     //memory, write cop0
     logic[2:0]  dest_cop0_sel;     //memory, write cop0
+    logic dest_llbit_data;
     cop0_info::cop0_excreg_t cop0_excreg;
-
+    
     logic[31:0] lo,hi;
     logic[31:0] pcjump,pc_branch;
     logic[31:0] alu_out,dest_reg_data; //execute

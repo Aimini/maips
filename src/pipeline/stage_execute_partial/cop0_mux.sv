@@ -2,11 +2,11 @@
 `define __COP0_MUX__
 
 module cop0_mux(input selector::cop0_source src,
-input logic[31:0] status,rt,
+input logic[31:0] status,rt,mem_addr,
 output logic[31:0] y);
     logic[31:0] status_out;
 
-    always_comb begin : cop0_select
+    always_comb begin : set_status
         status_out = status;
         case(src)
             selector::COP0_SRC_STATUS_ERET:
@@ -23,7 +23,17 @@ output logic[31:0] y);
                 status_out[cop0_info::IDX_STATUS_EXL] <= '1;
         endcase
     end
-    assign y = src ===  selector::COP0_SRC_RT ? rt : status_out;
+
+    always_comb begin : cop0_select
+        case(src)
+            selector::COP0_SRC_RT:
+                y = rt;
+            selector::COP0_SRC_LLADDR:
+                y = mem_addr;
+            default:
+                y = status_out;
+        endcase
+    end
 endmodule
 
 `endif

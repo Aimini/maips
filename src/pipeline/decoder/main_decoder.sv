@@ -117,7 +117,7 @@ module main_decoder(input logic[31:0] instruction,output signals::control_t ctl)
             main_opcode::SB, main_opcode::SH, main_opcode::SW,
             main_opcode::SWR, main_opcode::SWL: begin
                 ctl = decoder_util::get_mem_addr_control();
-                ctl.write_mem = '1;
+                ctl.mem_write_cond = selector::MEM_WRITE_ALWAYS;
                 case(unpack.opcode)
                     main_opcode::SB: ctl.write_mode = selector::MEM_WRITE_BYTE;
                     main_opcode::SH: ctl.write_mode = selector::MEM_WRITE_HALF;
@@ -126,6 +126,25 @@ module main_decoder(input logic[31:0] instruction,output signals::control_t ctl)
                     main_opcode::SWL: ctl.write_mode = selector::MEM_WRITE_SWL;
                     default: ctl.write_mode = selector::MEM_WRITE_NCARE;
                 endcase
+            end
+
+            main_opcode::LL: begin
+                ctl = decoder_util::get_mem_addr_control();
+                ctl.opd_use = selector::OPERAND_USE_RS;
+                ctl.read_mode = selector::MEM_READ_WORD;
+                ctl.write_llbit = '1;
+                decoder_util::write_rt(ctl, selector::REG_SRC_MEM);
+
+                ctl.write_cop0 = '1;
+                ctl.cop0_src = selector::COP0_SRC_LLADDR;
+                ctl.dest_cop0 = selector::DEST_COP0_LLADDR;
+            end
+
+            main_opcode::SC: begin
+                ctl = decoder_util::get_mem_addr_control();
+                ctl.write_mode = selector::MEM_WRITE_WORD;
+                ctl.mem_write_cond = selector::MEM_WRITE_WHEN_LLBIT;
+                decoder_util::write_rt(ctl, selector::REG_SRC_LLBIT);
             end
 
             main_opcode::LUI: begin

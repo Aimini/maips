@@ -40,7 +40,11 @@ module stage_memory(pipeline_interface.port pif,
     end
 
     always_comb begin
-        pif.signal_out = reconnect.signal_out;
+        pif.signal_out = reconnect.signal_out;        
+        if(pif.signal_out.cop0_excdata.exception_happen) begin
+            pif.signal_out.dest_llbit_data = '0;
+            pif.signal_out.control.write_llbit = '1;
+        end
         pif.signal_out.mem_data = processed_data;
     end
 

@@ -18,7 +18,7 @@ cmd = ["mips-mti-elf-g++",
        "-nostartfiles", "-nostdlib",
        "-mno-check-zero-division -O0",
        ' '.join(passed),
-       "-Wl,--gc-sections,-G64,-T,tool\\kernel.lds",
+       "-Wl,-G64,-T,tool\\kernel.lds",
        "& mips-mti-elf-objdump -S -D {}".format(outfilename),
        f"> {outfilename}.disa.txt"]
 

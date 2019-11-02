@@ -13,6 +13,7 @@ typedef struct{
     selector::flag_select flag_sel;
     selector::register_source reg_src;
 
+    selector::mem_write_condition mem_write_cond;
     selector::mem_read_type read_mode;
     selector::mem_write_type write_mode;
 
@@ -28,18 +29,20 @@ typedef struct{
     logic write_reg;
     logic write_mem;
     logic write_hi,write_lo;
-    
+    logic write_llbit;
 } control_t;
 
 function automatic control_t nullify_control(input control_t ctl);
     ctl.pc_src  = selector::PC_SRC_NEXT;
     ctl.exc_chk = selector::EXC_CHK_NONE;
     ctl.write_cond =selector::REG_WRITE_ALWAYS;
+    ctl.mem_write_cond = selector::MEM_WRITE_KEEP;
     ctl.write_cop0 =  '0;
     ctl.write_mem = '0;
     ctl.write_reg = '0;
     ctl.write_hi = '0;
     ctl.write_lo = '0;
+    ctl.write_llbit = '0;
     return ctl;
 endfunction
 
@@ -49,9 +52,9 @@ function automatic control_t get_clear_control();
         selector::ALU_NCARE,        selector::ALU_SRCA_NCARE,   selector::ALU_SRCB_NCARE,
         selector::ALU_SRCSA_NCARE,  selector::MULDIV_NCARE,     selector::HILO_SRC_NCARE,
         selector::DEST_REG_NCARE,   selector::PC_SRC_NEXT,      selector::FLAG_NCARE,
-        selector::REG_SRC_NCARE,    selector::MEM_READ_NCARE,   selector::MEM_WRITE_NCARE,
+        selector::REG_SRC_NCARE,    selector::MEM_WRITE_KEEP,   selector::MEM_READ_NCARE,   selector::MEM_WRITE_NCARE,
         selector::OPERAND_USE_NONE, selector::REG_WRITE_ALWAYS, selector::EXC_CHK_NONE,
         selector::COP0_SRC_NCARE,   selector::DEST_COP0_NCARE,
-        1'b0, 1'b0, 1'b0, 1'b0, 1'b0
+        1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0
     };
 endfunction

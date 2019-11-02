@@ -101,3 +101,5 @@ geneate_gcc\address.py unalign_store
 geneate_gcc\address.py unalign_pc
 geneate_gcc\syscall.py reserved
 geneate_gcc\soft_interrupt.py
+geneate_gcc\di_ei.py
+geneate_gcc\ll_sc.py
