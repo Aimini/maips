@@ -10,14 +10,6 @@ module top_test();
 
     top unit_top(clk,reset);
 
-
-    typedef struct {
-        string name;
-        logic assert_equal, assert_not_equal, check_register_file;
-        logic sw_dbg_target;
-        logic bin, kernel;
-    } check_target_t;
-
     // string j_too_large = "j";
     // string jal_too_large = "jal"; // don't test j and jal if unnecessary, it'test file too large
     `include "src/testbench/top_test/test_target.sv"
@@ -41,17 +33,17 @@ module top_test();
 `define dbg_arg1  `dbg_data[2]
 
 
-    logic[31:0] pc_write_back_stage,insruction_fetch_stage;
+    logic[31:0] pc_write_back_stage,instruction_fetch_stage;
     logic[31:0] invalid_instruction_count; 
     // indicate cpu is writing dbg memory.
     logic dbg_loaded;
     
     assign pc_write_back_stage = unit_top.unit_core.unit_write_back.pif.signal_out.pc;
-    assign insruction_fetch_stage =  unit_top.unit_core.unit_fetch.instruction;
+    assign instruction_fetch_stage =  unit_top.unit_core.unit_fetch.instruction;
     always_ff @(posedge clk) begin
         dbg_loaded <= `dbg_ram.mif.write & `dbg_ram.mif.addr === 0;
 
-        if(insruction_fetch_stage === 'x) begin
+        if(instruction_fetch_stage === 'x) begin
             invalid_instruction_count <= invalid_instruction_count + 1;
             if(invalid_instruction_count === 5)
                 stop_print_pc();
@@ -62,21 +54,21 @@ module top_test();
 
 
     typedef string name_group_t[4];
-    function automatic name_group_t get_filename_names(string target,logic bin);
+    function automatic name_group_t get_filename_names(string target,logic kernel);
         string   subffix = "hextext";
         name_group_t  names = '{"ktext", "kdata","text", "data"};
         name_group_t  ret;
-        if(bin)
-            subffix = "bin";
         foreach(names[i]) begin
             ret[i] = {"asm/temp/", target, ".",names[i],".bin"};
         end
+        if(!kernel)
+            ret[0] = {"asm/tool/simple_kernel.ktext.bin"};
         return ret;
     endfunction
 
 
     function automatic string get_regchk_filename(string target);
-        return  {"asm/temp/", target, ".asm.reg.hextext"};
+        return  {"asm/temp/", target, ".reg.hextext"};
     endfunction
 
 
@@ -215,6 +207,24 @@ module top_test();
             endcase
         end
     endtask
+`define LOAD_ADDR_MEM_FILE(_MEM,_FILENAME,_DISP,_OFFSET)     \
+    begin                                                    \
+        int __HANDLE = $fopen(_FILENAME,"rb");               \
+        int __RES = 0;                                       \
+        int __I = 0;                                         \
+        logic[31:0] __ADDR,__BUF;                            \
+        if(__HANDLE) begin                                   \
+            while(!$feof(__HANDLE)) begin                    \
+                __RES = $fread(__ADDR,__HANDLE);             \
+                __RES = $fread(__BUF,__HANDLE);              \
+                __I += __RES;                                \
+                _MEM[(__ADDR - _OFFSET) >> 2] = __BUF;       \
+            end                                              \
+        $fclose(__HANDLE);                                   \
+        $display("read %x bytes in %s sgement",__I,_DISP);   \
+        end                                                  \
+    end
+
 
 `define LOAD_MEM_FILE(_MEM,_FILENAME,_DISP)        \
     begin                                          \
@@ -225,9 +235,7 @@ module top_test();
             __RES = $fread(_MEM,__HANDLE);         \
             $fclose(__HANDLE);                                \
             $display("read %x bytes in %s sgement",__RES,_DISP);\
-        end else begin                                        \
-            $display("invalid filename \"%s\"",_FILENAME,);   \
-        end                                                   \
+        end                                                    \
     end
 
     task automatic load_text_data(input check_target_t target);
@@ -235,16 +243,22 @@ module top_test();
         string kdata_file_name;
         string text_file_name;
         string data_file_name;
-        name_group_t names =  get_filename_names(target.name,target.bin);
+        name_group_t names =  get_filename_names(target.name,target.kernel);
         ktext_file_name  = names[0];
         kdata_file_name  = names[1];
         text_file_name   = names[2];
         data_file_name   = names[3];
-        if(~target.bin) begin
-            $readmemh(ktext_file_name, `kernel_text);
-            $readmemh(kdata_file_name, `kernel_data);
-            $readmemh(text_file_name, `user_text);
-            $readmemh(data_file_name, `user_data);
+        if(target.addrbin) begin
+            if(target.kernel) begin
+                `LOAD_ADDR_MEM_FILE(`kernel_text,ktext_file_name,"ktext",32'h80000000);
+            end else begin
+                // using simple kernel
+                `LOAD_MEM_FILE(`kernel_text, ktext_file_name,"ktext");
+            end
+                
+            `LOAD_ADDR_MEM_FILE(`kernel_data,kdata_file_name,"kdata",32'h90000000);
+            `LOAD_ADDR_MEM_FILE(`user_text , text_file_name, "text", 32'h00400000);
+            `LOAD_ADDR_MEM_FILE(`user_data,  data_file_name, "data", 32'h10010000);
         end else begin
             `LOAD_MEM_FILE(`kernel_text, ktext_file_name,"ktext");
             `LOAD_MEM_FILE(`kernel_data, kdata_file_name,"kdata");
@@ -362,14 +376,14 @@ module top_test();
     int test = 0;
     int test_number = 1; // if test_number > 0 ,test last <test_number> case, else test all.
     initial begin
-        // new_test_by_name("cop0_unusable");
-        if(test === 0) begin    
-            for(int i = test_number > 0 ? all_targets.size() - test_number : 0; i < all_targets.size(); ++i)
-                new_test(.target(all_targets[i]));
-            $finish;
-        end else if (test === 1) begin
-            new_execution("main");    
-        end
+        new_test_by_name("j");
+        // if(test === 0) begin    
+        //     for(int i = test_number > 0 ? all_targets.size() - test_number : 0; i < all_targets.size(); ++i)
+        //         new_test(.target(all_targets[i]));
+        //     $finish;
+        // end else if (test === 1) begin
+        //     new_execution("main");    
+        // end
 
         manual_check_target = '{"", 1'b0,  1'b0,  1'b0,  1'b0,  1'b0,  1'b0};
         // for(int i = manual_target_name.size() - 1; i < manual_target_name.size(); ++i) begin

@@ -1,4 +1,9 @@
-
+    typedef struct {
+        string name;
+        logic assert_equal, assert_not_equal, check_register_file;
+        logic sw_dbg_target;
+        logic addrbin, kernel;
+    } check_target_t;
     check_target_t all_targets[] = 
     '{ 
         '{"sw_dbg",     1'b0,  1'b0,  1'b0,  1'b1, 1'b0, 1'b0},
@@ -9,6 +14,8 @@
         '{"sll_1",      1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
         '{"sll_2",      1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
         '{"addu",       1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        '{"j",          1'b0,  1'b0,  1'b1,  1'b0, 1'b1, 1'b0},
+        '{"jal",        1'b0,  1'b0,  1'b1,  1'b0, 1'b1, 1'b0},
         '{"addiu",      1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
         '{"beq",        1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
         '{"bne",        1'b0,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
@@ -72,32 +79,32 @@
         '{"wsbh",       1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
         '{"mfc0_mtc0",  1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
         // --------------------- exception ---------------------
-        '{"syscall",    1'b1,  1'b0,  1'b0,  1'b0, 1'b1, 1'b1},
-        '{"tge",        1'b1,  1'b0,  1'b0,  1'b0, 1'b1, 1'b1},
-        '{"tgeu",       1'b1,  1'b0,  1'b0,  1'b0, 1'b1, 1'b1},
-        '{"tlt",        1'b1,  1'b0,  1'b0,  1'b0, 1'b1, 1'b1},
-        '{"tltu",       1'b1,  1'b0,  1'b0,  1'b0, 1'b1, 1'b1},
-        '{"teq",        1'b1,  1'b0,  1'b0,  1'b0, 1'b1, 1'b1},
-        '{"tne",        1'b1,  1'b0,  1'b0,  1'b0, 1'b1, 1'b1},
+        '{"syscall",    1'b1,  1'b0,  1'b0,  1'b0, 1'b0, 1'b1},
+        '{"tge",        1'b1,  1'b0,  1'b0,  1'b0, 1'b0, 1'b1},
+        '{"tgeu",       1'b1,  1'b0,  1'b0,  1'b0, 1'b0, 1'b1},
+        '{"tlt",        1'b1,  1'b0,  1'b0,  1'b0, 1'b0, 1'b1},
+        '{"tltu",       1'b1,  1'b0,  1'b0,  1'b0, 1'b0, 1'b1},
+        '{"teq",        1'b1,  1'b0,  1'b0,  1'b0, 1'b0, 1'b1},
+        '{"tne",        1'b1,  1'b0,  1'b0,  1'b0, 1'b0, 1'b1},
         
-        '{"tgei",        1'b1,  1'b0,  1'b0,  1'b0, 1'b1, 1'b1},
-        '{"tgeiu",       1'b1,  1'b0,  1'b0,  1'b0, 1'b1, 1'b1},
-        '{"tlti",        1'b1,  1'b0,  1'b0,  1'b0, 1'b1, 1'b1},
-        '{"tltiu",       1'b1,  1'b0,  1'b0,  1'b0, 1'b1, 1'b1},
-        '{"teqi",        1'b1,  1'b0,  1'b0,  1'b0, 1'b1, 1'b1},
-        '{"tnei",        1'b1,  1'b0,  1'b0,  1'b0, 1'b1, 1'b1},
-        '{"ov_add",      1'b1,  1'b0,  1'b0,  1'b0, 1'b1, 1'b1},
-        '{"ov_sub",      1'b1,  1'b0,  1'b0,  1'b0, 1'b1, 1'b1},
-        '{"ov_addi",     1'b1,  1'b0,  1'b0,  1'b0, 1'b1, 1'b1},
-        '{"unalign_load",1'b1,  1'b0,  1'b0,  1'b0, 1'b1, 1'b1},
-        '{"unalign_store",1'b1,  1'b0,  1'b0,  1'b0, 1'b1, 1'b1},
-        '{"unalign_pc",   1'b1,  1'b0,  1'b0,  1'b0, 1'b1, 1'b1},
-        '{"reserved",     1'b1,  1'b0,  1'b0,  1'b0, 1'b1, 1'b1},
-        '{"cop0_unusable",1'b1,  1'b0,  1'b0,  1'b0, 1'b1, 1'b1},
-        '{"soft_interrupt",1'b1,  1'b0,  1'b0,  1'b0, 1'b1, 1'b1},
-        '{"di_ei",         1'b1,  1'b0,  1'b0,  1'b0, 1'b1, 1'b1},
-        '{"ll_sc",         1'b1,  1'b0,  1'b0,  1'b0, 1'b1, 1'b1},
-        '{"read_instruction",1'b1,  1'b0,  1'b0,  1'b0, 1'b1, 1'b1}
+        '{"tgei",            1'b1,  1'b0,  1'b0,  1'b0, 1'b0, 1'b1},
+        '{"tgeiu",           1'b1,  1'b0,  1'b0,  1'b0, 1'b0, 1'b1},
+        '{"tlti",            1'b1,  1'b0,  1'b0,  1'b0, 1'b0, 1'b1},
+        '{"tltiu",           1'b1,  1'b0,  1'b0,  1'b0, 1'b0, 1'b1},
+        '{"teqi",            1'b1,  1'b0,  1'b0,  1'b0, 1'b0, 1'b1},
+        '{"tnei",            1'b1,  1'b0,  1'b0,  1'b0, 1'b0, 1'b1},
+        '{"ov_add",          1'b1,  1'b0,  1'b0,  1'b0, 1'b0, 1'b1},
+        '{"ov_sub",          1'b1,  1'b0,  1'b0,  1'b0, 1'b0, 1'b1},
+        '{"ov_addi",         1'b1,  1'b0,  1'b0,  1'b0, 1'b0, 1'b1},
+        '{"unalign_load",    1'b1,  1'b0,  1'b0,  1'b0, 1'b0, 1'b1},
+        '{"unalign_store",   1'b1,  1'b0,  1'b0,  1'b0, 1'b0, 1'b1},
+        '{"unalign_pc",      1'b1,  1'b0,  1'b0,  1'b0, 1'b0, 1'b1},
+        '{"reserved",        1'b1,  1'b0,  1'b0,  1'b0, 1'b0, 1'b1},
+        '{"cop0_unusable",   1'b1,  1'b0,  1'b0,  1'b0, 1'b0, 1'b1},
+        '{"soft_interrupt",  1'b1,  1'b0,  1'b0,  1'b0, 1'b0, 1'b1},
+        '{"di_ei",           1'b1,  1'b0,  1'b0,  1'b0, 1'b0, 1'b1},
+        '{"ll_sc",           1'b1,  1'b0,  1'b0,  1'b0, 1'b0, 1'b1},
+        '{"read_instruction",1'b1,  1'b0,  1'b0,  1'b0, 1'b0, 1'b1}
       };
 
     string manual_target_name[] = {

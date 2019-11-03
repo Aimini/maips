@@ -5,91 +5,67 @@ import os,sys
 import pathlib
 import subprocess
 import re
+from optparse import OptionParser
 
-def pre_process(rfilename,mars_filename,sim_fliename):
-    with open(rfilename,mode='r') as fr,\
-         open(mars_filename ,mode='w') as mfw,\
-         open(sim_fliename ,mode='w')  as sfw:
-        find_my_sysall(fr.readlines(),mfw,sfw)
+optParser = OptionParser()
 
-def find_my_sysall(lines,mwfp,swfp):
-    state = 0
-    # 0 normal , 1 find my_syscall 2, else,
-    for one in lines:
-        s =  one.strip()
-        if state == 0 and s == "###--my_syscall":
-            state = 1
-        if state == 1:
-            if s == "###--else":
-                state = 2
-            elif s == "###--end_syscall":
-                state = 0
-        if state == 2:
-            if s == "###--end_syscall":
-                state = 0
+optParser.add_option('-i','--input-file',      action = 'store',type = "string", dest = 'input')
+optParser.add_option('-o','--output-directory',action = 'store',type = "string", dest = 'output_dir',default='temp')
+optParser.add_option("-c","--compiler",        action = 'store',type = "string", dest = "compiler",  default='mars')
 
-        if(state == 0):
-            mwfp.write(one)
-            swfp.write(one)
-        elif(state == 1):
-            swfp.write(one)
-        elif(state == 2):
-            mwfp.write(one)
+optParser.add_option("-r","--range",           action = 'store',     type = "string", dest = "range",  default='.text')
+optParser.add_option("-b","--address-binary",  action = 'store_true',dest = "addr_bin",      default=False)
+optParser.add_option("-a","--aseembly-only",   action = 'store_true',dest = "aseembly_only", default=False)
+optParser.add_option("-d","--dump-data",       action = 'store_true',dest = "dump_data",     default=False)
+optParser.add_option("-D","--dump-disassembly",action = 'store_true',dest = "dump_disa",     default=False)
 
-    if(state != 0):
-        print("warning: somthing wrong with your ###--my_syscall")
+options, args = optParser.parse_args(sys.argv[1:])
 
-# dump_reg =  " $0 $1 $2 $3 $4 $5 $6 $7 $8 $9 $10 $11 $12 $13 $14 $15 " \
-#     " $16 $17 $18 $19 $20 $21 $22 $23 $24 $25 $26 $27 $28 $29 $30 $31 " 
+def get_mips_compile_cmd(options):
+    compiler_map = {
+        "mars"  : "Mars.jar",
+        "mix"   : "mix_compile.py",
+        "kernel": "gcc_compile.py"
+    }
 
-if len(sys.argv) > 1:
-    namepath = pathlib.Path(sys.argv[1])
-    name = namepath.name
-    pdir = namepath.parent
+    compiler = compiler_map[options.compiler]
+        
+    namepath = pathlib.Path(options.input)
+    name = namepath.stem
     pdir = pathlib.Path('.')
     tooldir = pdir / "tool"
-    tmpdir = pdir / "temp"
-    run_by_mars = tmpdir / ("mars_" + name)
-    dump_to_modelsim = tmpdir / ("modelsim_" + name)
-
-    #pre_process(namepath, run_by_mars, dump_to_modelsim)
-
-    hextextdir = tmpdir/ "{0}.hextext".format(name)
-    datadumpdir = tmpdir/ "{0}.data.hextext".format(name)
-    regdumpdir = tmpdir/ "{0}.reg.hextext".format(name)
-    asmdumpdir = tmpdir/ "{0}.assembly.hextext".format(name)
-    special_dumpdir = tmpdir/ "{0}.spec.hextext".format(name)
-    Mars_dir = tooldir / 'Mars.jar'
-
-    # dump 
-    use_special_dump = len(sys.argv)  > 2
-    command = ['java','-jar',str(Mars_dir),sys.argv[1],'-1']
-    command_asm = ['java','-jar',str(Mars_dir),sys.argv[1],'a']
-    dump_range = '0x00400000-0x0FFFFFFC'
-    dump_text = '.text'
-    dump_data = ['dump','.data','HexText',str(datadumpdir)]
-    dump_reg = ['dump','reg','all',str(regdumpdir)]
-    dump_asm = ['dump','as','all',str(asmdumpdir)]
-    if use_special_dump:
-        dump_segment = ['dump',dump_range,'HexText']
-    else:
-        dump_segment = ['dump',dump_text,'HexText']
-        
-    dump_segment.append(str(hextextdir))
-    command.extend(dump_segment)
-    command.extend(dump_reg)
-    command.extend(dump_asm)
-    command_asm.extend(dump_data)
-    f = open(special_dumpdir,mode='wb')
-    cmd_str = ' '.join(command)
-    #print(cmd_str)
-    os.system(cmd_str)
-    os.system(' '.join(command_asm))
-    # if no data to dump ,still create empty file
-    with open(datadumpdir,"a") as f:
-        pass
-
-        
+    outputdir = pdir / options.output_dir
 
 
+    textdumpdir = outputdir/ "{0}.text.bin".format(name)
+    datadumpdir = outputdir/ "{0}.data.bin".format(name)
+    regdumpdir =  outputdir/ "{0}.reg.hextext".format(name)
+    asmdumpdir =  outputdir/ "{0}.assembly.txt".format(name)
+    complierdir = tooldir / compiler
+
+
+    command_file = [str(complierdir), str(namepath)]
+    if options.compiler == "mars":
+        pre_command = list(command_file)
+        pre_command.append("nc")
+        pre_command.insert(0,"java -jar")
+
+        command = list(pre_command)
+        command.append('a' if options.aseembly_only else '-1')
+        # dump text segment
+        command.extend(['dump',options.range, 'BEAddrBinary' if options.addr_bin else 'BEBinary', str(textdumpdir)])
+        # dump register
+        command.extend(['dump', 'reg', 'all', str(regdumpdir)])
+        # dump assembly
+        if options.dump_disa:
+            command.extend(['dump', 'as', 'all', str(asmdumpdir)])
+        cmd_str = ' '.join(command)
+        print(cmd_str)
+        os.system(cmd_str)
+
+        if options.dump_data:
+            pre_command.extend(['dump','.data','BEBinary',str(datadumpdir)])
+            os.system(' '.join(pre_command))
+
+get_mips_compile_cmd(options)
 
