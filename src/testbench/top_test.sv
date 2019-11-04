@@ -233,9 +233,9 @@ module top_test();
         logic[31:0] __BUF;                         \
         if(__HANDLE) begin                         \
             __RES = $fread(_MEM,__HANDLE);         \
-            $fclose(__HANDLE);                                \
+            $fclose(__HANDLE);                                  \
             $display("read %x bytes in %s sgement",__RES,_DISP);\
-        end                                                    \
+        end                                                     \
     end
 
     task automatic load_text_data(input check_target_t target);
@@ -328,7 +328,7 @@ module top_test();
                 break;
             end
         end
-        assert(found) 
+        assert(found === '1) 
         else $error("test target name %s not found.",name);
     endtask
 
@@ -374,16 +374,22 @@ module top_test();
 
     check_target_t manual_check_target;
     int test = 0;
-    int test_number = 1; // if test_number > 0 ,test last <test_number> case, else test all.
+    int total_test = all_targets.size();
+    int test_number = 0; // if test_number > 0 ,test last <test_number> case, else test all.
     initial begin
-        new_test_by_name("j");
-        // if(test === 0) begin    
-        //     for(int i = test_number > 0 ? all_targets.size() - test_number : 0; i < all_targets.size(); ++i)
-        //         new_test(.target(all_targets[i]));
-        //     $finish;
-        // end else if (test === 1) begin
-        //     new_execution("main");    
-        // end
+        //new_test_by_name("clz");
+        if(test === 0) begin    
+            for(int i = test_number ; i < total_test; ++i) begin
+                $display("[%0d]",i);
+                new_test(.target(all_targets[i]));
+            end
+                
+
+            $display("total test %d",total_test);
+            $finish;
+        end else if (test === 1) begin
+            new_execution("main");    
+        end
 
         manual_check_target = '{"", 1'b0,  1'b0,  1'b0,  1'b0,  1'b0,  1'b0};
         // for(int i = manual_target_name.size() - 1; i < manual_target_name.size(); ++i) begin

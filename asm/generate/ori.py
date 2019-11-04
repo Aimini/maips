@@ -1,32 +1,33 @@
-from gen_com import *
+from __numutil import *
+from __regutil import *
+from __asmutil import *
+from __gencom  import *
 
 r = gen('ori_1')
-def my_gen1(A,C,E):
+def my_gen1(A,au):
     base = 5
     previous = 0
     for i in range(1, 16):
         x = i % 16
         rotate = (base << x) & 0xFFFF | base >> (16 - x)
         previous = previous | rotate
-        A('ori ${0},${1},0x{2:0>4x}'.format(i,i - 1,rotate))
+        A(f'ori ${i},${i - 1},{numutil.sx4(rotate)}')
     
 
     for i in range(16, 32):
         x = i % 16
         rotate = (base << x) & 0xFFFF | base >> (16 - x)
-        A('ori ${0},${1},0x{2:0>4x}'.format(i,0,rotate))
+        A(f'ori ${i}, $0, {numutil.sx4(rotate)}')
+    au.check_and_exit()
 
-    C(1,6)
-    E(1)
 r.gen(my_gen1)
 
 r = gen('ori_2')
-def my_gen2(A,C,E):
-    for i in range(1, 32):
-        x = i % 16
+def my_gen2(A,au):
+    for i in reg_list[1:]:
+        x = i.order % 16
         rotate = (1 << x) & 0xFFFF
-        A('ori ${0},${1},0x{2:0>4x}'.format(i,0,rotate))
+        A(f'ori {i},$0, {numutil.sx4(rotate)}')
+    au.check_and_exit()
 
-    C(5,17)
-    E(5)
 r.gen(my_gen2)

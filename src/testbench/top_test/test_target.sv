@@ -77,7 +77,10 @@
         '{"seb",        1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
         '{"seh",        1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
         '{"wsbh",       1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
-        '{"mfc0_mtc0",  1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
+        // some cop0 reigster bit are not writable now
+        // need to write generate script again. 
+        // but I'm gonna to have a reset now XD
+        //'{"mfc0_mtc0",  1'b1,  1'b0,  1'b1,  1'b0, 1'b0, 1'b0},
         // --------------------- exception ---------------------
         '{"syscall",    1'b1,  1'b0,  1'b0,  1'b0, 1'b0, 1'b1},
         '{"tge",        1'b1,  1'b0,  1'b0,  1'b0, 1'b0, 1'b1},

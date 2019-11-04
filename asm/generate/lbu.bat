@@ -1,0 +1,1 @@
+generate\__gen_lbu_lhu.py lbu

@@ -1,47 +1,42 @@
-from gen_com import *
+from __numutil import *
+from __regutil import *
+from __asmutil import *
+from __gencom import *
 import random
 
 r = gen('bne')
 
 
-def my_gen1(A,C,E):
-    A("li $sp,0")
-    A("li $gp,0")
-    
+def my_gen1(A, au):
     mark = 4000
-    branch_seq_order =  list(range(mark))
-    random.shuffle(branch_seq_order)
-    branch_seq = [0 for x in range(mark)]
-
-    start = 0
-    for i in range(mark):
-        next_seq = branch_seq_order[i]
-        branch_seq[start] = next_seq
-        start = next_seq
 
     #inital to all zero
-    for i in range(32):
-        A("li ${0},0".format(0))
+    au.clear_reg()
 
+    branch_seq = numutil.jl(mark)
+    start = branch_seq[0]
     #which branch block will jump to end
     for x in range(mark):
         A("")
         A("mark{}:".format(x))
-        reg = [random.choice(range(1,32)) for x in range(3)]
-        #A("addu ${0},${1},${2}".format(*reg))
+        regutil.get_random(k=3)
+        #A("addu {0},{1},{2}".format(*reg))
 
         #compare random regstier ,and branch to random mark
-        
-        if branch_seq[x] == 0:
+        if branch_seq[x] == start:
             A("j end")
+            A("nop")
         else:
             # make sure there nobody compare to itself
-            reg = random.sample(range(1,32),k = 2) 
+            reg = regutil.get_random(k=2)
             tm = branch_seq[x]
-            A("bne ${0},${1},mark{2}".format(*reg,tm))
-            # make sure next time ${0} != ${1}
-            A("li ${0},0x{1:0>8X}".format(reg[0],1 << reg[0]))
-            A("li ${0},0x{1:0>8X}".format(reg[1],1 << reg[1]))
+            A("bne {0},{1},mark{2}".format(*reg, tm))
+            A("nop")
+            # make sure next time {0} != {1}
+            au.li(reg[0], 1 << reg[0].order)
+            au.li(reg[1], 1 << reg[1].order)
     A("end:")
-    A(check_and_exit())
+    au.check_and_exit()
+
+
 r.gen(my_gen1)

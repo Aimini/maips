@@ -5,7 +5,7 @@ generate\ori.py
 generate\sll.py
 
 generate\addu.py 
-:: generate\j_jal.py  & tool\mips_compile.py j.asm --special & tool\mips_compile.py jal.asm --special
+generate\j_jal.py  & tool\mips_compile.py j.asm --special & tool\mips_compile.py jal.asm --special
 generate\addiu.py
 generate\beq.py 
 generate\bne.py 

@@ -7,7 +7,6 @@ class asmutil:
         self.using_provide_sys_reg = using_provide_sys_reg
         self.base_reg = base_reg
         self.arg_reg = arg_reg
-        self.regutil = regutil()
 
 
     def ASM(self, text):
@@ -34,11 +33,11 @@ class asmutil:
 
     def get_sys_reg(self,base_reg, arg_reg, exclude = []):
         if base_reg is None:
-            base_reg = self.regutil.get_one(exclude = exclude)
+            base_reg = regutil.get_one(exclude = exclude)
         if arg_reg is None:
             exclude = list(exclude)
             exclude.append(base_reg)
-            arg_reg = self.regutil.get_one(exclude = exclude)
+            arg_reg = regutil.get_one(exclude = exclude)
         if base_reg == arg_reg:
             print("wtf")
         return base_reg, arg_reg
@@ -110,3 +109,10 @@ class asmutil:
     def assert_not_equal(self,arg0,arg1,base_reg = None,arg_reg = None):
         self.ASM("##################### assert not equal")
         self.sys(base_reg,arg_reg, 2,arg0,arg1)
+
+    def gnu_as_head(self):
+        self.ASM("""
+    .set noat
+    .globl __start
+    .align 4
+    .text""")

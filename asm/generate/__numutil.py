@@ -45,8 +45,13 @@ class numutil:
         return random.choice(range(2**32)) 
 
     @staticmethod
+    def u16():
+        return random.choice(range(2**16))
+
+    @staticmethod
     def s16():
         return random.choice(range(-2**15,2**15))
+        
     @staticmethod
     def s8():
         return random.choice(range(-2**8,2**8))

@@ -1,44 +1,50 @@
-from gen_com import *
+from __numutil import *
+from __regutil import *
+from __asmutil import *
+from __gencom  import *
 import random
 
 r = gen('bgtz')
 
-def my_gen1(A,C,E):
+def my_gen1(A,au):
     #test negative number and zero
     for i in range(1024):
-        reg = i % 32;
-        A("li ${0},{1}".format(reg, -random.choice(range(0,2**31 + 1))))
-        A("bgtz ${},wrong".format(reg))
-        A("li ${0},0".format(reg))
-        A("bgtz ${},wrong".format(reg))
+        reg = reg_list[i % 32]
+        au.li(reg, -random.choice(range(0,2**31 + 1)))
+        A(f"bgtz {reg},wrong")
+        au.li(reg,0)
+        A(f"bgtz {reg},wrong")
 
-    A("li $3, 1")
+    au.li(reg_list[3], 1)
     A("bgtz $3, next")
+    A("nop")
     #generate some meaing less code
     for i in range(32):
-        A("li ${0},{0}".format(i))
+        au.li(reg_list[i],i)
         #shouldn't execute to there
         A("j wrong")
     
     A("next:")
     #test postive number postive
     for i in range(1024):
-        reg = i % 32;
-        A("mark{}:".format(i))
-        A("li ${},{}".format(reg, random.choice(range(1,2**31 + 1))))
-        if reg == 0:
+        reg = reg_list[i % 32]
+        A(f"mark{i}:")
+        au.li(reg, random.choice(range(1,2**31 + 1)))
+        if reg == reg_zero:
             continue
-        A("bgtz ${},mark{}".format(reg,i + 1))
+        A(f"bgtz {reg},mark{i + 1}")
+        A("nop")
         #shouldn't execute to there
         A("j  wrong")
-        A("bgtz ${},wrong".format(reg))
+        A(f"bgtz {reg},wrong")
 
     A("mark1024:")
-    A("li $31, 0x7FFFFFFF")
+    au.li(reg_list[31], 0x7FFFFFFF)
     A("bgtz $31,end")
+    A("nop")
     A("wrong:")
     # $0 != $s0 always_fail. so...
-    A(assert_not_equal(0,0))
+    au.assert_not_equal(0,0)
     A("end:")
-    A(check_and_exit())
+    au.check_and_exit()
 r.gen(my_gen1)

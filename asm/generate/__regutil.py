@@ -94,8 +94,8 @@ class regutil:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
-
-    def find(self,x):
+    @staticmethod
+    def find(x):
         a = list(reg_list)
         if isinstance(x,int) or isinstance(x,str) and x.isnumeric():
             order = int(x)
@@ -111,8 +111,9 @@ class regutil:
         if len(a) == 0:
             return None
         return a[0]
-
-    def get(self, exclude = []):
+        
+    @staticmethod
+    def get(exclude = []):
         al = list(reg_list)[1:]
 
         def filter_function(x):
@@ -124,11 +125,13 @@ class regutil:
         a = list(filter(filter_function, al))
         return a
 
-    def get_random(self, k = 1, exclude = []):
-        a = self.get(exclude)
+    @staticmethod
+    def get_random(k = 1, exclude = []):
+        a = regutil.get(exclude)
         if k > len(a) or k < 0:
             print("wtf")
         return random.sample(a, k = k)
 
-    def get_one(self, exclude = []):
-        return self.get_random(k = 1, exclude = exclude)[0]
+    @staticmethod
+    def get_one(exclude = []):
+        return regutil.get_random(k = 1, exclude = exclude)[0]

@@ -1,14 +1,16 @@
-from gen_com import *
+from __numutil import *
+from __regutil import *
+from __asmutil import *
+from __gencom  import *
 import random
 g = gen("addu")
-def my_gen(A,C,E):
+def my_gen(A,au):
     for i in range(0,4096):
-        va = random.choice(range(0,2**32))
-        reg = [random.choice(range(0,32)) for x in range(3)]
-        A("li   ${0},0x{1:0>8X}".format(reg[2],va));
-        A("addu ${0},${1},${2}".format(*reg));
-    reg = get_random_exclude_reg(k = 2)
-    C(reg[0],reg[1])
-    E(reg[0])
+        va = numutil.u32()
+        reg = regutil.get_random(k=3)
+        au.li(reg[2],va);
+        A("addu {0},{1},{2}".format(*reg));
+
+    au.check_and_exit()
 
 g.gen(my_gen)
