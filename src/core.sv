@@ -1,5 +1,5 @@
-`ifndef CORE__
-`define CORE__
+`ifndef __CORE__
+`define __CORE__
 `include "src/pipeline/stage_fetch.sv"
 `include "src/pipeline/stage_decode.sv"
 `include "src/pipeline/stage_execute.sv"
@@ -119,6 +119,8 @@ memory_interface.controller data_mif);
         pif_memory.signal_in.cop0_excdata = exc_data;
     end
     assign pif_write_back.signal_in = pif_memory.signal_out;
+
+    
     assign pif_decode.signal_in.cop0_excdata  = pif_memory.signal_out.cop0_excdata;
     /*** GPR write back ***/
     assign pif_decode.signal_in.fetch = '1;

@@ -16,8 +16,8 @@ module cop0_write_filter(
         logic[31:0] wmask; // write mask, 1 meaing can be written by mtc0.
     } config_t;
 
-
-    const config_t reg_configures[] = '{
+    localparam CON_LEN = 5;
+    const config_t reg_configures[CON_LEN] = '{
         '{rd:5'b01000, sel:3'b000, wmask:32'h00000000}, //BadVaddr
         '{rd:5'b01100, sel:3'b000, wmask:32'h1040FF17}, // Status
         '{rd:5'b01101, sel:3'b000, wmask:32'h00800300}, // Cause
@@ -29,7 +29,7 @@ module cop0_write_filter(
 
     function automatic config_t get_config(input logic[4:0] rd,input logic[2:0] sel);
         //return full_access_config; // allow full access when test
-        for(int i = 0; i < reg_configures.size(); ++i) begin
+        for(int i = 0; i < CON_LEN;  ++i) begin
             if(rd === reg_configures[i].rd & sel === reg_configures[i].sel) begin
                 return reg_configures[i];
             end

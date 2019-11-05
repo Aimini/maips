@@ -72,9 +72,9 @@ module div_mul #(parameter N = 32)
     always_ff @(posedge clk) begin
         case(tick_op)
             TICK_ONE:
-                tick_count <= tick_count + 1;
+                tick_count <= tick_count + 'b1;
             TICK_RESET:
-                tick_count <= 0;
+                tick_count <= '0;
             default:
                 tick_count <= 'x;
         endcase
@@ -103,7 +103,7 @@ module div_mul #(parameter N = 32)
             THI_ALU             : thi <= alu_out;
             THI_PARTIAL_MUL     : thi <= {cout,alu_out[N - 1:1]};
             THI_PARTIAL_DIV     : thi <= cout ? alu_out : srcA;
-            THI_ZERO            : thi <= 0;
+            THI_ZERO            : thi <= '0;
             default:            thi <= 'x;
         endcase
 
@@ -168,7 +168,7 @@ module div_mul #(parameter N = 32)
     assign {cout,alu_out} = srcA + srcB + cin;
     always_comb begin
         case(srcA_select)
-            SRCA_ZERO: srcA = 0;
+            SRCA_ZERO: srcA = '0;
             SRCA_THI : srcA = thi;
             SRCA_THI_WITH_AITER : srcA = {thi[N-2:0],a_abs_iter};
             SRCA_HI : srcA = hi_in;
@@ -189,8 +189,8 @@ module div_mul #(parameter N = 32)
             srcB = ~srcB;
 
         case (cin_sel)
-            CIN_ZERO: cin = 0;
-            CIN_ONE:  cin = 1;
+            CIN_ZERO: cin = '0;
+            CIN_ONE:  cin = 'b1;
             CIN_COUT: cin = cout_reg;
             default:  cin = 'x;
         endcase
@@ -259,19 +259,25 @@ module div_mul #(parameter N = 32)
                     end else begin
                         next_state = STORAGE;
                     end
+                end else begin
+                    next_state = DIV;
                 end
 
             MUL:
                 if(&tick_count) begin
-                    if(using_sign & (a[N - 1]^b[N - 1]))
+                    if(using_sign & (a[N - 1]^b[N - 1])) begin
                         next_state = NEG_PRODUCT_TLO;
-                    else
-                        if(add)
+                    end else begin
+                        if(add) begin
                              next_state = PREVIOUS_ADD_TLO;
-                        else if(sub) 
+                        end else if(sub) begin
                             next_state =  PREVIOUS_SUB_TLO;
-                        else
+                        end else begin
                             next_state = STORAGE;
+                        end
+                    end
+                end else begin
+                    next_state = MUL;
                 end
             
             NEG_PRODUCT_TLO: //negative quotion or axb[31:0]

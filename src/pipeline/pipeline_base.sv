@@ -1,6 +1,8 @@
+`ifndef __PIPELINE_BASE__
+`define __PIPELINE_BASE__
 `include "src/pipeline/pipeline_interface.sv"
 
-module pipeline_base (pipeline_interface.port pif, input logic nullify_instruction = '0);
+module pipeline_base (pipeline_interface.port pif, input logic nullify_instruction);
     pipeline_signal_t signal_reg;
 
     assign pif.signal_out = signal_reg;
@@ -28,6 +30,6 @@ module pipeline_base (pipeline_interface.port pif, input logic nullify_instructi
     end
 endmodule
 
-
+`endif
 
 

@@ -1,3 +1,5 @@
+`ifndef __DECODER_UTIL__
+`define __DECODER_UTIL__
 `include "src/common/signals.sv"
 
 package decoder_util;
@@ -102,3 +104,4 @@ package decoder_util;
         return ctl;
     endfunction
 endpackage
+`endif

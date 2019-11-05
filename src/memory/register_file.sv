@@ -1,3 +1,6 @@
+`ifndef __REGISTER_FILE__
+`define __REGISTER_FILE__
+
 module register_file  #(parameter out = 2,parameter addr = 5,parameter width = 32)
 (   input logic clk,reset,
     input logic we,
@@ -14,11 +17,10 @@ module register_file  #(parameter out = 2,parameter addr = 5,parameter width = 3
                 file[i] <= {width{1'b0}};
             end
         end 
-        else if(we & waddr !== 0) begin
-            file[waddr] <= din;
-        end
-        
-        if(we) begin
+        else if(we) begin
+            if(waddr !== 0) begin
+                file[waddr] <= din;
+            end
             foreach(waddr[i]) begin
                 assert(waddr[i] !== 'x)
                 else begin
@@ -43,3 +45,5 @@ module register_file  #(parameter out = 2,parameter addr = 5,parameter width = 3
         end
     end
 endmodule
+
+`endif

@@ -1,3 +1,5 @@
+`ifndef  __STAGE_FETCH__
+`define  __STAGE_FETCH__
 module stage_fetch(
  input clk,reset,
  input logic stall, load,
@@ -15,9 +17,9 @@ module stage_fetch(
         else if(!stall)
             pc_reg <= pc_add4;
     
+    assign mif.read = '1;
     always_comb begin
         mif.addr = pc_reg;
-        mif.read = '1;
 
         instruction =  mif.dout;
         pc = pc_reg;
@@ -26,3 +28,4 @@ module stage_fetch(
         pc_sub4 = pc_reg - 4;
     end
 endmodule
+`endif

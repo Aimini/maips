@@ -375,9 +375,9 @@ module top_test();
     check_target_t manual_check_target;
     int test = 0;
     int total_test = all_targets.size();
-    int test_number = 0; // if test_number > 0 ,test last <test_number> case, else test all.
+    int test_number = 0; //test from index <test_number> to last one
     initial begin
-        //new_test_by_name("clz");
+        // new_test_by_name("ll_sc");
         if(test === 0) begin    
             for(int i = test_number ; i < total_test; ++i) begin
                 $display("[%0d]",i);

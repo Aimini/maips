@@ -18,21 +18,22 @@ output logic[N - 1:0] out);
     logic[N - 1:0] synchronizer[SN], int_reg;
     always_ff @(posedge clk,posedge reset) begin : catch_interrupt
         if(reset) begin
-            for(int i = 0; i < N; ++i) begin
+            for(int i = 0; i < SN; ++i) begin
                 synchronizer[i] <= '0;
             end
                 int_reg <= '0;
         end else begin
             /**/        
             synchronizer[0] <= in;
-            for(int i = 1; i < N; ++i) begin
+            for(int i = 1; i < SN; ++i) begin
                 synchronizer[i] <= synchronizer[i - 1];
             end
 
             if(clear) begin
                 int_reg <= '0;
+            end else begin
+                int_reg <= sync_mask & synchronizer[SN - 1] | ~sync_mask & in;
             end
-            int_reg <= sync_mask & synchronizer[SN - 1] | ~sync_mask & in;
         end
     end
     

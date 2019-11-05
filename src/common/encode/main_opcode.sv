@@ -1,3 +1,6 @@
+`ifndef __MAIN_OPCODE__
+`define __MAIN_OPCODE__
+
 package main_opcode;
 
 typedef enum logic[5:0] {
@@ -45,3 +48,5 @@ typedef enum logic[5:0] {
     SC       = 6'b111000
 } opcode;
 endpackage : main_opcode
+
+`endif
