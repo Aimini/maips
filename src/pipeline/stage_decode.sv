@@ -64,7 +64,7 @@ module stage_decode(pipeline_interface.port pif,input forward_info_t forward, in
         if(pif.signal_in.control.write_hi)
             hi_reg <= pif.signal_in.dest_hi_data;
         if(pif.signal_in.control.write_llbit)
-            hi_reg <= pif.signal_in.dest_llbit_data;
+            llbit_reg <= pif.signal_in.dest_llbit_data;
        end
     end
 
@@ -90,11 +90,14 @@ module stage_decode(pipeline_interface.port pif,input forward_info_t forward, in
     // assign cop0_excctl   =  pif.signal_in.control.cop0_excctl;
     assign p_out.dest_cop0_sel = unpack.sel;
     assign p_out.dest_cop0_rd  = unpack.rd;
+    assign p_out.dest_llbit_data = '1;
+    
     always_comb begin
         //-----------------------------------------------------
         /*      DONT. CHANGE. SEQENCE. */
         p_out.rs = rs_data; p_out.rt = rt_data;
         p_out.hi = hi_reg;  p_out.lo = lo_reg;
+        p_out.llbit = llbit_reg;
         p_out.cop0 = cop0_data;
         p_out.cop0_excreg = cop0_excreg;
         /*      DONT. CHANGE. SEQENCE. */
@@ -108,7 +111,6 @@ module stage_decode(pipeline_interface.port pif,input forward_info_t forward, in
         p_out.pcadd4 =  reconnect.signal_out.pcadd4;
         p_out.pcadd8 =  reconnect.signal_out.pcadd8;
         p_out.fetch  =  reconnect.signal_out.fetch;
-        p_out.dest_llbit_data = '1;
     end
 endmodule
 `endif
