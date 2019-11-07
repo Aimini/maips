@@ -12,10 +12,27 @@ module stage_fetch(
     always_ff @(posedge clk)
         if(reset)
             pc_reg <= 32'h8000_0000;//32'h8000_0000;
-        else if(load)
-            pc_reg <= pc_in;
+        /*consider instructions:
+   	        mul	v1,a1,s3
+   	        jal	4040e0 <printf_.constprop.0>
+   	        subu	a1,v0,v1
+        mul in excute stage
+        jal in decode stage
+        subu in fetch stage and in delay slot
+
+        
+        jal send load signal to fetch stage and want pc load target address
+        in normal case, jal jump to target address and
+        subu transition from fetch stage to decode stage
+
+        but,mul send stall signal to all stage, we also want
+        subu stall in fetch stage too.
+        */
         else if(!stall)
-            pc_reg <= pc_add4;
+            if(load)
+                pc_reg <= pc_in;
+            else
+                pc_reg <= pc_add4;
     
     assign mif.read = '1;
     always_comb begin
