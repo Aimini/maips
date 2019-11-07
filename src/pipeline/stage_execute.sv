@@ -125,6 +125,7 @@ output logic wait_result); //forward
         pif.signal_out.flag = alu_flag;
         pif.signal_out.dest_reg_data  = dest_reg_data;
         pif.signal_out.dest_cop0_data = dest_cop0_data;
+        pif.signal_out.dest_cop0_mask = dest_cop0_mask;
         pif.signal_out.alu_out   = alu_out;
         pif.signal_out.dest_reg  = dest_reg;
         pif.signal_out.flag_selected = flag_selected;

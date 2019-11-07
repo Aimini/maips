@@ -110,11 +110,10 @@ module register_cop0(input logic clk,reset,
                 if(excdata.exception_happen)
                     file[status_index][cop0_info::IDX_STATUS_EXL] <= '1;
             end
-`ifndef COP0_CAUSE_EIP // dcefine of external hardware interrupt.
-`define COP0_CAUSE_EIP file[cause_index][cop0_info::IDX_CAUSE_IP_E: cop0_info::IDX_CAUSE_IP_S + 2]
-`endif
-                `COP0_CAUSE_EIP <= excdata.ext_int  | `COP0_CAUSE_EIP;
-`undef COP0_CAUSE_EIP
+            for(int i = cop0_info::IDX_CAUSE_IP_S + 2; i < cop0_info::IDX_CAUSE_IP_E; ++i) begin
+                if(excdata.ext_int[i - (cop0_info::IDX_CAUSE_IP_S + 2)] === '1)
+                    file[cause_index][i] <= '1;
+            end
         end
     end
     
