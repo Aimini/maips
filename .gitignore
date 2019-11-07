@@ -3,9 +3,17 @@
 /work
 !.gitignore
 !implement_order
+!README.md
 *.jar
 /asm/temp
 /_gsdata_
 __pycache__
 /asm/temp
 /c/temp
+/noyet/*
+/*.do
+/asm/tool/copy_mars.cmd
+/asm/compile_command.cmd
+/c/set_evn.cmd
+/c/reorder_test/reorder_complie.cmd
+*.bin
