@@ -50,7 +50,7 @@ output logic stall_fetch);
 
 /******************** clear control hazard  ****************/
         //decode  J,JAL
-        if(ps_decode.control.pc_src == selector::PC_SRC_JUMP) begin
+        if(ps_decode.control.pc_src === selector::PC_SRC_JUMP) begin
             load = '1;
             pc = ps_decode.pcjump;
             if(!using_delay_slot) begin
@@ -90,15 +90,7 @@ output logic stall_fetch);
             pif_execute.nullify = '1;
         end
 
-        if(exception_happen) begin
-            load = '1;
-            pc = exc_addr;
 
-            pif_decode.nullify = '1;
-            pif_execute.nullify = '1;
-            pif_memory.nullify = '1;
-            pif_memory.keep_exception = '1;
-        end
 /************** stall or bubble to clear data hazard  **********/
         if(instruction_memory_busy) begin
             stall_fetch = '1;
@@ -126,6 +118,32 @@ output logic stall_fetch);
             pif_write_back.stall = '1;
         end
 
+        /*
+            consider instruction
+            execute : mult
+            decode : xx
+            fetch : xx
+            when interrupt happend , mult
+            stall all pipeline, but interrupt will nullify
+            execute , decode and fetch stage,if stall signal 
+            are still  1, pc will not jump to exception vector address,
+            so we need to set stall and bubble signal to 0.
+        */
+        if(exception_happen) begin
+            load = '1;
+            pc = exc_addr;
+            stall_fetch = '0;
+            pif_decode.stall = '0;   
+            pif_execute.stall = '0;
+
+            pif_decode.bubble = '0;   
+            pif_execute.bubble = '0;
+
+            pif_decode.nullify = '1;
+            pif_execute.nullify = '1;
+            pif_memory.nullify = '1;
+            pif_memory.keep_exception = '1;
+        end
     end
 endmodule
 

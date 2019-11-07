@@ -14,8 +14,22 @@ module pipeline_base (pipeline_interface.port pif, input logic nullify_instructi
                 signals::flag_t:   '{default: '0},
                 default: '0
             };
-        else if(pif.nullify) begin
-            signal_reg <= pif.signal_in;
+        /*
+        consider instruction
+         mul
+         add
+         xx 
+         mul at execute stage and stall pipeline
+         add at decode stage and be stalled
+         xx is instruction in decode stage that wait memory
+         so it's send nullify signal to decode,
+         obviously, decode stage must be nullify util add transition
+         to execute stage. so nullify signal have lower priority than stall and bubble
+        */
+        else if(pif.stall | pif.bubble) begin
+          
+        end else if(pif.nullify) begin
+              signal_reg <= pif.signal_in;
             signal_reg.control <=  signals::get_clear_control();
             if(nullify_instruction)
                 signal_reg.instruction <= '0;
@@ -23,8 +37,6 @@ module pipeline_base (pipeline_interface.port pif, input logic nullify_instructi
             // bacause of write status when exception happen
             // must keep cop0 data and write_cop0 signal
             signal_reg.cop0_excdata <= pif.signal_in.cop0_excdata;
-        end else if(pif.stall | pif.bubble) begin
-        
         end else
             signal_reg <= pif.signal_in;
     end
