@@ -58,7 +58,7 @@ int main()
 	strncpy(str, "  Goodbyte! \n",STACK_LIMIT - 1);
 	print_str(str);
 	
-	for(int i = 0 ; i < 1000; ++i){
+	while(true){
 		uint32_t hns = syscall::tick();
 		uint32_t us = hns / 10U; 
 		hns %= 10;

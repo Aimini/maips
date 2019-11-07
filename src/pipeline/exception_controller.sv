@@ -95,7 +95,7 @@ module exception_controller(
                 if(read_error | store_error) begin
                     exception_happen = '1;
                     exc_data.load_addr = '1;
-                    exc_data.badvaddr = ps_execute.pc;
+                    exc_data.badvaddr = ps_execute.mem_addr;
                     if(read_error) begin
                         exc_data.exc_code = EXCCODE_ADEL;
                     end else begin
@@ -131,7 +131,9 @@ module exception_controller(
                         end
                     endcase
                 end
-                if(~in_kernel_mode & unpack.opcode === main_opcode::COP0) begin
+                if(~in_kernel_mode 
+                && unpack.opcode === main_opcode::COP0
+                && status[cop0_info::IDX_STATUS_CU0] === 0) begin
                     exc_data.load_ce = '1;
                     exc_data.ce = '0;
                     exc_data.exc_code = EXCCODE_CU;

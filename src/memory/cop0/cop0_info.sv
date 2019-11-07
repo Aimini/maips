@@ -45,15 +45,17 @@ package cop0_info;
         logic exl;       //x  Required          RW: exception level  0 : Normal  1: Eexception
         logic ie;        //0  Required          RW: interrupt enable 0 : disable :enable
     } status_t;
-    const logic[4:0] IDX_STATUS_BEV = 22;
-    const logic[4:0] IDX_STATUS_CE_E = 29;
-    const logic[4:0] IDX_STATUS_CE_S = 28;
-    const logic[4:0] IDX_STATUS_UM =  4;
-    const logic[4:0] IDX_STATUS_ERL = 2;
-    const logic[4:0] IDX_STATUS_EXL = 1;
+    
+    localparam logic[4:0] IDX_STATUS_CU0 = 28;
+    localparam logic[4:0] IDX_STATUS_BEV = 22;
+    localparam logic[4:0] IDX_STATUS_CE_E = 29;
+    localparam logic[4:0] IDX_STATUS_CE_S = 28;
+    localparam logic[4:0] IDX_STATUS_UM =  4;
+    localparam logic[4:0] IDX_STATUS_ERL = 2;
+    localparam logic[4:0] IDX_STATUS_EXL = 1;
     localparam logic[4:0] IDX_STATUS_IM_E = 15;
     localparam logic[4:0] IDX_STATUS_IM_S = 8;
-    const logic[4:0] IDX_STATUS_IE = 0;
+    localparam logic[4:0] IDX_STATUS_IE = 0;
     
     typedef struct packed {
         logic[1:0] hi1;         //10    ignore      R
