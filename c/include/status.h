@@ -3,7 +3,7 @@
 class status {
     public:
     typedef int bit_t;
-        status(int value) {
+        status(uint32_t value) {
             for(int i = 0; i < 4; ++i)
                 this->cu[i] = extract_bit(value, 28 + i);
             this->bev = extract_bit(value, 22);
@@ -14,7 +14,7 @@ class status {
             this->exl = extract_bit(value,1);
             this->ie  = extract_bit(value,0);
         };
-        bit_t extract_bit(int value,int offset){
+        bit_t extract_bit(uint32_t value,int offset){
              return (value >> (offset)) & 0x1;
         }
 

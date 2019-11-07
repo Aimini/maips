@@ -32,8 +32,8 @@ initial_bss_end:
     li $k0, 0x00800000
     mtc0 $k0, $13 # claer cause set iv
 
-    li $k0, 0x00000401
-    mtc0 $k0,$12  # enable clock interrupt, clear bev
+    li $k0, 0x00000701
+    mtc0 $k0,$12  # enable clock interrupt and soft interrupt, clear bev
     
     jal print_booting_info
     la   $k0, user_text
@@ -63,8 +63,11 @@ mfhi	$k0
 sw	    $k0,88($sp)
  #cause , passed to exception_handler
 
-sw	    $a1,32($sp)
-mfc0	$a1,$13
+sw	    $a1,32($sp) #epc
+mfc0	$a1,$14
+
+sw	    $a2,36($sp) # cause
+mfc0	$a2,$13
 
 #c0_status
 ins	    $k1,$zero,0x1,0x4 
@@ -73,7 +76,6 @@ sw	    $at,16($sp)
 sw	    $v0,20($sp)
 sw	    $v1,24($sp)
 sw	    $a0,28($sp)
-sw	    $a2,36($sp)
 sw	    $a3,40($sp)
 sw	    $t0,44($sp)
 sw	    $t1,48($sp)
@@ -88,14 +90,16 @@ sw	    $t9,80($sp)
 sw	    $ra,84($sp)
 sw	    $s0,104($sp)
 
-    andi    $s0,  $a1,   0x7C
+    andi    $s0,  $a2,   0x7C
     xori    $s0,  $s0,   0x20 #check syscall
     blez    $s0, __turn_syscall_exception
-    move    $a0,  $a1
+    move    $a0,  $a2
     jal     exception_handler
-
+    j      __skip_syscall
 __turn_syscall_exception:
     jal     syscall_handler
+
+__skip_syscall:
 di
 # because syscall put return value value in $v0
 blez    $s0, ___reserve_syscall_v0

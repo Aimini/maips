@@ -4,66 +4,9 @@
 #include <cai_mem>
 #include <stdarg.h>
 #include <syscall.h>
-
-void calculate_e(int iter, char * out, int size) {
-	int i = 0;
-	long up = 1;
-	long down = 1;
-	int fisrt_less_down = 1;
-	for (i = 1; i <= iter; ++i)
-	{
-		up = up * i + 1;
-		down *= i;
-	}
-	i = 0;
-	while (i < size)
-	{
-		while (up < down)
-		{
-			up *= 10;
-			out[i++] = '0';
-			if (i >= size) {
-				return;
-			}
-		}
-		long quotient = up / down;
-		long remainder = up % down;
-		char div = (char)quotient + '0';
-		out[i++] = div;
-		if (fisrt_less_down && i < size) {
-			out[i++] = '.';
-			fisrt_less_down = 0;
-		}
-		up = remainder * 10;
-	}
-}
-
-double calculate_e_double(int iter) {
-	int i = 0;
-	double result = 1.0;
-	double down = 1.0;
-	for (i = 1; i <= iter; ++i)
-	{
-		down = down * 1.0f/i;
-		result += down;
-	}
-	return result;
-}
-
-
-int compare_to_e(const char * in) {
-	const char * const e =
-		"2."
-		"71828182845904523536028747135266249775724709369995";
-	const char * cmp = e;
-	int match = 0;
-	while (*cmp && *in) {
-		if (*cmp++ != *in++)
-			break;
-		++match;
-	}
-	return match;
-}
+#include "exception_callback.h"
+#include "exception_test.h"
+#include "calculate_e.h"
 
 void test_print_int() {
 	print_str("test print interger\n");
@@ -74,6 +17,8 @@ void test_print_int() {
 	printf("    min int:0x%X\n",0x80000000);
 	printf("         -1:%d\n",-1);
 }
+
+
 extern "C" {
 	int main();
 }
@@ -86,29 +31,43 @@ int main()
 	double de = 1.55f;
 	char str[STACK_LIMIT];
 	str[STACK_LIMIT - 1] = 0;
-	while(true){
-		strncpy(str, "Hello World!\n",STACK_LIMIT - 1);
-		print_str("------------------------------------------\n");
-		print_str(str);
-		strncpy(str, "  from AI!  \n",STACK_LIMIT - 1);
-		print_str(str);
-		test_print_int();
-		print_str("\n");
-		print_str("------------ calculate e -----------------\n");
+	syscall::set_exception_callback(exception_callback);
 
-		calculate_e(iter, str, STACK_LIMIT - 1);
-		str[STACK_LIMIT - 1] = 0;
-		match = compare_to_e(str) - 2;
-		printf("using string result is %s, match decimal %d places.\n",str,match);
+	strncpy(str, "Hello World!\n",STACK_LIMIT - 1);
+	print_str("------------------------------------------\n");
+	print_str(str);
+	strncpy(str, "  from AI!  \n",STACK_LIMIT - 1);
+	print_str(str);
+	test_print_int();
+	print_str("\n");
+	print_str("------------ calculate e -----------------\n");
 
-		de = calculate_e_double(iter);
-		snprintf(str,STACK_LIMIT,"%.29lf",de);
-		match = compare_to_e(str) - 2;
-		printf("using double result is %s, match decimal %d places.\n",str,match);
-		print_str("--------------- exit  --------------------\n");
-		strncpy(str, "  Goodbyte! \n",STACK_LIMIT - 1);
-		print_str(str);
+	calculate_e(iter, str, STACK_LIMIT - 1);
+	str[STACK_LIMIT - 1] = 0;
+	match = compare_to_e(str) - 2;
+	printf("using string result is %s, match decimal %d places.\n",str,match);
+
+	de = calculate_e_double(iter);
+	snprintf(str,STACK_LIMIT,"%.29lf",de);
+	match = compare_to_e(str) - 2;
+	printf("using double result is %s, match decimal %d places.\n",str,match);
+	_flush();
+	exception_test();
+
+	print_str("--------------- exit  --------------------\n");
+	strncpy(str, "  Goodbyte! \n",STACK_LIMIT - 1);
+	print_str(str);
+	
+	for(int i = 0 ; i < 1000; ++i){
+		uint32_t hns = syscall::tick();
+		uint32_t us = hns / 10U; 
+		hns %= 10;
+		uint32_t ms = us / 1000U;
+		us %= 1000;
+		uint32_t s = ms / 1000U;
+		ms %= 1000;
+		printf("%2ds%3dms%3dus%d00ns \n",s, ms, us, hns);
+		_flush();
 	}
-
 	syscall::exit();
 }

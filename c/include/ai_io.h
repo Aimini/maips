@@ -6,21 +6,25 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-void _putchar(char c)
-{
 #ifndef  _PRINT_BUF_LEN
 #define _PRINT_BUF_LEN 64
 #endif
 	static char buffer[_PRINT_BUF_LEN];
 	static int top = 0;
+void _flush(){
+	buffer[top] = 0;
+	syscall::print_str(buffer);
+	top = 0;
+}
+
+void _putchar(char c)
+{
 	buffer[top++] = c;
 	if(top >= _PRINT_BUF_LEN - 1){
 		buffer[_PRINT_BUF_LEN - 1] = 0;
 		syscall::print_str(buffer);
 		top = 0;
 	}
-	
 }
 
 void print_str(const char * s){

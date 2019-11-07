@@ -10,22 +10,22 @@ void dump_status(){
     printf("cop(3 2 1 0)  bev  im(7 6 5 4 3 2 1 0)  erl  exl  ie\n");
     print_str("    ");
     for(int i = 0; i < 4; ++i){
-        sys_print_char4(TA(s.cu[3 - i]));
-        sys_print_char4(' ');
+        _putchar(TA(s.cu[3 - i]));
+        _putchar(' ');
     }
     print_str("    ");
-    sys_print_char4(TA(s.bev));
+    _putchar(TA(s.bev));
     print_str("     ");
     for(int i = 0; i < 8; ++i){
-        sys_print_char4(TA(s.im[7 - i]));
-        sys_print_char4(' ');
+        _putchar(TA(s.im[7 - i]));
+        _putchar(' ');
     }
     print_str("    ");
-    sys_print_char4(TA(s.erl));
+    _putchar(TA(s.erl));
     print_str("    ");
-    sys_print_char4(TA(s.exl));
+    _putchar(TA(s.exl));
     print_str("   ");
-    sys_print_char4(TA(s.ie));
+    _putchar(TA(s.ie));
     print_str("\n");
 #undef  TA
 }

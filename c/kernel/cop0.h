@@ -1,14 +1,14 @@
 #ifndef __COP0__
 #define __COP0__
+#include <stdint.h>
 #include "status.h"
-
 #include "cop0.h"
 
 
 
 
-int mfc0(char rd,char sel){
-    int result;
+uint32_t mfc0(char rd,char sel){
+    uint32_t result;
 #define __MFCO_DEF(_RD,_SEL)                          \
     if(rd == _RD && sel == _SEL) {                     \
         asm("mfc0    %0, $" #_RD "," #_SEL             \
@@ -30,7 +30,7 @@ int mfc0(char rd,char sel){
     return 0;
 }
 
-void mtc0(char rd,char sel,int val){
+void mtc0(char rd,char sel,uint32_t val){
 #define __MTCO_DEF(_RD,_SEL)                            \
     if(rd == _RD && sel == _SEL) {                      \
         asm("mtc0    %0, $" #_RD "," #_SEL              \
@@ -64,4 +64,6 @@ status get_status()
 {
     return status(mfc0(12,0));
 }
+
+
 #endif
