@@ -377,19 +377,19 @@ module top_test();
     int total_test = all_targets.size();
     int test_number = 0; //test from index <test_number> to last one
     initial begin
-        // new_test_by_name("ll_sc");
-        if(test === 0) begin    
-            for(int i = test_number ; i < total_test; ++i) begin
-                $display("[%0d]",i);
-                new_test(.target(all_targets[i]));
-            end
+        new_test_by_name("ins");
+        //if(test === 0) begin    
+        //     for(int i = test_number ; i < total_test; ++i) begin
+        //         $display("[%0d]",i);
+        //         new_test(.target(all_targets[i]));
+        //     end
                 
 
-            $display("total test %d",total_test);
-            $finish;
-        end else if (test === 1) begin
-            new_execution("main");    
-        end
+        //     $display("total test %d",total_test);
+        //     $finish;
+        // end else if (test === 1) begin
+        //     new_execution("main");    
+        // end
 
         manual_check_target = '{"", 1'b0,  1'b0,  1'b0,  1'b0,  1'b0,  1'b0};
         // for(int i = manual_target_name.size() - 1; i < manual_target_name.size(); ++i) begin
