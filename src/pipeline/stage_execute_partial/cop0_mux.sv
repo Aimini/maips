@@ -2,8 +2,8 @@
 `define __COP0_MUX__
 
 module cop0_mux(input selector::cop0_source src,
-input logic[31:0] status,rt,mem_addr,
-output logic[31:0] y);
+input logic[31:0] status,rt,mem_addr, wmask_mtc0,
+output logic[31:0] y,wmask);
     logic[31:0] status_out;
 
     always_comb begin : set_status
@@ -32,6 +32,13 @@ output logic[31:0] y);
                 y = mem_addr;
             default:
                 y = status_out;
+        endcase
+
+         case(src)
+            selector::COP0_SRC_RT:
+                wmask = wmask_mtc0;
+            default:
+                wmask = 32'hFFFFFFFF;
         endcase
     end
 endmodule

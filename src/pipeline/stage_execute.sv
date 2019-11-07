@@ -36,7 +36,7 @@ output logic wait_result); //forward
     pipeline_signal_t p_out;
     signals::control_t p_ctl;
 
-    logic[31:0] dest_cop0_data;
+    logic[31:0] dest_cop0_data,dest_cop0_mask;
     extract_instruction unit_ei(p_out.instruction, unpack);
 
     sign_extend #(.NI(16),.NO(32)) 
@@ -46,7 +46,7 @@ output logic wait_result); //forward
     cop0_writer unit_cop0_writer(.src(p_ctl.cop0_src),
     .rd(p_out.dest_cop0_rd),.sel(p_out.dest_cop0_sel),
     .rt(p_out.rt) ,.status(p_out.cop0_excreg.Status),.mem_addr(p_out.mem_addr),
-    .y(dest_cop0_data));
+    .y(dest_cop0_data),.wmask(dest_cop0_mask));
 
 
 /********************************* alu  **************************/

@@ -20,13 +20,14 @@
 module cop0_writer(input selector::cop0_source src,
 input logic[4:0] rd,input logic[2:0] sel,
 input logic[31:0] status, rt, mem_addr,
-output logic[31:0] y);
-    logic[31:0] rt_out;
+output logic[31:0] y,wmask);
+
+    logic[31:0] wmask_mtc0;
     cop0_write_filter unit_cop0_write_filter(
-    .rd(rd),.sel(sel),
-    .din(rt),.dout(rt_out));
+    .rd(rd),.sel(sel), .wmask(wmask_mtc0));
 
     cop0_mux unit_cop0_mux(.src(src),
-        .status(status),.rt(rt_out),.mem_addr(mem_addr),.y(y));
+        .status(status),.rt(rt),.mem_addr(mem_addr),.wmask_mtc0(wmask_mtc0),
+        .y(y), .wmask(wmask));
 endmodule
 `endif

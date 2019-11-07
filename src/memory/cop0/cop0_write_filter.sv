@@ -7,8 +7,7 @@
     */
 module cop0_write_filter(
     input logic [4:0] rd, input logic [2:0] sel,
-    input logic[31:0] din,
-    output logic[31:0] dout);
+    output logic[31:0] wmask);
 
     typedef struct {
         logic[4:0] rd;
@@ -40,7 +39,7 @@ module cop0_write_filter(
     config_t current_config;
     always_comb begin
         current_config =  get_config(rd,sel);
-        dout = current_config.wmask & din;
+        wmask = current_config.wmask;
     end
 endmodule
 `endif

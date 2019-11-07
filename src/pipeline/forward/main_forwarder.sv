@@ -4,10 +4,14 @@
 
 `include "src/common/util.sv"
 `include "src/pipeline/pipeline_interface.sv"
-
+/*
+ f: forward condition
+ data: data to forward
+ mask:bit 1 meaning foward, 0 meaing keep src data
+*/
 typedef struct{
     logic f;
-    logic[31:0] data;
+    logic[31:0] data,mask;
 } fowrad_element_t;
 
 
@@ -23,6 +27,10 @@ typedef struct {
     logic[31:0] and_bit, or_bit;
 } bit_replace_element_t;
 
+/*
+ statusEXL will change when exception happend, 
+ we n
+*/
 typedef struct {
     bit_replace_element_t cop0,status,cause;
 } bit_replace_info_t;
@@ -31,7 +39,11 @@ function automatic void process_forward_data(
     ref pipeline_signal_t ps,
     input forward_info_t forward_info);
 `ifndef PROC_GPR
-`define PROC_GPR(name)  ps.name = forward_info.name.f ? forward_info.name.data : ps.name;
+`define PROC_GPR(name)  \
+    if(forward_info.name.f)\
+        ps.name = forward_info.name.data & forward_info.name.mask  \
+                | ps.name & ~forward_info.name.mask;
+
         `PROC_GPR(rs)
         `PROC_GPR(rt)
         `PROC_GPR(hi)
@@ -94,7 +106,7 @@ execute_replace_info);
     .ei(decode_unpack));
 
     function  automatic  fowrad_element_t get_clear_element();
-        return fowrad_element_t'{1'b0 ,  32'bx};
+        return fowrad_element_t'{1'b0 ,  32'bx ,32'hFFFFFFFF};
     endfunction
 
     function automatic forward_info_t get_clear_info();
@@ -105,7 +117,10 @@ execute_replace_info);
      function automatic fowrad_element_t test_one(input pipeline_signal_t ps, logic [4:0] target);
         if(ps.dest_reg !== 0 & ps.control.write_reg) begin
             if(target === ps.dest_reg) begin
-                return fowrad_element_t'{f:'1 , data: ps.dest_reg_data};
+                return fowrad_element_t'{
+                    f:'1,
+                    data: ps.dest_reg_data,
+                    mask: 32'hFFFFFFFF};
             end
         end
         return get_clear_element();
@@ -114,7 +129,10 @@ execute_replace_info);
     function automatic fowrad_element_t test_cp0(input pipeline_signal_t ps, logic [4:0] rd,logic [4:0] sel);
         if(ps.control.write_cop0 !== 0) begin                                       
             if(ps.dest_cop0_rd === rd &&  ps.dest_cop0_sel === sel) begin 
-                return fowrad_element_t'{f:'1 , data: ps.dest_cop0_data};                                                             
+                return fowrad_element_t'{
+                    f:'1 ,
+                    data: ps.dest_cop0_data,
+                    mask: ps.dest_cop0_mask};                                              
             end                                                                         
         end
         return get_clear_element();

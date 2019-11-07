@@ -396,6 +396,8 @@ module div_mul #(parameter N = 32)
                       write_hi_lo = '0; waiting_result = '0;
             end
         endcase
+        if(clear)
+            waiting_result = '0;
     end
 endmodule
 

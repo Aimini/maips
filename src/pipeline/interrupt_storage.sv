@@ -32,7 +32,7 @@ output logic[N - 1:0] out);
             if(clear) begin
                 int_reg <= '0;
             end else begin
-                int_reg <= sync_mask & synchronizer[SN - 1] | ~sync_mask & in;
+                int_reg <= int_reg | (sync_mask & synchronizer[SN - 1] | ~sync_mask & in);
             end
         end
     end

@@ -47,10 +47,10 @@ module exception_controller(
 
         soft_interrupt = (`GET_STATUS_SOFT_INT(ps_execute) & ~`GET_STATUS_SOFT_INT(ps_memory));
         interrupt_masked =  {hardware_int,soft_interrupt} & status[cop0_info::IDX_STATUS_IM_E:cop0_info::IDX_STATUS_IM_S];
-        interrupt_masked =  {8{interrupt_main_enable}} & interrupt_masked;
+        interrupt_masked = {8{ps_execute.fetch}} &{8{interrupt_main_enable}} & interrupt_masked;
         any_interrupt =  | (interrupt_masked);
         exc_data.ext_int = interrupt_masked[7:2];
-        accept_hardware_interrupt = | (exc_data.ext_int);
+        accept_hardware_interrupt =  | (exc_data.ext_int);
     end
     `undef GET_STATUS_SOFT_INT
 
@@ -87,54 +87,56 @@ module exception_controller(
         exc_data.ce = 'x;
         
      // prevent nullified pipeline signal cause accident exception
-        if(any_interrupt) begin
-            exception_happen = '1;
-            exc_data.exc_code = EXCCODE_INT;
-        end else if(ps_execute.fetch) begin            
-            if(read_error | store_error) begin
+        if(ps_execute.fetch) begin
+            if(any_interrupt) begin
                 exception_happen = '1;
-                exc_data.load_addr = '1;
-                exc_data.badvaddr = ps_execute.pc;
-                if(read_error) begin
-                    exc_data.exc_code = EXCCODE_ADEL;
-                end else begin
-                    exc_data.exc_code = EXCCODE_ADES;
-                end
+                exc_data.exc_code = EXCCODE_INT;
             end else begin
-                case(ps_execute.control.exc_chk)
-                    selector::EXC_CHK_SYSCALL: begin
-                        exc_data.exc_code = EXCCODE_SYS;
-                        exception_happen = '1;
+                if(read_error | store_error) begin
+                    exception_happen = '1;
+                    exc_data.load_addr = '1;
+                    exc_data.badvaddr = ps_execute.pc;
+                    if(read_error) begin
+                        exc_data.exc_code = EXCCODE_ADEL;
+                    end else begin
+                        exc_data.exc_code = EXCCODE_ADES;
                     end
-                    selector::EXC_CHK_BREAK: begin
-                        exc_data.exc_code = EXCCODE_BP;
-                        exception_happen = '1;
-                    end
-                    selector::EXC_CHK_TRAP: begin
-                        exc_data.exc_code = EXCCODE_TR;
-                        if(ps_execute.flag_selected)
+                end else begin
+                    case(ps_execute.control.exc_chk)
+                        selector::EXC_CHK_SYSCALL: begin
+                            exc_data.exc_code = EXCCODE_SYS;
                             exception_happen = '1;
-                    end
-                    selector::EXC_CHK_OVERFLOW: begin
-                        exc_data.exc_code = EXCCODE_OV;
-                        if(ps_execute.flag.overflow)
+                        end
+                        selector::EXC_CHK_BREAK: begin
+                            exc_data.exc_code = EXCCODE_BP;
                             exception_happen = '1;
-                    end
-                    selector::EXC_CHK_RESERVERD: begin
-                        exc_data.exc_code = EXCCODE_RI;
-                        exception_happen = '1;
-                    end
-                    default: begin 
-                        exc_data.exc_code = 'x;
-                        exception_happen = '0;
-                    end
-                endcase
-            end
-            if(~in_kernel_mode & unpack.opcode === main_opcode::COP0) begin
-                exc_data.load_ce = '1;
-                exc_data.ce = '0;
-                exc_data.exc_code = EXCCODE_CU;
-                exception_happen = '1;
+                        end
+                        selector::EXC_CHK_TRAP: begin
+                            exc_data.exc_code = EXCCODE_TR;
+                            if(ps_execute.flag_selected)
+                                exception_happen = '1;
+                        end
+                        selector::EXC_CHK_OVERFLOW: begin
+                            exc_data.exc_code = EXCCODE_OV;
+                            if(ps_execute.flag.overflow)
+                                exception_happen = '1;
+                        end
+                        selector::EXC_CHK_RESERVERD: begin
+                            exc_data.exc_code = EXCCODE_RI;
+                            exception_happen = '1;
+                        end
+                        default: begin 
+                            exc_data.exc_code = 'x;
+                            exception_happen = '0;
+                        end
+                    endcase
+                end
+                if(~in_kernel_mode & unpack.opcode === main_opcode::COP0) begin
+                    exc_data.load_ce = '1;
+                    exc_data.ce = '0;
+                    exc_data.exc_code = EXCCODE_CU;
+                    exception_happen = '1;
+                end
             end
         end
         exc_data.exception_happen = exception_happen;  

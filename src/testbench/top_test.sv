@@ -346,8 +346,8 @@ module top_test();
         `LOAD_MEM_FILE(`user_text, {"c/temp/",program_name,".text.bin"}, "user text");
         `LOAD_MEM_FILE(`user_data, {"c/temp/",program_name,".data.bin"}, "user data");
         /************************** load kernel **********************/
-        `LOAD_MEM_FILE(`kernel_text, "c/temp/kernel.text.bin", "kernel text");
-        `LOAD_MEM_FILE(`kernel_data, "c/temp/kernel.data.bin", "kernel data");
+        `LOAD_MEM_FILE(`kernel_text, "c/kernel/kernel.text.bin", "kernel text");
+        `LOAD_MEM_FILE(`kernel_data, "c/kernel/kernel.data.bin", "kernel data");
 
         $display("#################################################################");
         $display("#################################################################");
@@ -373,7 +373,7 @@ module top_test();
     endtask
 
     check_target_t manual_check_target;
-    int test = 0;
+    int test = 1;
     int total_test = all_targets.size();
     int test_number = 0; //test from index <test_number> to last one
     initial begin

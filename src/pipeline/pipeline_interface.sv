@@ -15,7 +15,7 @@ typedef struct
     logic llbit;
     
     logic[31:0] cop0;               //decode
-    logic[31:0] dest_cop0_data;     //memory, write cop0
+    logic[31:0] dest_cop0_data,dest_cop0_mask;     //memory, write cop0
     logic[4:0]  dest_cop0_rd;     //memory, write cop0
     logic[2:0]  dest_cop0_sel;     //memory, write cop0
     logic dest_llbit_data;
