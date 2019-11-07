@@ -63,7 +63,7 @@ def my_gen1(A,au):
         lambda : random.choice(range(0x8FFFFFF0,0xFFFFFFFF))  ]
     for i in gen_sample:
         for j in gen_sample:
-            previous_value = gen_partial(A, au, i,j,previous_value,time = 2)
-    previous_value = gen_partial(A, au, lambda : numutil.u32(), lambda : numutil.u32(),previous_value,time = 2)
+            previous_value = gen_partial(A, au, i,j,previous_value,time = 1)
+    previous_value = gen_partial(A, au, lambda : numutil.u32(), lambda : numutil.u32(),previous_value,time = 1)
     au.check_and_exit()
 r.gen(my_gen1)
