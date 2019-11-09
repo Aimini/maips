@@ -1,12 +1,14 @@
 
-#define  MIPS_DBG__
 #include <cai_io>
-#include <cai_mem>
 #include <stdarg.h>
 #include <syscall.h>
+#include <cai_mem>
 #include "exception_callback.h"
 #include "exception_test.h"
 #include "calculate_e.h"
+
+
+
 
 void test_print_int() {
 	print_str("test print interger\n");
@@ -23,40 +25,48 @@ extern "C" {
 	int main();
 }
 
-#define STACK_LIMIT 32
 int main()
 {
-	int match = 0;
-	int iter = 11;
-	double de = 1.55f;
+	unsigned int iter = 40;
+	#define STACK_LIMIT 64U
+	#define EINT_LIMIT (STACK_LIMIT / 4U)
 	char str[STACK_LIMIT];
-	str[STACK_LIMIT - 1] = 0;
+	memset_try_word(str, 0 , STACK_LIMIT);
+	
+	uint32_t elong_result[EINT_LIMIT];
 	syscall::set_exception_callback(exception_callback);
-
-	strncpy(str, "Hello World!\n",STACK_LIMIT - 1);
 	print_str("------------------------------------------\n");
-	print_str(str);
-	strncpy(str, "  from AI!  \n",STACK_LIMIT - 1);
-	print_str(str);
+	
+	print_str("Hello World!\n");
+	print_str("  from AI!  \n");
 	test_print_int();
 	print_str("\n");
 	print_str("------------ calculate e -----------------\n");
 
-	calculate_e(iter, str, STACK_LIMIT - 1);
-	str[STACK_LIMIT - 1] = 0;
-	match = compare_to_e(str) - 2;
-	printf("using string result is %s, match decimal %d places.\n",str,match);
+	calculate_e(11, str, STACK_LIMIT - 1);
+	printf("using string result is %s, match decimal %d places.\n",str,compare_to_e(str) - 2);
 
-	de = calculate_e_double(iter);
-	snprintf(str,STACK_LIMIT,"%.29lf",de);
-	match = compare_to_e(str) - 2;
-	printf("using double result is %s, match decimal %d places.\n",str,match);
+	snprintf(str,STACK_LIMIT,"%.29f", calculate_e_double(12));
+	printf("using double result is %s, match decimal %d places.\n",str,compare_to_e(str) - 2);
+
+
+	e_long<EINT_LIMIT>(iter, elong_result);
+	str[0] = '2';
+	str[1] = '.';
+	for(unsigned int i = 1; i < EINT_LIMIT; ++i){
+		unsigned int j = (i - 1) * 4  + 2;
+		if(j >= STACK_LIMIT)
+			break;
+		snprintf(str + j,STACK_LIMIT - j,"%.4d",elong_result[i]);
+	}
+	printf("using long e result is %s, match decimal %d places.\n",str,  compare_to_e(str) - 2);
+
+
 	_flush();
 	exception_test();
 
 	print_str("--------------- exit  --------------------\n");
-	strncpy(str, "  Goodbyte! \n",STACK_LIMIT - 1);
-	print_str(str);
+	print_str("  Goodbyte! \n");
 	
 	while(true){
 		uint32_t hns = syscall::tick();

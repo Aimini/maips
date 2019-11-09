@@ -10,16 +10,15 @@ cmd = ["mips-mti-elf-g++",
        "-flto",
        "-fschedule-insns", "-fschedule-insns2",
        "-march=mips32r2", "-mno-micromips -mabi=32",
-       "-msoft-float", 
+       "-msoft-float", "-fno-builtin",
        "-nostartfiles", #"-nostdlib",
        "-fdata-sections", "-ffunction-sections",
        "-O3",
-       R"crt0.s main.c ..\include\printf-master\printf.c",
+       R"crt0.s main.cpp ..\include\printf-master\printf.c",
        f"-o {outfilename}",
        "-Wl,--gc-sections,-G64,-T,main.lds",
        f"& mips-mti-elf-objdump -S -d {outfilename}",
        f"> {outfilename}.disa.txt"]
-
 
 
 

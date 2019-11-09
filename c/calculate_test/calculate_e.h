@@ -1,10 +1,54 @@
-
-#define  MIPS_DBG__
-#include <cai_io>
+#ifndef __CALCULATE_E__
+#define __CALCULATE_E__
+#include <stdint.h>
 #include <cai_mem>
-#include <stdarg.h>
-#include <syscall.h>
-#include "exception_callback.h"
+
+template<class T,class E>
+T * memset_try_word(T * dest, E value, size_t n){
+	if(((uint32_t)dest) %4 == 0 && n %4 == 0){
+		for(;0 < n;++dest,--n)
+			*dest = value;
+		return dest;
+	}
+	else{
+		return (T *)memset(dest,value,n*sizeof(T));
+	}
+}
+
+template<size_t SIZE = 1000>
+void e_long(unsigned int iter, uint32_t *result,void (*step_callback)(unsigned int step) = 0){
+	
+	const unsigned int max_base = 10000;
+	unsigned int d = 2;
+
+	uint32_t partial[SIZE];
+	memset_try_word(partial + 1, 0UL ,SIZE - 1);
+	partial[0] = 1;
+	memset_try_word(result + 1,  0UL ,SIZE - 1);
+	result[0] = 2;
+
+	for( d = 2;d <= iter; ++d)
+	{
+		unsigned int remainder = 0;
+		for (unsigned int j = 0; j < SIZE; ++j) 
+		{
+			unsigned int current = remainder * max_base;
+			current += partial[j];
+			partial[j] = current / d;
+			remainder = current % d;
+		}
+
+		unsigned int carry = 0; 
+		unsigned int j = SIZE;
+		do
+		{
+			--j;
+			unsigned int current = result[j] + carry + partial[j];
+			result[j] =  current % max_base;
+			carry = current / max_base;
+		}while (j);
+	}
+}
 
 void calculate_e(int iter, char * out, int size) {
 	int i = 0;
@@ -54,8 +98,14 @@ double calculate_e_double(int iter) {
 
 int compare_to_e(const char * in) {
 	const char * const e =
-		"2."
-		"71828182845904523536028747135266249775724709369995";
+		"2."  // 450 + 2
+		"718281828459045235360287471352662497757247093699959574966967627724076630353"
+  		"547594571382178525166427427466391932003059921817413596629043572900334295260"
+  		"595630738132328627943490763233829880753195251019011573834187930702154089149"
+	  	"934884167509244761460668082264800168477411853742345442437107539077744992069"
+		"551702761838606261331384583000752044933826560297606737113200709328709127443"
+  		"747047230696977209310141692836819025515108657463772111252389784425056953696";
+
 	const char * cmp = e;
 	int match = 0;
 	while (*cmp && *in) {
@@ -65,3 +115,4 @@ int compare_to_e(const char * in) {
 	}
 	return match;
 }
+#endif

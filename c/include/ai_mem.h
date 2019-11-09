@@ -1,11 +1,11 @@
 #ifndef __AI_MEM__
 #define __AI_MEM__
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-// typedef unsigned int size_t;
 void *memcpy(void *dest, const void *src, size_t n)
 {
 	char *dp = (char *)dest;
@@ -14,12 +14,13 @@ void *memcpy(void *dest, const void *src, size_t n)
 		*dp++ = *sp++;
 	return dest;
 }
-//https://blog.csdn.net/Hackbuteer1/article/details/7343189
-void *memset(void *dest, int c, size_t n)
+
+
+void * __attribute__((used)) memset(void *dest, int c, size_t n)
 {
 	const unsigned char uc = c;
 	unsigned char *su;
-	for(su = (unsigned char *)dest;0 < n;++su,--n)
+	for(su = (unsigned char *)dest; 0 < n;++su,--n)
 		*su = uc;
 	return dest;
 }
