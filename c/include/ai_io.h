@@ -37,7 +37,7 @@ void print_str(const char * s){
 void print_int(int i) {
 	int max_10base = 1000000000;
 	int still_less_than_base = 1;
-	if (i == 0x80000000)
+	if (i == 1 << 31)
 		print_str("-2147483648");
 	else if (i == 0)
 		_putchar('0');
