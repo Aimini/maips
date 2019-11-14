@@ -7,13 +7,13 @@ class register:
         self.value = 0
 
     def set(self,value):
-        if self.order is not 0:
+        if self.order != 0:
             self.value = value
         else:
             self.value = 0
     
     def get(self):
-        if self.order is not 0:
+        if self.order != 0:
             return self.value
         else:
             return 0
