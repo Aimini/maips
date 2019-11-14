@@ -93,6 +93,13 @@ module stage_decode(pipeline_interface.port pif,input forward_info_t forward, in
     assign p_out.dest_llbit_data = '1;
     
     always_comb begin
+        p_out.instruction = reconnect.signal_out.instruction;
+        p_out.control = ctl;
+        p_out.pcsub4 =  reconnect.signal_out.pcsub4;
+        p_out.pc =      reconnect.signal_out.pc;
+        p_out.pcadd4 =  reconnect.signal_out.pcadd4;
+        p_out.pcadd8 =  reconnect.signal_out.pcadd8;
+        p_out.fetch  =  reconnect.signal_out.fetch;
         //-----------------------------------------------------
         /*      DONT. CHANGE. SEQENCE. */
         p_out.rs = rs_data; p_out.rt = rt_data;
@@ -104,13 +111,6 @@ module stage_decode(pipeline_interface.port pif,input forward_info_t forward, in
         process_forward_data(p_out, forward);
         process_bit_replace(p_out,replace);
         //-----------------------------------------------------
-        p_out.instruction = reconnect.signal_out.instruction;
-        p_out.control = ctl;
-        p_out.pcsub4 =  reconnect.signal_out.pcsub4;
-        p_out.pc =      reconnect.signal_out.pc;
-        p_out.pcadd4 =  reconnect.signal_out.pcadd4;
-        p_out.pcadd8 =  reconnect.signal_out.pcadd8;
-        p_out.fetch  =  reconnect.signal_out.fetch;
     end
 endmodule
 `endif
