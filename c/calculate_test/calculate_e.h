@@ -5,7 +5,7 @@
 
 template<class T,class E>
 T * memset_try_word(T * dest, E value, size_t n){
-	if(((uint32_t)dest) %4 == 0 && n %4 == 0){
+	if(((uint32_t)dest) %4 == 0){
 		for(;0 < n;++dest,--n)
 			*dest = value;
 		return dest;
