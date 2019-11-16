@@ -1,4 +1,3 @@
-
 # compatibility
 ## tech
 * rtype itype core instruction set
@@ -9,8 +8,11 @@
 * ktext segement 0x80000000
 * kdata segement 0x90000000
 * compatible  interrupt mode
-* synthesizable
+* synthesizable(but I haven't run it on FPGA)
+
+
 ## notice
+* don't use it in production environment.
 * no cache
 * no fpu
 * slow mul and div(the most easy method)
@@ -148,7 +150,7 @@ Yes
 * AdEL
   * unalign load\fetch
   * load kernel segment in user mode
-* AdEL
+* AdES
   * unalign store
   * store kernel segment in user mode
 * Syscall
